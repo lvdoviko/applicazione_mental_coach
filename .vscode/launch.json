@@ -1,0 +1,34 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Web (Chrome)",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "args": [
+        "--web-renderer", "html",
+        "--web-port", "8080"
+      ]
+    },
+    {
+      "name": "Flutter Web Mobile Preview",
+      "type": "dart", 
+      "request": "launch",
+      "program": "lib/main.dart",
+      "deviceId": "web-server",
+      "args": [
+        "--web-renderer", "html",
+        "--web-port", "8080"
+      ]
+    },
+    {
+      "name": "Flutter (Linux Desktop)",
+      "type": "dart",
+      "request": "launch", 
+      "program": "lib/main.dart",
+      "deviceId": "linux"
+    }
+  ]
+}

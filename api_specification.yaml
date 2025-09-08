@@ -1,0 +1,1053 @@
+openapi: 3.0.3
+info:
+  title: AI Wellbeing Coach API
+  description: |
+    REST API for AI Wellbeing Coach mobile application.
+    Supports mental wellness coaching for athletes and sports teams.
+    
+    ## Features
+    - Real-time chat with AI coach
+    - Health data integration (Apple HealthKit, Google Health Connect)
+    - Avatar customization
+    - Human coach escalation
+    - GDPR-compliant data management
+    
+    ## Authentication
+    All endpoints require JWT authentication except for public endpoints.
+    
+    ## Rate Limiting
+    - 100 requests per day for free tier
+    - 1000 requests per hour for authenticated users
+    - Chat endpoints: 20 messages per hour
+    
+    ## Privacy & GDPR
+    - All data encrypted in transit and at rest
+    - User data export available
+    - Account deletion with data purge
+  version: 1.0.0
+  contact:
+    name: AI Wellbeing Coach Support
+    email: support@aiwellbeingcoach.com
+    url: https://aiwellbeingcoach.com/support
+  license:
+    name: Private
+    url: https://aiwellbeingcoach.com/terms
+
+servers:
+  - url: https://api.aiwellbeingcoach.com/v1
+    description: Production server
+  - url: https://staging-api.aiwellbeingcoach.com/v1
+    description: Staging server
+
+security:
+  - bearerAuth: []
+
+paths:
+  # Authentication
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user with email and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: athlete@example.com
+                password:
+                  type: string
+                  format: password
+                  example: securePassword123
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      description: Create new user account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                name:
+                  type: string
+                  example: John Doe
+                sport:
+                  type: string
+                  example: Basketball
+                team:
+                  type: string
+                  example: Lakers
+                role:
+                  type: string
+                  enum: [athlete, coach, team_manager]
+                consent_data_processing:
+                  type: boolean
+                  example: true
+                consent_health_data:
+                  type: boolean
+                  example: true
+              required:
+                - email
+                - password
+                - name
+                - consent_data_processing
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+              required:
+                - refresh_token
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # User Management
+  /user/profile:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags:
+        - User
+      summary: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # Chat Endpoints
+  /chat/send:
+    post:
+      tags:
+        - Chat
+      summary: Send message to AI coach
+      description: Send a message and receive AI coach response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  maxLength: 2000
+                  example: "I'm feeling overwhelmed with training lately"
+                session_id:
+                  type: string
+                  format: uuid
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+                context:
+                  type: object
+                  description: Additional context for AI processing
+                  properties:
+                    mood_score:
+                      type: number
+                      minimum: 1
+                      maximum: 10
+                    stress_level:
+                      type: number
+                      minimum: 1
+                      maximum: 10
+                    recent_activities:
+                      type: array
+                      items:
+                        type: string
+              required:
+                - message
+      responses:
+        '200':
+          description: Message sent and response received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Daily message limit reached (100/100)"
+                  reset_at:
+                    type: string
+                    format: date-time
+
+  /chat/stream:
+    get:
+      tags:
+        - Chat
+      summary: WebSocket endpoint for real-time chat
+      description: |
+        WebSocket connection for real-time chat with AI coach.
+        
+        ## Connection
+        - Upgrade: websocket
+        - Sec-WebSocket-Protocol: chat-v1
+        
+        ## Message Format
+        ```json
+        {
+          "type": "message|typing|status",
+          "content": "message content",
+          "session_id": "uuid",
+          "timestamp": "ISO8601"
+        }
+        ```
+      responses:
+        '101':
+          description: WebSocket connection established
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /chat/sessions:
+    get:
+      tags:
+        - Chat
+      summary: Get chat sessions
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Chat sessions retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ChatSession'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+
+  /chat/sessions/{sessionId}:
+    get:
+      tags:
+        - Chat
+      summary: Get specific chat session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chat session retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatSession'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Health Data Integration
+  /health/connect:
+    post:
+      tags:
+        - Health
+      summary: Connect health data source
+      description: Connect Apple HealthKit or Google Health Connect
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                platform:
+                  type: string
+                  enum: [apple_health, google_health]
+                  example: apple_health
+                auth_token:
+                  type: string
+                  description: Platform-specific authentication token
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    enum: [steps, heart_rate, sleep, workouts, mindfulness]
+                  example: [steps, heart_rate, sleep]
+              required:
+                - platform
+                - auth_token
+                - permissions
+      responses:
+        '200':
+          description: Health data source connected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: connected
+                  platform:
+                    type: string
+                    example: apple_health
+                  connected_at:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /health/sync:
+    post:
+      tags:
+        - Health
+      summary: Sync health data
+      description: Trigger manual health data sync
+      responses:
+        '200':
+          description: Health data sync initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sync_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    example: initiated
+                  estimated_completion:
+                    type: string
+                    format: date-time
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /health/data:
+    get:
+      tags:
+        - Health
+      summary: Get health metrics
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [steps, heart_rate, sleep, workouts, mindfulness]
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Health metrics retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HealthMetric'
+                  summary:
+                    type: object
+                    properties:
+                      total_steps:
+                        type: integer
+                      avg_heart_rate:
+                        type: number
+                      sleep_score:
+                        type: number
+                      workouts_count:
+                        type: integer
+
+  # Avatar Customization
+  /avatar:
+    get:
+      tags:
+        - Avatar
+      summary: Get current avatar configuration
+      responses:
+        '200':
+          description: Avatar configuration retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvatarConfig'
+
+    put:
+      tags:
+        - Avatar
+      summary: Update avatar configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvatarConfig'
+      responses:
+        '200':
+          description: Avatar configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvatarConfig'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # Escalation & Support
+  /escalation:
+    post:
+      tags:
+        - Support
+      summary: Request human coach support
+      description: Escalate to human coach for additional support
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  enum: [needs_human_support, emergency_support, technical_issue, feedback_complaint, general_inquiry]
+                  example: needs_human_support
+                message:
+                  type: string
+                  maxLength: 2000
+                  example: "I need to speak with a human coach about my anxiety levels"
+                urgency:
+                  type: string
+                  enum: [low, medium, high, critical]
+                  example: medium
+                context:
+                  type: object
+                  description: Chat session context
+                  properties:
+                    session_id:
+                      type: string
+                      format: uuid
+                    messages_count:
+                      type: integer
+                    last_message:
+                      type: string
+              required:
+                - reason
+                - message
+      responses:
+        '201':
+          description: Escalation request submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    example: submitted
+                  estimated_response_time:
+                    type: string
+                    example: "24 hours"
+                  reference_number:
+                    type: string
+                    example: "ESC-2024-001234"
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /escalation/{requestId}:
+    get:
+      tags:
+        - Support
+      summary: Get escalation request status
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Escalation request status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    enum: [submitted, in_progress, responded, closed]
+                  submitted_at:
+                    type: string
+                    format: date-time
+                  responded_at:
+                    type: string
+                    format: date-time
+                  coach_name:
+                    type: string
+                    example: "Sarah Johnson"
+                  response:
+                    type: string
+
+  # Analytics & Insights
+  /analytics/dashboard:
+    get:
+      tags:
+        - Analytics
+      summary: Get dashboard analytics
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month, year]
+            default: week
+      responses:
+        '200':
+          description: Dashboard analytics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardAnalytics'
+
+  /analytics/export:
+    post:
+      tags:
+        - Analytics
+      summary: Request data export (GDPR)
+      description: Request export of all user data for GDPR compliance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  enum: [json, csv, xml]
+                  default: json
+                include:
+                  type: array
+                  items:
+                    type: string
+                    enum: [profile, chat_history, health_data, avatar_config, settings]
+                  default: [profile, chat_history, avatar_config, settings]
+              required:
+                - format
+      responses:
+        '202':
+          description: Export request accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  export_id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    example: processing
+                  estimated_completion:
+                    type: string
+                    format: date-time
+                  download_expires_at:
+                    type: string
+                    format: date-time
+
+  # Account Management
+  /account/delete:
+    delete:
+      tags:
+        - Account
+      summary: Delete user account and all data
+      description: |
+        Permanently delete user account and all associated data.
+        This action cannot be undone and complies with GDPR right to erasure.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirmation:
+                  type: string
+                  example: "DELETE MY ACCOUNT"
+                password:
+                  type: string
+                  format: password
+                reason:
+                  type: string
+                  example: "No longer needed"
+              required:
+                - confirmation
+                - password
+      responses:
+        '202':
+          description: Account deletion scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deletion_id:
+                    type: string
+                    format: uuid
+                  scheduled_at:
+                    type: string
+                    format: date-time
+                    description: Account will be deleted after 7-day grace period
+                  cancellation_deadline:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+        refresh_token:
+          type: string
+          description: JWT refresh token
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          description: Token expiration in seconds
+          example: 3600
+        user:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        sport:
+          type: string
+        team:
+          type: string
+        role:
+          type: string
+          enum: [athlete, coach, team_manager]
+        avatar_config:
+          $ref: '#/components/schemas/AvatarConfig'
+        created_at:
+          type: string
+          format: date-time
+        last_active:
+          type: string
+          format: date-time
+        preferences:
+          type: object
+          properties:
+            notifications_enabled:
+              type: boolean
+            health_data_enabled:
+              type: boolean
+            language:
+              type: string
+              example: en
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        sport:
+          type: string
+        team:
+          type: string
+        preferences:
+          type: object
+          properties:
+            notifications_enabled:
+              type: boolean
+            health_data_enabled:
+              type: boolean
+            language:
+              type: string
+
+    ChatResponse:
+      type: object
+      properties:
+        message_id:
+          type: string
+          format: uuid
+        ai_response:
+          type: string
+          example: "I understand that training can feel overwhelming. It's completely normal to feel this way."
+        session_id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        quick_replies:
+          type: array
+          items:
+            type: string
+          example: ["Tell me more", "I need help", "Talk to human coach"]
+        context_update:
+          type: object
+          description: Updated context for next messages
+
+    ChatSession:
+      type: object
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+        message_count:
+          type: integer
+        summary:
+          type: string
+          description: AI-generated session summary
+        mood_progression:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              mood_score:
+                type: number
+                minimum: 1
+                maximum: 10
+
+    HealthMetric:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [steps, heart_rate, sleep, workouts, mindfulness]
+        value:
+          type: number
+        unit:
+          type: string
+          example: "steps"
+        timestamp:
+          type: string
+          format: date-time
+        source:
+          type: string
+          example: "Apple Health"
+
+    AvatarConfig:
+      type: object
+      properties:
+        style:
+          type: string
+          enum: [modern, classic, sport, minimal]
+          example: modern
+        expression:
+          type: string
+          enum: [neutral, happy, focused, determined]
+          example: neutral
+        primary_color:
+          type: string
+          format: hex-color
+          example: "#0F5860"
+        secondary_color:
+          type: string
+          format: hex-color
+          example: "#2B9ED9"
+        accessory:
+          type: string
+          enum: [none, cap, headband, glasses]
+          example: none
+        updated_at:
+          type: string
+          format: date-time
+
+    DashboardAnalytics:
+      type: object
+      properties:
+        period:
+          type: string
+          example: week
+        wellness_metrics:
+          type: object
+          properties:
+            mood_score:
+              type: object
+              properties:
+                current:
+                  type: number
+                  example: 8.2
+                trend:
+                  type: string
+                  enum: [up, down, neutral]
+                  example: up
+                change:
+                  type: number
+                  example: 0.5
+            stress_level:
+              type: object
+              properties:
+                current:
+                  type: number
+                  example: 3.1
+                trend:
+                  type: string
+                  example: down
+                change:
+                  type: number
+                  example: -1.2
+        chat_activity:
+          type: object
+          properties:
+            sessions_count:
+              type: integer
+              example: 23
+            messages_count:
+              type: integer
+              example: 142
+            avg_session_duration:
+              type: integer
+              description: Average session duration in minutes
+              example: 15
+        health_integration:
+          type: object
+          properties:
+            steps_today:
+              type: integer
+              example: 8542
+            avg_heart_rate:
+              type: number
+              example: 72
+            workouts_this_week:
+              type: integer
+              example: 3
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Conflict:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Rate limit exceeded"
+            code: "RATE_LIMIT_EXCEEDED"
+            details:
+              limit: 100
+              window: "24h"
+              reset_at: "2024-01-01T00:00:00Z"
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: User
+    description: User profile management
+  - name: Chat
+    description: AI coach chat functionality
+  - name: Health
+    description: Health data integration
+  - name: Avatar
+    description: Avatar customization
+  - name: Support
+    description: Human coach escalation and support
+  - name: Analytics
+    description: User analytics and insights
+  - name: Account
+    description: Account management and deletion

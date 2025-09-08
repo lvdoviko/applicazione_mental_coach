@@ -1,0 +1,24 @@
+{
+  "livePreview.defaultPreviewPath": "/index.html",
+  "livePreview.portNumber": 8080,
+  "browser-preview.startUrl": "http://localhost:8080",
+  "browser-preview.chromeExecutable": "",
+  "flutter.flutterPath": "",
+  "flutter.androidSdk": "",
+  "flutter.showInspectorNotificationsForWidgetErrors": true,
+  "flutter.enableSdkFormatter": true,
+  "dart.previewLsp": true,
+  "dart.debugExternalLibraries": false,
+  "dart.debugSdkLibraries": false,
+  
+  // Mobile preview settings
+  "flutter.web.debug.mode": "debug",
+  "flutter.web.auto.runDebug": true,
+  
+  // Browser preview mobile emulation
+  "browser-preview.windowSize": {
+    "width": 414,
+    "height": 896
+  },
+  "browser-preview.userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+}
