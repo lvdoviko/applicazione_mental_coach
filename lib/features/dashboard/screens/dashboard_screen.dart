@@ -76,13 +76,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.deepTeal.withOpacity(0.1),
-            AppColors.softBlue.withOpacity(0.1),
+            AppColors.warmTerracotta.withOpacity(0.1),
+            AppColors.warmGold.withOpacity(0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.deepTeal.withOpacity(0.2),
+          color: AppColors.warmTerracotta.withOpacity(0.2),
         ),
       ),
       child: Column(
@@ -93,12 +93,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: AppColors.deepTeal.withOpacity(0.2),
+                  color: AppColors.warmTerracotta.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.psychology,
-                  color: AppColors.deepTeal,
+                  color: AppColors.warmTerracotta,
                   size: 24,
                 ),
               ),
@@ -138,7 +138,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             icon: Icons.chat_bubble_outline,
             label: 'Sessions',
             value: '23',
-            color: AppColors.softBlue,
+            color: AppColors.warmGold,
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -147,7 +147,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             icon: Icons.favorite_border,
             label: 'Mood Score',
             value: '8.2',
-            color: AppColors.lime,
+            color: AppColors.warmYellow,
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -156,7 +156,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             icon: Icons.trending_up,
             label: 'Progress',
             value: '+15%',
-            color: AppColors.orange,
+            color: AppColors.warmOrange,
           ),
         ),
       ],
@@ -220,7 +220,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     vertical: AppSpacing.sm,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.deepTeal : Colors.transparent,
+                    color: isSelected ? AppColors.warmTerracotta : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -306,10 +306,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: AppColors.lime.withOpacity(0.05),
+        color: AppColors.warmYellow.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.lime.withOpacity(0.2),
+          color: AppColors.warmYellow.withOpacity(0.2),
         ),
       ),
       child: Column(
@@ -319,7 +319,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Icon(
                 Icons.favorite,
-                color: AppColors.lime,
+                color: AppColors.warmYellow,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -377,14 +377,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       children: [
         Icon(
           icon,
-          color: AppColors.lime,
+          color: AppColors.warmYellow,
           size: 20,
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: AppTypography.h4.copyWith(
-            color: AppColors.lime,
+            color: AppColors.warmYellow,
             fontWeight: AppTypography.bold,
           ),
           textAlign: TextAlign.center,
@@ -489,8 +489,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.softBlue.withOpacity(0.1),
-            AppColors.orange.withOpacity(0.1),
+            AppColors.warmGold.withOpacity(0.1),
+            AppColors.warmOrange.withOpacity(0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -502,7 +502,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Icon(
                 Icons.lightbulb_outline,
-                color: AppColors.orange,
+                color: AppColors.warmOrange,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -561,28 +561,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         subtitle: 'Discussed stress management techniques',
         time: '2h ago',
         icon: Icons.chat_bubble_outline,
-        color: AppColors.deepTeal,
+        color: AppColors.warmTerracotta,
       ),
       DashboardActivity(
         title: 'Workout Completed',
         subtitle: 'Strength training • 45 minutes',
         time: '5h ago',
         icon: Icons.fitness_center,
-        color: AppColors.lime,
+        color: AppColors.warmYellow,
       ),
       DashboardActivity(
         title: 'Mood Check-in',
         subtitle: 'Feeling energized and focused',
         time: '1d ago',
         icon: Icons.mood,
-        color: AppColors.orange,
+        color: AppColors.warmOrange,
       ),
       DashboardActivity(
         title: 'Avatar Updated',
         subtitle: 'Changed expression to determined',
         time: '2d ago',
         icon: Icons.face,
-        color: AppColors.softBlue,
+        color: AppColors.warmGold,
       ),
     ];
   }

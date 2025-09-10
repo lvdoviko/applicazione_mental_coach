@@ -53,11 +53,11 @@ class AppTheme {
   // Color Schemes
   static const ColorScheme _lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: AppColors.deepTeal,
+    primary: AppColors.warmTerracotta,
     onPrimary: AppColors.white,
-    secondary: AppColors.softBlue,
+    secondary: AppColors.warmOrange,
     onSecondary: AppColors.white,
-    tertiary: AppColors.lime,
+    tertiary: AppColors.warmYellow,
     onTertiary: AppColors.textPrimary,
     error: AppColors.error,
     onError: AppColors.white,
@@ -71,11 +71,11 @@ class AppTheme {
 
   static const ColorScheme _darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: AppColors.softBlue,
+    primary: AppColors.warmGold,
     onPrimary: AppColors.white,
-    secondary: AppColors.lime,
+    secondary: AppColors.warmYellow,
     onSecondary: AppColors.textPrimary,
-    tertiary: AppColors.orange,
+    tertiary: AppColors.warmOrange,
     onTertiary: AppColors.white,
     error: AppColors.error,
     onError: AppColors.white,
@@ -119,7 +119,7 @@ class AppTheme {
         backgroundColor: AppColors.white,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
         titleTextStyle: AppTypography.h3,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       );
@@ -128,7 +128,7 @@ class AppTheme {
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkTextPrimary,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
         titleTextStyle: AppTypography.h3Dark,
         systemOverlayStyle: SystemUiOverlayStyle.light,
       );
@@ -136,7 +136,7 @@ class AppTheme {
   static ElevatedButtonThemeData get _elevatedButtonTheme =>
       ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.deepTeal,
+          backgroundColor: AppColors.warmTerracotta,
           foregroundColor: AppColors.white,
           textStyle: AppTypography.buttonLarge,
           shape: RoundedRectangleBorder(
@@ -150,7 +150,7 @@ class AppTheme {
   static ElevatedButtonThemeData get _darkElevatedButtonTheme =>
       ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.softBlue,
+          backgroundColor: AppColors.warmGold,
           foregroundColor: AppColors.white,
           textStyle: AppTypography.buttonLarge,
           shape: RoundedRectangleBorder(
@@ -163,7 +163,7 @@ class AppTheme {
 
   static TextButtonThemeData get _textButtonTheme => TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.deepTeal,
+          foregroundColor: AppColors.warmTerracotta,
           textStyle: AppTypography.buttonMedium,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -173,7 +173,7 @@ class AppTheme {
 
   static TextButtonThemeData get _darkTextButtonTheme => TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.softBlue,
+          foregroundColor: AppColors.warmGold,
           textStyle: AppTypography.buttonMedium,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -184,9 +184,9 @@ class AppTheme {
   static OutlinedButtonThemeData get _outlinedButtonTheme =>
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.deepTeal,
+          foregroundColor: AppColors.warmTerracotta,
           textStyle: AppTypography.buttonMedium,
-          side: const BorderSide(color: AppColors.deepTeal),
+          side: const BorderSide(color: AppColors.warmTerracotta),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -197,9 +197,9 @@ class AppTheme {
   static OutlinedButtonThemeData get _darkOutlinedButtonTheme =>
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.softBlue,
+          foregroundColor: AppColors.warmGold,
           textStyle: AppTypography.buttonMedium,
-          side: const BorderSide(color: AppColors.softBlue),
+          side: const BorderSide(color: AppColors.warmGold),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -221,7 +221,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.deepTeal, width: 2),
+          borderSide: const BorderSide(color: AppColors.warmTerracotta, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -245,7 +245,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.softBlue, width: 2),
+          borderSide: const BorderSide(color: AppColors.warmGold, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -256,7 +256,7 @@ class AppTheme {
             AppTypography.bodyMedium.copyWith(color: AppColors.darkTextSecondary),
       );
 
-  static CardTheme get _cardTheme => CardTheme(
+  static CardThemeData get _cardTheme => CardThemeData(
         color: AppColors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -265,7 +265,7 @@ class AppTheme {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       );
 
-  static CardTheme get _darkCardTheme => CardTheme(
+  static CardThemeData get _darkCardTheme => CardThemeData(
         color: AppColors.darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -276,7 +276,7 @@ class AppTheme {
 
   static ChipThemeData get _chipTheme => ChipThemeData(
         backgroundColor: AppColors.grey100,
-        selectedColor: AppColors.deepTeal,
+        selectedColor: AppColors.warmTerracotta,
         labelStyle: AppTypography.bodySmall,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -285,7 +285,7 @@ class AppTheme {
 
   static ChipThemeData get _darkChipTheme => ChipThemeData(
         backgroundColor: AppColors.grey700,
-        selectedColor: AppColors.softBlue,
+        selectedColor: AppColors.warmGold,
         labelStyle: AppTypography.bodySmall.copyWith(color: AppColors.darkTextPrimary),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -294,34 +294,38 @@ class AppTheme {
 
   static FloatingActionButtonThemeData get _fabTheme =>
       const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.deepTeal,
+        backgroundColor: AppColors.warmTerracotta,
         foregroundColor: AppColors.white,
+        elevation: 0,
       );
 
   static FloatingActionButtonThemeData get _darkFabTheme =>
       const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.softBlue,
+        backgroundColor: AppColors.warmGold,
         foregroundColor: AppColors.white,
+        elevation: 0,
       );
 
   static BottomNavigationBarThemeData get _bottomNavTheme =>
       BottomNavigationBarThemeData(
         backgroundColor: AppColors.white,
-        selectedItemColor: AppColors.deepTeal,
+        selectedItemColor: AppColors.warmTerracotta,
         unselectedItemColor: AppColors.grey500,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: AppTypography.caption,
         unselectedLabelStyle: AppTypography.caption,
+        elevation: 0,
       );
 
   static BottomNavigationBarThemeData get _darkBottomNavTheme =>
       BottomNavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
-        selectedItemColor: AppColors.softBlue,
+        selectedItemColor: AppColors.warmGold,
         unselectedItemColor: AppColors.darkTextSecondary,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: AppTypography.captionDark,
         unselectedLabelStyle: AppTypography.captionDark,
+        elevation: 0,
       );
 
   static DividerThemeData get _dividerTheme => const DividerThemeData(
@@ -339,7 +343,7 @@ class AppTheme {
   static SwitchThemeData get _switchTheme => SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.deepTeal;
+            return AppColors.warmTerracotta;
           }
           return AppColors.grey400;
         }),
@@ -348,7 +352,7 @@ class AppTheme {
   static SwitchThemeData get _darkSwitchTheme => SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.softBlue;
+            return AppColors.warmGold;
           }
           return AppColors.grey400;
         }),

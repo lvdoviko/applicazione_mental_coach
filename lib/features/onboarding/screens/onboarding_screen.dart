@@ -7,6 +7,7 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/core/routing/app_router.dart';
+import 'package:applicazione_mental_coach/design_system/components/lofi_wave_background.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -24,28 +25,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: 'Welcome to Your AI Coach',
       subtitle: 'Supporting your mental wellness journey with empathy and understanding',
       icon: Icons.psychology,
-      primaryColor: AppColors.deepTeal,
+      primaryColor: AppColors.warmTerracotta,
       content: 'Your personal AI wellness coach is here to provide support, guidance, and encouragement tailored specifically for athletes and sports teams.',
     ),
     OnboardingPage(
       title: 'Privacy & Data Security',
       subtitle: 'Your data is encrypted and secure',
       icon: Icons.security,
-      primaryColor: AppColors.softBlue,
+      primaryColor: AppColors.warmGold,
       content: 'We use end-to-end encryption and follow GDPR compliance. Your conversations and health data are never shared without your explicit consent.',
     ),
     OnboardingPage(
       title: 'Health Data Integration',
       subtitle: 'Connect with your wearables for personalized insights',
       icon: Icons.favorite,
-      primaryColor: AppColors.lime,
+      primaryColor: AppColors.warmYellow,
       content: 'Securely connect your Apple HealthKit or Google Health Connect data to receive personalized wellness recommendations.',
     ),
     OnboardingPage(
       title: 'Human Support Available',
       subtitle: 'Connect with qualified coaches when you need it',
       icon: Icons.support_agent,
-      primaryColor: AppColors.orange,
+      primaryColor: AppColors.warmOrange,
       content: 'While our AI provides 24/7 support, you can always escalate to speak with a qualified human coach for additional guidance.',
     ),
   ];
@@ -59,22 +60,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildSkipButton(),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentPage = index),
-                itemCount: _pages.length,
-                itemBuilder: (context, index) => _buildPage(_pages[index]),
-              ),
+      body: Stack(
+        children: [
+          // Animated wave background
+          const LofiWaveBackground(),
+          
+          // Main content
+          SafeArea(
+            child: Column(
+              children: [
+                _buildSkipButton(),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) => setState(() => _currentPage = index),
+                    itemCount: _pages.length,
+                    itemBuilder: (context, index) => _buildPage(_pages[index]),
+                  ),
+                ),
+                _buildBottomSection(),
+              ],
             ),
-            _buildBottomSection(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -143,13 +151,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ],
           ),
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: page.primaryColor.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
         ),
         child: Icon(
           page.icon,
@@ -211,7 +212,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           height: 8,
           decoration: BoxDecoration(
             color: _currentPage == index
-                ? AppColors.deepTeal
+                ? AppColors.warmTerracotta
                 : AppColors.grey300,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -240,7 +241,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Expanded(
           flex: _currentPage > 0 ? 1 : 2,
           child: ElevatedButton(
-            onPressed: isLastPage ? _requestPermissions : _nextPage,
+            onPressed: isLastPage ? _simpleCompleteOnboarding : _nextPage,
             child: Text(isLastPage ? 'Get Started' : 'Continue'),
           ),
         ),
@@ -257,9 +258,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _requestPermissions() async {
     try {
-      // Request notification permission
-      await Permission.notification.request();
+      // Skip permissions for now to isolate the crash
+      print('DEBUG: Starting permission requests...');
       
+      // Request notification permission
+      print('DEBUG: Requesting notification permission...');
+      await Permission.notification.request();
+      print('DEBUG: Notification permission requested');
+      
+      // Comment out health permissions temporarily to isolate crash
+      /*
       // Request health data permission
       if (await Health().hasPermissions([
         HealthDataType.STEPS,
@@ -272,17 +280,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           HealthDataType.WORKOUT,
         ]);
       }
+      */
       
+      print('DEBUG: Completing onboarding...');
       _completeOnboarding();
     } catch (e) {
       // Handle permission errors gracefully
+      print('DEBUG: Error in permissions: $e');
       _completeOnboarding();
     }
   }
 
+  void _simpleCompleteOnboarding() {
+    print('DEBUG: Simple complete onboarding called');
+    try {
+      AppRoute.chat.go(context);
+    } catch (e) {
+      print('DEBUG: Error in simple complete: $e');
+    }
+  }
+
   void _completeOnboarding() {
-    // TODO: Save onboarding completion status
-    AppRoute.chat.go(context);
+    try {
+      print('DEBUG: In _completeOnboarding function...');
+      // TODO: Save onboarding completion status
+      print('DEBUG: About to navigate to chat...');
+      AppRoute.chat.go(context);
+      print('DEBUG: Navigation to chat completed');
+    } catch (e) {
+      print('DEBUG: Error in _completeOnboarding: $e');
+      print('DEBUG: Stack trace: ${StackTrace.current}');
+    }
   }
 }
 

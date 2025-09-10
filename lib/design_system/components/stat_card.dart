@@ -104,13 +104,6 @@ class _StatCardState extends State<StatCard>
                   color: _getBorderColor(context),
                   width: 1,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: _getAccentColor().withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: widget.isLoading
                   ? _buildLoadingState()
@@ -281,9 +274,9 @@ class _StatCardState extends State<StatCard>
   Color _getAccentColor() {
     switch (widget.variant) {
       case StatCardVariant.primary:
-        return AppColors.deepTeal;
+        return AppColors.warmTerracotta;
       case StatCardVariant.secondary:
-        return AppColors.softBlue;
+        return AppColors.warmGold;
       case StatCardVariant.success:
         return AppColors.success;
       case StatCardVariant.warning:

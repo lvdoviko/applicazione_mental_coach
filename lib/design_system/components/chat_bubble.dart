@@ -74,8 +74,8 @@ class ChatBubble extends StatelessWidget {
       height: 32,
       decoration: BoxDecoration(
         color: type == ChatBubbleType.user
-            ? AppColors.deepTeal
-            : AppColors.softBlue,
+            ? AppColors.warmTerracotta
+            : AppColors.warmGold,
         shape: BoxShape.circle,
       ),
       child: Icon(
@@ -113,13 +113,6 @@ class ChatBubble extends StatelessWidget {
           bottomLeft: Radius.circular(type == ChatBubbleType.user ? 16 : 4),
           bottomRight: Radius.circular(type == ChatBubbleType.user ? 4 : 16),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Text(
         message,

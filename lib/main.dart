@@ -7,7 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:applicazione_mental_coach/core/theme/app_theme.dart';
 import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/core/config/app_config.dart';
-// import 'package:applicazione_mental_coach/flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,16 +55,8 @@ class AIWellbeingCoachApp extends ConsumerWidget {
       themeMode: ThemeMode.system, // A/B test hook: could be user preference
       
       // Localization
-      localizationsDelegates: const [
-        // AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en', ''),
-        Locale('it', ''),
-      ],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       
       // Routing
       routerConfig: router,

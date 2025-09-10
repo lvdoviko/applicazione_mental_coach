@@ -19,8 +19,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
   AvatarConfig _currentConfig = const AvatarConfig(
     style: AvatarStyle.modern,
     expression: AvatarExpression.neutral,
-    primaryColor: AppColors.deepTeal,
-    secondaryColor: AppColors.softBlue,
+    primaryColor: AppColors.warmTerracotta,
+    secondaryColor: AppColors.warmGold,
   );
 
   @override
@@ -89,8 +89,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        indicatorColor: AppColors.deepTeal,
-        labelColor: AppColors.deepTeal,
+        indicatorColor: AppColors.warmTerracotta,
+        labelColor: AppColors.warmTerracotta,
         unselectedLabelColor: AppColors.grey500,
         labelStyle: AppTypography.bodyMedium.copyWith(
           fontWeight: AppTypography.medium,
@@ -165,19 +165,12 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected 
-                ? AppColors.deepTeal 
+                ? AppColors.warmTerracotta 
                 : (Theme.of(context).brightness == Brightness.dark 
                     ? AppColors.grey700 
                     : AppColors.grey200),
             width: isSelected ? 2 : 1,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: AppColors.deepTeal.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ] : null,
         ),
         child: Column(
           children: [
@@ -197,7 +190,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
                     preset.name,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: AppTypography.medium,
-                      color: isSelected ? AppColors.deepTeal : null,
+                      color: isSelected ? AppColors.warmTerracotta : null,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -228,8 +221,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.classic,
           expression: AvatarExpression.determined,
-          primaryColor: AppColors.deepTeal,
-          secondaryColor: AppColors.softBlue,
+          primaryColor: AppColors.warmTerracotta,
+          secondaryColor: AppColors.warmGold,
           accessory: 'cap',
         ),
       ),
@@ -239,8 +232,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.modern,
           expression: AvatarExpression.focused,
-          primaryColor: AppColors.softBlue,
-          secondaryColor: AppColors.lime,
+          primaryColor: AppColors.warmGold,
+          secondaryColor: AppColors.warmYellow,
           accessory: 'headband',
         ),
       ),
@@ -250,8 +243,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.minimal,
           expression: AvatarExpression.neutral,
-          primaryColor: AppColors.lime,
-          secondaryColor: AppColors.orange,
+          primaryColor: AppColors.warmYellow,
+          secondaryColor: AppColors.warmOrange,
         ),
       ),
       AvatarPreset(
@@ -260,7 +253,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.sport,
           expression: AvatarExpression.happy,
-          primaryColor: AppColors.orange,
+          primaryColor: AppColors.warmOrange,
           secondaryColor: Color(0xFF8B5CF6),
         ),
       ),
@@ -271,7 +264,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
           style: AvatarStyle.modern,
           expression: AvatarExpression.determined,
           primaryColor: Color(0xFFEC4899),
-          secondaryColor: AppColors.deepTeal,
+          secondaryColor: AppColors.warmTerracotta,
           accessory: 'glasses',
         ),
       ),
@@ -282,7 +275,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
           style: AvatarStyle.minimal,
           expression: AvatarExpression.focused,
           primaryColor: Color(0xFF10B981),
-          secondaryColor: AppColors.softBlue,
+          secondaryColor: AppColors.warmGold,
         ),
       ),
     ];
@@ -326,8 +319,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
                 _currentConfig = const AvatarConfig(
                   style: AvatarStyle.modern,
                   expression: AvatarExpression.neutral,
-                  primaryColor: AppColors.deepTeal,
-                  secondaryColor: AppColors.softBlue,
+                  primaryColor: AppColors.warmTerracotta,
+                  secondaryColor: AppColors.warmGold,
                 );
               });
               Navigator.of(context).pop();

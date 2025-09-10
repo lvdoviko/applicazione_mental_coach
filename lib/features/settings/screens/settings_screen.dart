@@ -191,14 +191,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               children: [
                 Icon(
                   icon,
-                  color: AppColors.deepTeal,
+                  color: AppColors.warmTerracotta,
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   title,
                   style: AppTypography.h4.copyWith(
-                    color: AppColors.deepTeal,
+                    color: AppColors.warmTerracotta,
                   ),
                 ),
               ],
@@ -267,7 +267,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       value: value,
       onChanged: onChanged,
-      activeColor: AppColors.deepTeal,
+      activeColor: AppColors.warmTerracotta,
     );
   }
 
@@ -384,7 +384,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 setState(() => _selectedLanguage = value!);
                 Navigator.of(context).pop();
               },
-              activeColor: AppColors.deepTeal,
+              activeColor: AppColors.warmTerracotta,
             );
           }).toList(),
         ),
@@ -429,7 +429,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   child: Text(
                     number,
                     style: const TextStyle(
-                      color: AppColors.deepTeal,
+                      color: AppColors.warmTerracotta,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -529,7 +529,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         height: 64,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.deepTeal, AppColors.softBlue],
+            colors: [AppColors.warmTerracotta, AppColors.warmGold],
           ),
           borderRadius: BorderRadius.circular(16),
         ),

@@ -45,8 +45,8 @@ class AvatarCustomizer extends StatefulWidget {
     this.initialConfig = const AvatarConfig(
       style: AvatarStyle.modern,
       expression: AvatarExpression.neutral,
-      primaryColor: AppColors.deepTeal,
-      secondaryColor: AppColors.softBlue,
+      primaryColor: AppColors.warmTerracotta,
+      secondaryColor: AppColors.warmGold,
     ),
     this.showPreview = true,
     this.compactMode = false,
@@ -165,9 +165,9 @@ class _AvatarCustomizerState extends State<AvatarCustomizer>
                   _updateConfig(_currentConfig.copyWith(style: style));
                 }
               },
-              selectedColor: AppColors.deepTeal.withOpacity(0.2),
+              selectedColor: AppColors.warmTerracotta.withOpacity(0.2),
               labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.deepTeal : null,
+                color: isSelected ? AppColors.warmTerracotta : null,
                 fontWeight: isSelected ? AppTypography.medium : null,
               ),
             );
@@ -205,9 +205,9 @@ class _AvatarCustomizerState extends State<AvatarCustomizer>
                   _updateConfig(_currentConfig.copyWith(expression: expression));
                 }
               },
-              selectedColor: AppColors.softBlue.withOpacity(0.2),
+              selectedColor: AppColors.warmGold.withOpacity(0.2),
               labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.softBlue : null,
+                color: isSelected ? AppColors.warmGold : null,
               ),
             );
           }).toList(),
@@ -335,9 +335,9 @@ class _AvatarCustomizerState extends State<AvatarCustomizer>
                   ));
                 }
               },
-              selectedColor: AppColors.orange.withOpacity(0.2),
+              selectedColor: AppColors.warmOrange.withOpacity(0.2),
               labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.orange : null,
+                color: isSelected ? AppColors.warmOrange : null,
               ),
             );
           }).toList(),
@@ -418,13 +418,6 @@ class AvatarPreview extends StatelessWidget {
           ],
         ),
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: config.primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: Center(
         child: Text(

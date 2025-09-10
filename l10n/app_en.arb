@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "AI Wellbeing Coach",
+  "appTitle": "KAIX",
   "welcome": "Welcome",
   "getStarted": "Get Started",
   "onboardingTitle": "Your Personal AI Coach",
@@ -19,7 +19,7 @@
   "consent": "I consent to data processing",
   "healthDataPermission": "Allow health data access",
   "notificationPermission": "Enable notifications",
-  "continue": "Continue",
+  "continueButton": "Continue",
   "skip": "Skip",
   "done": "Done"
 }

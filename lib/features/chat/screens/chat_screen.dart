@@ -83,7 +83,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             height: 36,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.softBlue, AppColors.deepTeal],
+                colors: [AppColors.warmGold, AppColors.warmTerracotta],
               ),
               shape: BoxShape.circle,
             ),
@@ -161,7 +161,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             width: 32,
             height: 32,
             decoration: const BoxDecoration(
-              color: AppColors.softBlue,
+              color: AppColors.warmGold,
               shape: BoxShape.circle,
             ),
             child: const Icon(

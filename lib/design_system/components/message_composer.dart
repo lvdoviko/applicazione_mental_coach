@@ -170,13 +170,6 @@ class _MessageComposerState extends State<MessageComposer>
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: isDarkMode ? AppColors.darkSurface : AppColors.white,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.black.withOpacity(0.05),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
-              ),
-            ],
           ),
           child: SafeArea(
             child: Row(
@@ -221,8 +214,8 @@ class _MessageComposerState extends State<MessageComposer>
                           borderRadius: BorderRadius.circular(24),
                           borderSide: BorderSide(
                             color: isDarkMode 
-                                ? AppColors.softBlue 
-                                : AppColors.deepTeal,
+                                ? AppColors.warmGold 
+                                : AppColors.warmTerracotta,
                             width: 2,
                           ),
                         ),
@@ -293,7 +286,7 @@ class _MessageComposerState extends State<MessageComposer>
       width: 48,
       decoration: BoxDecoration(
         color: canSend 
-            ? (isDarkMode ? AppColors.softBlue : AppColors.deepTeal)
+            ? (isDarkMode ? AppColors.warmGold : AppColors.warmTerracotta)
             : AppColors.grey300,
         shape: BoxShape.circle,
       ),

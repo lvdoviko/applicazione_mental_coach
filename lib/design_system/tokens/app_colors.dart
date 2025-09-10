@@ -3,19 +3,23 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primary Brand Colors (as requested)
-  static const Color deepTeal = Color(0xFF0F5860);
-  static const Color softBlue = Color(0xFF2B9ED9);
-  static const Color lime = Color(0xFFA7D129);
-  static const Color orange = Color(0xFFFF9A42);
-  static const Color background = Color(0xFFF6F8FA);
-  static const Color textPrimary = Color(0xFF0B1A1F);
+  // Primary Brand Colors (warm palette)
+  static const Color warmRed = Color(0xFFD73527);
+  static const Color warmOrange = Color(0xFFFF8C42);
+  static const Color warmYellow = Color(0xFFFFC947);
+  static const Color warmCoral = Color(0xFFFF6B6B);
+  static const Color warmTerracotta = Color(0xFFE07A5F);
+  static const Color warmPeach = Color(0xFFFFB4A2);
+  static const Color warmGold = Color(0xFFF2CC8F);
+  static const Color warmBrown = Color(0xFF8B4513);
+  static const Color background = Color(0xFFFFFBF7);
+  static const Color textPrimary = Color(0xFF2D1B14);
 
   // Semantic Colors
-  static const Color success = lime;
-  static const Color warning = orange;
-  static const Color error = Color(0xFFE53E3E);
-  static const Color info = softBlue;
+  static const Color success = Color(0xFFE9C46A);
+  static const Color warning = warmOrange;
+  static const Color error = Color(0xFFE76F51);
+  static const Color info = warmGold;
 
   // Neutral Palette
   static const Color white = Color(0xFFFFFFFF);
@@ -32,21 +36,21 @@ class AppColors {
   static const Color grey900 = Color(0xFF111827);
 
   // Chat Bubble Colors
-  static const Color userBubble = deepTeal;
+  static const Color userBubble = warmTerracotta;
   static const Color aiBubble = grey100;
   static const Color userBubbleText = white;
   static const Color aiBubbleText = textPrimary;
 
   // Avatar Colors
   static const List<Color> avatarColors = [
-    deepTeal,
-    softBlue,
-    lime,
-    orange,
-    Color(0xFF8B5CF6), // Purple
-    Color(0xFFEC4899), // Pink
-    Color(0xFFF59E0B), // Amber
-    Color(0xFF10B981), // Emerald
+    warmTerracotta,
+    warmGold,
+    warmYellow,
+    warmOrange,
+    warmCoral,
+    warmPeach,
+    warmRed,
+    warmBrown,
   ];
 
   // Dark Mode Colors

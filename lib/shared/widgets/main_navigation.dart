@@ -27,13 +27,6 @@ class MainNavigation extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDarkMode ? AppColors.darkSurface : AppColors.white,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: SafeArea(
         child: Padding(
@@ -89,7 +82,7 @@ class MainNavigation extends StatelessWidget {
     required bool isSelected,
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = isDarkMode ? AppColors.softBlue : AppColors.deepTeal;
+    final primaryColor = isDarkMode ? AppColors.warmGold : AppColors.warmTerracotta;
     final inactiveColor = isDarkMode 
         ? AppColors.darkTextSecondary 
         : AppColors.grey500;

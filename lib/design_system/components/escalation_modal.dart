@@ -130,8 +130,8 @@ class _EscalationModalState extends State<EscalationModal>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.softBlue.withOpacity(0.1),
-            AppColors.deepTeal.withOpacity(0.1),
+            AppColors.warmGold.withOpacity(0.1),
+            AppColors.warmTerracotta.withOpacity(0.1),
           ],
         ),
         borderRadius: const BorderRadius.only(
@@ -144,12 +144,12 @@ class _EscalationModalState extends State<EscalationModal>
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: AppColors.softBlue.withOpacity(0.2),
+              color: AppColors.warmGold.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.support_agent,
-              color: AppColors.softBlue,
+              color: AppColors.warmGold,
               size: 24,
             ),
           ),
@@ -234,7 +234,7 @@ class _EscalationModalState extends State<EscalationModal>
                 setState(() => _selectedReason = value);
               }
             },
-            activeColor: AppColors.deepTeal,
+            activeColor: AppColors.warmTerracotta,
             contentPadding: EdgeInsets.zero,
           ),
         ),
@@ -302,7 +302,7 @@ class _EscalationModalState extends State<EscalationModal>
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.deepTeal, width: 2),
+              borderSide: const BorderSide(color: AppColors.warmTerracotta, width: 2),
             ),
           ),
         ),
