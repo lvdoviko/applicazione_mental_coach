@@ -12,8 +12,17 @@ class AppColors {
   static const Color warmPeach = Color(0xFFFFB4A2);
   static const Color warmGold = Color(0xFFF2CC8F);
   static const Color warmBrown = Color(0xFF8B4513);
+  
+  // Main brand colors
+  static const Color primary = warmTerracotta;
+  static const Color secondary = warmGold;
+  
+  // Background and surface colors
   static const Color background = Color(0xFFFFFBF7);
+  static const Color surface = Color(0xFFF9F7F4);
   static const Color textPrimary = Color(0xFF2D1B14);
+  static const Color textSecondary = Color(0xFF8B7355);
+  static const Color border = Color(0xFFE5DDD5);
 
   // Semantic Colors
   static const Color success = Color(0xFFE9C46A);

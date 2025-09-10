@@ -131,35 +131,40 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildQuickStats() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildQuickStat(
-            icon: Icons.chat_bubble_outline,
-            label: 'Sessions',
-            value: '23',
-            color: AppColors.warmGold,
+    return IntrinsicHeight(
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: _buildQuickStat(
+              icon: Icons.chat_bubble_outline,
+              label: 'Sessions',
+              value: '23',
+              color: AppColors.warmGold,
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: _buildQuickStat(
-            icon: Icons.favorite_border,
-            label: 'Mood Score',
-            value: '8.2',
-            color: AppColors.warmYellow,
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            flex: 1,
+            child: _buildQuickStat(
+              icon: Icons.favorite_border,
+              label: 'Mood Score',
+              value: '8.2',
+              color: AppColors.warmYellow,
+            ),
           ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: _buildQuickStat(
-            icon: Icons.trending_up,
-            label: 'Progress',
-            value: '+15%',
-            color: AppColors.warmOrange,
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            flex: 1,
+            child: _buildQuickStat(
+              icon: Icons.trending_up,
+              label: 'Progress',
+              value: '+15%',
+              color: AppColors.warmOrange,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -169,39 +174,51 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     required String value,
     required Color color,
   }) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          color: color,
-          size: 20,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          value,
-          style: AppTypography.h4.copyWith(
+    return Container(
+      constraints: const BoxConstraints(minHeight: 80),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
             color: color,
-            fontWeight: AppTypography.bold,
+            size: 18,
           ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          label,
-          style: AppTypography.caption,
-          textAlign: TextAlign.center,
-        ),
-      ],
+          const SizedBox(height: AppSpacing.xs),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: AppTypography.h4.copyWith(
+                color: color,
+                fontWeight: AppTypography.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: AppTypography.caption,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildPeriodSelector() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Analytics Period',
           style: AppTypography.h4,
         ),
-        const Spacer(),
+        const SizedBox(height: AppSpacing.sm),
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
@@ -209,25 +226,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: _periods.map((period) {
               final isSelected = period == _selectedPeriod;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedPeriod = period),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.warmTerracotta : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    period,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: isSelected ? AppColors.white : AppColors.grey600,
-                      fontWeight: isSelected ? AppTypography.medium : AppTypography.regular,
+              return Flexible(
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedPeriod = period),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.sm,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.warmTerracotta : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      period,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: isSelected ? AppColors.white : AppColors.grey600,
+                        fontWeight: isSelected ? AppTypography.medium : AppTypography.regular,
+                      ),
                     ),
                   ),
                 ),
@@ -335,6 +355,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Row(
             children: [
               Expanded(
+                flex: 1,
                 child: _buildHealthStat(
                   'Steps',
                   '8,542',
@@ -342,7 +363,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Icons.directions_walk,
                 ),
               ),
+              const SizedBox(width: AppSpacing.xs),
               Expanded(
+                flex: 1,
                 child: _buildHealthStat(
                   'Heart Rate',
                   '72 bpm',
@@ -350,7 +373,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   Icons.favorite,
                 ),
               ),
+              const SizedBox(width: AppSpacing.xs),
               Expanded(
+                flex: 1,
                 child: _buildHealthStat(
                   'Workouts',
                   '3',
@@ -361,10 +386,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Data synced from Apple Health • Last update: 2 hours ago',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.grey500,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              'Data synced from Apple Health • Last update: 2 hours ago',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.grey500,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
         ],
@@ -373,36 +402,52 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildHealthStat(String label, String value, String period, IconData icon) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          color: AppColors.warmYellow,
-          size: 20,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          value,
-          style: AppTypography.h4.copyWith(
+    return Container(
+      constraints: const BoxConstraints(minHeight: 90),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
             color: AppColors.warmYellow,
-            fontWeight: AppTypography.bold,
+            size: 18,
           ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          label,
-          style: AppTypography.caption,
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          period,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.grey500,
+          const SizedBox(height: AppSpacing.xs),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.warmYellow,
+                fontWeight: AppTypography.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+          const SizedBox(height: AppSpacing.xs),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: AppTypography.caption,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+            ),
+          ),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              period,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.grey500,
+                fontSize: 10,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

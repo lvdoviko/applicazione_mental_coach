@@ -116,10 +116,11 @@ class _StatCardState extends State<StatCard>
   }
 
   Widget _buildContent(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -171,6 +172,7 @@ class _StatCardState extends State<StatCard>
           _buildSparkline(),
         ],
       ],
+      ),
     );
   }
 

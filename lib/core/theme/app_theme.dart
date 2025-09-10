@@ -87,18 +87,21 @@ class AppTheme {
     outlineVariant: AppColors.grey700,
   );
 
-  // Text Themes
+  // Text Themes - iOS Style
   static TextTheme get _textTheme => TextTheme(
+        displayLarge: AppTypography.largeTitle,
         headlineLarge: AppTypography.h1,
         headlineMedium: AppTypography.h2,
         headlineSmall: AppTypography.h3,
         titleLarge: AppTypography.h4,
+        titleMedium: AppTypography.callout,
+        titleSmall: AppTypography.subheadline,
         bodyLarge: AppTypography.bodyLarge,
         bodyMedium: AppTypography.bodyMedium,
-        bodySmall: AppTypography.bodySmall,
+        bodySmall: AppTypography.footnote,
         labelLarge: AppTypography.buttonLarge,
         labelMedium: AppTypography.buttonMedium,
-        labelSmall: AppTypography.caption,
+        labelSmall: AppTypography.caption1,
       );
 
   static TextTheme get _darkTextTheme => TextTheme(
@@ -140,10 +143,11 @@ class AppTheme {
           foregroundColor: AppColors.white,
           textStyle: AppTypography.buttonLarge,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16), // More iOS-like rounded corners
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // More generous padding
           elevation: 0,
+          minimumSize: const Size(0, 54), // iOS button height
         ),
       );
 
@@ -154,10 +158,11 @@ class AppTheme {
           foregroundColor: AppColors.white,
           textStyle: AppTypography.buttonLarge,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16), // More iOS-like rounded corners
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // More generous padding
           elevation: 0,
+          minimumSize: const Size(0, 54), // iOS button height
         ),
       );
 
@@ -166,8 +171,10 @@ class AppTheme {
           foregroundColor: AppColors.warmTerracotta,
           textStyle: AppTypography.buttonMedium,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          minimumSize: const Size(0, 44), // iOS minimum touch target
         ),
       );
 
@@ -176,8 +183,10 @@ class AppTheme {
           foregroundColor: AppColors.warmGold,
           textStyle: AppTypography.buttonMedium,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          minimumSize: const Size(0, 44), // iOS minimum touch target
         ),
       );
 
@@ -186,11 +195,12 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.warmTerracotta,
           textStyle: AppTypography.buttonMedium,
-          side: const BorderSide(color: AppColors.warmTerracotta),
+          side: const BorderSide(color: AppColors.warmTerracotta, width: 1.5), // Slightly thicker iOS-style border
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          minimumSize: const Size(0, 54), // iOS button height
         ),
       );
 
@@ -199,35 +209,36 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.warmGold,
           textStyle: AppTypography.buttonMedium,
-          side: const BorderSide(color: AppColors.warmGold),
+          side: const BorderSide(color: AppColors.warmGold, width: 1.5), // Slightly thicker iOS-style border
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          minimumSize: const Size(0, 54), // iOS button height
         ),
       );
 
   static InputDecorationTheme get _inputDecorationTheme =>
       InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: AppColors.grey100,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.grey300),
+          borderRadius: BorderRadius.circular(16), // More iOS-like rounded corners
+          borderSide: BorderSide.none, // iOS-style no border when not focused
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.grey300),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: AppColors.warmTerracotta, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.error),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16), // More generous iOS padding
         hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.grey500),
       );
 
@@ -244,7 +255,7 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.grey600),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: AppColors.warmGold, width: 2),
         ),
         errorBorder: OutlineInputBorder(
@@ -260,18 +271,18 @@ class AppTheme {
         color: AppColors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20), // More iOS-like rounded corners
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // More generous iOS spacing
       );
 
   static CardThemeData get _darkCardTheme => CardThemeData(
         color: AppColors.darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20), // More iOS-like rounded corners
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // More generous iOS spacing
       );
 
   static ChipThemeData get _chipTheme => ChipThemeData(

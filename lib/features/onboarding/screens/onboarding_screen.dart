@@ -8,6 +8,7 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_typography.da
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/design_system/components/lofi_wave_background.dart';
+import 'package:applicazione_mental_coach/design_system/components/ios_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -228,21 +229,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       children: [
         if (_currentPage > 0) ...[
           Expanded(
-            child: OutlinedButton(
+            child: IOSButton(
+              text: 'Back',
+              style: IOSButtonStyle.secondary,
+              size: IOSButtonSize.large,
               onPressed: () => _pageController.previousPage(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
               ),
-              child: const Text('Back'),
             ),
           ),
           const SizedBox(width: AppSpacing.lg),
         ],
         Expanded(
           flex: _currentPage > 0 ? 1 : 2,
-          child: ElevatedButton(
+          child: IOSButton(
+            text: isLastPage ? 'Get Started' : 'Continue',
+            style: IOSButtonStyle.primary,
+            size: IOSButtonSize.large,
             onPressed: isLastPage ? _simpleCompleteOnboarding : _nextPage,
-            child: Text(isLastPage ? 'Get Started' : 'Continue'),
           ),
         ),
       ],
