@@ -3,32 +3,34 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primary Brand Colors (warm palette)
-  static const Color warmRed = Color(0xFFD73527);
-  static const Color warmOrange = Color(0xFFFF8C42);
-  static const Color warmYellow = Color(0xFFFFC947);
-  static const Color warmCoral = Color(0xFFFF6B6B);
-  static const Color warmTerracotta = Color(0xFFE07A5F);
-  static const Color warmPeach = Color(0xFFFFB4A2);
-  static const Color warmGold = Color(0xFFF2CC8F);
-  static const Color warmBrown = Color(0xFF8B4513);
-  
-  // Main brand colors
-  static const Color primary = warmTerracotta;
-  static const Color secondary = warmGold;
-  
-  // Background and surface colors
-  static const Color background = Color(0xFFFFFBF7);
-  static const Color surface = Color(0xFFF9F7F4);
-  static const Color textPrimary = Color(0xFF2D1B14);
-  static const Color textSecondary = Color(0xFF8B7355);
-  static const Color border = Color(0xFFE5DDD5);
+  // Lo-Fi Minimal Palette - Light Mode
+  static const Color background = Color(0xFFFBF9F8);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceVariant = Color(0xFFF8F6F5);
+  static const Color primary = Color(0xFF7DAEA9);
+  static const Color secondary = Color(0xFFE6D9F2);
+  static const Color accent = Color(0xFFD4C4E8);
+  static const Color textPrimary = Color(0xFF0F1724);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textTertiary = Color(0xFF9CA3AF);
+  static const Color border = Color(0xFFE5E7EB);
+  static const Color borderFocus = primary;
 
-  // Semantic Colors
-  static const Color success = Color(0xFFE9C46A);
-  static const Color warning = warmOrange;
-  static const Color error = Color(0xFFE76F51);
-  static const Color info = warmGold;
+  // Message Bubble Colors
+  static const Color userBubble = Color(0xFFDCEEF9);
+  static const Color userBubbleText = textPrimary;
+  static const Color botBubble = Color(0xFFFFF7EA);
+  static const Color botBubbleText = textPrimary;
+
+  // Semantic Colors - Muted for lo-fi aesthetic
+  static const Color success = Color(0xFF86EFAC);
+  static const Color warning = Color(0xFFFDE68A);
+  static const Color error = Color(0xFFFCA5A5);
+  static const Color info = Color(0xFFBAE6FD);
+
+  // Skeleton Loading
+  static const Color skeleton = Color(0xFFF3F4F6);
+  static const Color skeletonHighlight = Color(0xFFFFFFFF);
 
   // Neutral Palette
   static const Color white = Color(0xFFFFFFFF);
@@ -44,27 +46,32 @@ class AppColors {
   static const Color grey800 = Color(0xFF1F2937);
   static const Color grey900 = Color(0xFF111827);
 
-  // Chat Bubble Colors
-  static const Color userBubble = warmTerracotta;
-  static const Color aiBubble = grey100;
-  static const Color userBubbleText = white;
-  static const Color aiBubbleText = textPrimary;
-
-  // Avatar Colors
+  // Avatar Colors - Lo-fi pastels
   static const List<Color> avatarColors = [
-    warmTerracotta,
-    warmGold,
-    warmYellow,
-    warmOrange,
-    warmCoral,
-    warmPeach,
-    warmRed,
-    warmBrown,
+    primary,
+    secondary,
+    accent,
+    Color(0xFFC7D2FE), // soft blue
+    Color(0xFFF8BBD0), // soft pink
+    Color(0xFFE1F5FE), // soft cyan
+    Color(0xFFE8F5E8), // soft green
+    Color(0xFFFFF3E0), // soft amber
   ];
 
   // Dark Mode Colors
-  static const Color darkBackground = Color(0xFF0D1117);
+  static const Color darkBackground = Color(0xFF0F1117);
   static const Color darkSurface = Color(0xFF161B22);
+  static const Color darkSurfaceVariant = Color(0xFF21262D);
   static const Color darkTextPrimary = Color(0xFFE6EDF3);
   static const Color darkTextSecondary = Color(0xFF7D8590);
+  static const Color darkTextTertiary = Color(0xFF656D76);
+  static const Color darkBorder = Color(0xFF30363D);
+  static const Color darkUserBubble = Color(0xFF1C2128);
+  static const Color darkBotBubble = Color(0xFF21262D);
+  static const Color darkSkeleton = Color(0xFF21262D);
+  static const Color darkSkeletonHighlight = Color(0xFF30363D);
+
+  // Legacy aliases for backward compatibility
+  static const Color aiBubble = botBubble;
+  static const Color aiBubbleText = botBubbleText;
 }

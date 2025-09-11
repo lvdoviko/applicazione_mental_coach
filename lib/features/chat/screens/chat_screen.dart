@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
-import 'package:applicazione_mental_coach/design_system/components/chat_bubble.dart';
-import 'package:applicazione_mental_coach/design_system/components/message_composer.dart';
-import 'package:applicazione_mental_coach/design_system/components/quick_reply_chips.dart';
-import 'package:applicazione_mental_coach/design_system/components/escalation_modal.dart';
+import 'package:applicazione_mental_coach/design_system/tokens/app_animations.dart';
+import 'package:applicazione_mental_coach/design_system/components/lofi_message_bubble.dart';
+import 'package:applicazione_mental_coach/design_system/components/lofi_input_composer.dart';
+import 'package:applicazione_mental_coach/design_system/components/lofi_quick_suggestions.dart';
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 
+/// **Lo-Fi Minimal Chat Screen**
+/// 
+/// **Functional Description:**
+/// Clean chat interface with smooth message bubbles, contextual suggestions,
+/// and minimal input composer. Supports voice and text interactions.
+/// 
+/// **Visual Specifications:**
+/// - Background: #FBF9F8 (paper)
+/// - Messages: User #DCEEF9, Bot #FFF7EA bubbles
+/// - Input: #FFFFFF persistent bottom bar
+/// - Typography: Inter 16px with 1.4 line-height
+/// - Animations: 350ms smooth transitions
+/// 
+/// **Accessibility:**
+/// - Message list semantics
+/// - Voice input announcements  
+/// - Focus management
+/// - Screen reader optimizations
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
 
@@ -20,11 +40,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   bool _isTyping = false;
+  bool _isRecording = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeDummyMessages();
+    _initializeDemoMessages();
   }
 
   @override
@@ -33,26 +54,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     super.dispose();
   }
 
-  void _initializeDummyMessages() {
-    // Dummy conversation for demonstration
+  void _initializeDemoMessages() {
     _messages.addAll([
       ChatMessage(
         id: '1',
         content: 'Hello! I\'m your AI Wellbeing Coach. I\'m here to support you on your mental wellness journey. How are you feeling today?',
-        type: ChatBubbleType.ai,
+        type: MessageType.bot,
         timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
       ),
       ChatMessage(
         id: '2',
         content: 'Hi! I\'ve been feeling a bit overwhelmed with training lately.',
-        type: ChatBubbleType.user,
+        type: MessageType.user,
         timestamp: DateTime.now().subtract(const Duration(minutes: 4)),
-        status: ChatBubbleStatus.read,
+        status: MessageStatus.read,
       ),
       ChatMessage(
         id: '3',
         content: 'I understand that training can feel overwhelming sometimes. It\'s completely normal to feel this way, especially when you\'re pushing yourself to improve. Can you tell me more about what specifically feels overwhelming?',
-        type: ChatBubbleType.ai,
+        type: MessageType.bot,
         timestamp: DateTime.now().subtract(const Duration(minutes: 3)),
       ),
     ]);
@@ -61,14 +81,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
       body: Column(
         children: [
           Expanded(
             child: _buildMessagesList(),
           ),
-          _buildQuickReplies(),
-          _buildMessageComposer(),
+          _buildQuickSuggestions(),
+          _buildInputComposer(),
         ],
       ),
     );
@@ -76,20 +97,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
+      backgroundColor: AppColors.surface,
+      elevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
       title: Row(
         children: [
           Container(
             width: 36,
             height: 36,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.warmGold, AppColors.warmTerracotta],
+                colors: [
+                  AppColors.primary.withOpacity(0.8),
+                  AppColors.secondary.withOpacity(0.6),
+                ],
               ),
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.psychology,
-              color: AppColors.white,
+              Icons.psychology_outlined,
+              color: AppColors.surface,
               size: 20,
             ),
           ),
@@ -99,12 +126,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             children: [
               Text(
                 'AI Coach',
-                style: AppTypography.h4,
+                style: AppTypography.h4.copyWith(
+                  color: AppColors.textPrimary,
+                ),
               ),
               Text(
-                'Online • Always here for you',
+                'Always here for you',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.success,
+                  color: AppColors.textSecondary,
                 ),
               ),
             ],
@@ -113,15 +142,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       actions: [
         IconButton(
-          onPressed: _showEscalationModal,
-          icon: const Icon(Icons.support_agent),
-          tooltip: 'Talk to human coach',
-        ),
-        IconButton(
           onPressed: () {
-            // TODO: Implement chat options menu
+            // TODO: Implement conversation details
           },
-          icon: const Icon(Icons.more_vert),
+          icon: const Icon(
+            Icons.info_outline,
+            color: AppColors.textSecondary,
+          ),
+          tooltip: 'Conversation details',
         ),
       ],
     );
@@ -130,7 +158,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget _buildMessagesList() {
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.lg,
+      ),
       itemCount: _messages.length + (_isTyping ? 1 : 0),
       itemBuilder: (context, index) {
         if (index == _messages.length && _isTyping) {
@@ -138,12 +169,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         }
 
         final message = _messages[index];
-        return ChatBubble(
+        return LoFiMessageBubble(
           message: message.content,
           type: message.type,
           timestamp: message.timestamp,
           status: message.status,
           isAnimated: index == _messages.length - 1,
+          onRetry: message.status == MessageStatus.error 
+              ? () => _retryMessage(message) 
+              : null,
         );
       },
     );
@@ -152,38 +186,50 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget _buildTypingIndicator() {
     return Container(
       margin: const EdgeInsets.only(
-        right: AppSpacing.huge,
-        bottom: AppSpacing.chatBubbleMargin,
+        right: AppSpacing.massive,
+        bottom: AppSpacing.messageBubbleMargin,
       ),
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-              color: AppColors.warmGold,
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withOpacity(0.8),
+                  AppColors.secondary.withOpacity(0.6),
+                ],
+              ),
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.psychology,
-              color: AppColors.white,
-              size: 18,
+              Icons.psychology_outlined,
+              color: AppColors.surface,
+              size: 16,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Container(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.chatBubblePadding,
+              horizontal: AppSpacing.messageBubblePadding,
               vertical: AppSpacing.md,
             ),
-            decoration: const BoxDecoration(
-              color: AppColors.aiBubble,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: AppColors.botBubble,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
                 bottomRight: Radius.circular(16),
                 bottomLeft: Radius.circular(4),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.textPrimary.withOpacity(0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: _buildAnimatedDots(),
           ),
@@ -221,40 +267,49 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  Widget _buildQuickReplies() {
-    final quickReplies = _getContextualQuickReplies();
+  Widget _buildQuickSuggestions() {
+    final suggestions = _getContextualSuggestions();
     
-    return QuickReplyChips(
-      replies: quickReplies,
-      onReplySelected: _sendMessage,
-      isVisible: quickReplies.isNotEmpty,
+    return LoFiQuickSuggestions(
+      suggestions: suggestions,
+      onSuggestionTap: _sendMessage,
+      isVisible: suggestions.isNotEmpty && !_isTyping,
     );
   }
 
-  List<String> _getContextualQuickReplies() {
-    if (_messages.isEmpty) return [];
+  List<String> _getContextualSuggestions() {
+    if (_messages.isEmpty) return QuickSuggestionPresets.general;
     
     final lastMessage = _messages.last;
-    if (lastMessage.type == ChatBubbleType.user) return [];
+    if (lastMessage.type == MessageType.user) return [];
     
-    // Context-based replies based on AI's last message
+    // Context-based suggestions based on AI's last message
     if (lastMessage.content.contains('overwhelming')) {
-      return QuickReplyPresets.getContextualReplies('supportive');
+      return QuickSuggestionPresets.getContextualSuggestions('supportive');
     } else if (lastMessage.content.contains('feeling')) {
-      return QuickReplyPresets.getContextualReplies('empathetic');
+      return QuickSuggestionPresets.getContextualSuggestions('empathetic');
+    } else if (lastMessage.content.contains('tell me more')) {
+      return QuickSuggestionPresets.getContextualSuggestions('curious');
     }
     
-    return QuickReplyPresets.empathetic;
+    return QuickSuggestionPresets.empathetic;
   }
 
-  Widget _buildMessageComposer() {
-    return MessageComposer(
+  Widget _buildInputComposer() {
+    return LoFiInputComposer(
       onSendMessage: _sendMessage,
       hintText: 'Share what\'s on your mind...',
+      isRecording: _isRecording,
       onVoiceStart: () {
+        setState(() {
+          _isRecording = true;
+        });
         // TODO: Implement voice recording start
       },
       onVoiceStop: () {
+        setState(() {
+          _isRecording = false;
+        });
         // TODO: Implement voice recording stop
       },
     );
@@ -266,9 +321,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final userMessage = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: message.trim(),
-      type: ChatBubbleType.user,
+      type: MessageType.user,
       timestamp: DateTime.now(),
-      status: ChatBubbleStatus.sending,
+      status: MessageStatus.sending,
     );
 
     setState(() {
@@ -286,7 +341,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       setState(() {
         final index = _messages.indexWhere((m) => m.id == userMessage.id);
         if (index != -1) {
-          _messages[index] = userMessage.copyWith(status: ChatBubbleStatus.delivered);
+          _messages[index] = userMessage.copyWith(status: MessageStatus.delivered);
         }
       });
     });
@@ -297,13 +352,32 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
   }
 
+  void _retryMessage(ChatMessage message) {
+    setState(() {
+      final index = _messages.indexWhere((m) => m.id == message.id);
+      if (index != -1) {
+        _messages[index] = message.copyWith(status: MessageStatus.sending);
+      }
+    });
+    
+    // Retry sending after a delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        final index = _messages.indexWhere((m) => m.id == message.id);
+        if (index != -1) {
+          _messages[index] = message.copyWith(status: MessageStatus.sent);
+        }
+      });
+    });
+  }
+
   void _simulateAIResponse(String userMessage) {
     final aiResponse = _generateContextualResponse(userMessage);
     
     final aiMessage = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       content: aiResponse,
-      type: ChatBubbleType.ai,
+      type: MessageType.bot,
       timestamp: DateTime.now(),
     );
 
@@ -336,70 +410,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _scrollToBottom() {
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-  }
-
-  void _showEscalationModal() {
-    showDialog(
-      context: context,
-      builder: (context) => EscalationModal(
-        onSubmit: _handleEscalationRequest,
-        chatContext: {
-          'messages_count': _messages.length,
-          'last_message': _messages.isNotEmpty ? _messages.last.content : '',
-          'session_duration': DateTime.now().difference(
-            _messages.isNotEmpty 
-                ? _messages.first.timestamp 
-                : DateTime.now(),
-          ).inMinutes,
-        },
-      ),
-    );
-  }
-
-  Future<void> _handleEscalationRequest(EscalationRequest request) async {
-    // TODO: Implement actual escalation API call
-    await Future.delayed(const Duration(seconds: 1));
-    
-    // Add system message about escalation
-    final escalationMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      content: 'I\'ve submitted your request for human support. A qualified coach will contact you within 24 hours. In the meantime, I\'m still here if you need immediate support.',
-      type: ChatBubbleType.ai,
-      timestamp: DateTime.now(),
-    );
-    
-    setState(() {
-      _messages.add(escalationMessage);
-    });
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: AppAnimations.medium,
+        curve: AppAnimations.easeOut,
+      );
+    }
   }
 }
 
 class ChatMessage {
   final String id;
   final String content;
-  final ChatBubbleType type;
+  final MessageType type;
   final DateTime timestamp;
-  final ChatBubbleStatus status;
+  final MessageStatus status;
 
   ChatMessage({
     required this.id,
     required this.content,
     required this.type,
     required this.timestamp,
-    this.status = ChatBubbleStatus.sent,
+    this.status = MessageStatus.sent,
   });
 
   ChatMessage copyWith({
     String? id,
     String? content,
-    ChatBubbleType? type,
+    MessageType? type,
     DateTime? timestamp,
-    ChatBubbleStatus? status,
+    MessageStatus? status,
   }) {
     return ChatMessage(
       id: id ?? this.id,

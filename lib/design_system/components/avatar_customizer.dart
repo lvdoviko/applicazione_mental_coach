@@ -45,8 +45,8 @@ class AvatarCustomizer extends StatefulWidget {
     this.initialConfig = const AvatarConfig(
       style: AvatarStyle.modern,
       expression: AvatarExpression.neutral,
-      primaryColor: AppColors.warmTerracotta,
-      secondaryColor: AppColors.warmGold,
+      primaryColor: AppColors.primary,
+      secondaryColor: AppColors.secondary,
     ),
     this.showPreview = true,
     this.compactMode = false,
@@ -165,9 +165,9 @@ class _AvatarCustomizerState extends State<AvatarCustomizer>
                   _updateConfig(_currentConfig.copyWith(style: style));
                 }
               },
-              selectedColor: AppColors.warmTerracotta.withOpacity(0.2),
+              selectedColor: AppColors.primary.withOpacity(0.2),
               labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.warmTerracotta : null,
+                color: isSelected ? AppColors.primary : null,
                 fontWeight: isSelected ? AppTypography.medium : null,
               ),
             );
@@ -205,9 +205,9 @@ class _AvatarCustomizerState extends State<AvatarCustomizer>
                   _updateConfig(_currentConfig.copyWith(expression: expression));
                 }
               },
-              selectedColor: AppColors.warmGold.withOpacity(0.2),
+              selectedColor: AppColors.secondary.withOpacity(0.2),
               labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.warmGold : null,
+                color: isSelected ? AppColors.secondary : null,
               ),
             );
           }).toList(),
@@ -335,9 +335,9 @@ class _AvatarCustomizerState extends State<AvatarCustomizer>
                   ));
                 }
               },
-              selectedColor: AppColors.warmOrange.withOpacity(0.2),
+              selectedColor: AppColors.accent.withOpacity(0.2),
               labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.warmOrange : null,
+                color: isSelected ? AppColors.accent : null,
               ),
             );
           }).toList(),

@@ -1,275 +1,348 @@
-# AI Wellbeing Coach - Flutter Mobile App
+# KAIX - Lo-Fi Mental Coach App
 
 [![Flutter Version](https://img.shields.io/badge/Flutter-3.16.0+-blue.svg)](https://flutter.dev/)
 [![Dart Version](https://img.shields.io/badge/Dart-3.2.0+-blue.svg)](https://dart.dev/)
-[![License](https://img.shields.io/badge/License-Private-red.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-> **AI Wellbeing Coach** - Your personal AI mental wellness companion for athletes and sports teams. Built with Flutter for iOS and Android.
+> **KAIX** - Una conversazione serena per il benessere mentale. Design lo-fi minimalista che promuove calma e riflessione attraverso interfacce pulite e interazioni fluide.
 
 ## 🏆 Overview
 
-AI Wellbeing Coach is a mobile-first application designed to provide mental wellness support specifically for athletes and sports teams. The app features an empathetic AI coach, health data integration, and seamless escalation to human coaches when needed.
+KAIX è un'app di mental coaching con un design lo-fi minimalista che promuove calma e riflessione. L'interfaccia pulita e le animazioni fluide creano un ambiente sereno per conversazioni significative con un AI coach intelligente.
 
-### ✨ Key Features
+### ✨ Funzionalità Principali
 
-- **🤖 AI Chat Coach**: Empathetic, sports-focused AI conversations
-- **📱 Mobile-First**: Optimized for iOS and Android
-- **🏥 Health Integration**: Apple HealthKit & Google Health Connect support
-- **👤 Avatar Customization**: Personalized avatar with multiple styles
-- **📊 Analytics Dashboard**: Wellness metrics and progress tracking
-- **🆘 Human Escalation**: Seamless transition to human coaches
-- **🔒 Privacy-First**: GDPR compliant with end-to-end encryption
-- **🌍 Multilingual**: English and Italian support
+- **🎨 Design Lo-Fi**: Estetica minimalista con palette pastello rilassante
+- **🤖 AI Coach Intelligente**: Conversazioni empatiche e personalizzate
+- **📱 Flutter Nativo**: Performance ottimali su iOS e Android
+- **🌙 Modalità Scura**: Adattamento automatico per comfort visivo
+- **♿ Accessibilità Completa**: Supporto VoiceOver/TalkBack WCAG 2.1
+- **🌍 Localizzazione**: Interfaccia completa in Italiano e Inglese
+- **🔒 Privacy-First**: Dati locali cifrati, zero tracking
+- **📐 Design Responsivo**: Adattivo per tablet e dispositivi foldable
 
-## 🎨 Design System
+## 🎨 Design System Lo-Fi
 
-### Color Palette
+Il design system KAIX abbraccia l'estetica lo-fi con colori pastello morbidi, spazi generosi e animazioni delicate che promuovono una sensazione di calma e benessere.
+
+### 🌈 Palette Colori
 ```dart
-// Primary Brand Colors
-Deep Teal: #0F5860
-Soft Blue: #2B9ED9  
-Lime: #A7D129
-Orange: #FF9A42
-Background: #F6F8FA
-Text: #0B1A1F
+// Colori Lo-Fi Principali
+Primary: #7DAEA9      // Teal rilassante
+Secondary: #E6D9F2    // Lavanda soft  
+Accent: #D4C4E8       // Viola tenue
+Background: #FBF9F8   // Carta naturale
+Surface: #FFFFFF      // Bianco puro
+Text Primary: #0F1724 // Blu-nero profondo
 ```
 
-### Typography
-- **Font**: Inter
-- **Body**: 16sp
-- **Headings**: 28sp semibold
-- **Accessible**: Supports font scaling 0.8x - 1.3x
+### 🔤 Tipografia
+- **Font Famiglia**: Inter (Google Fonts)
+- **Fallback**: -apple-system, BlinkMacSystemFont, Roboto
+- **Dimensioni**: Scala 10px-34px con line-height ottimizzato
+- **Pesi**: Da Light (300) a Bold (700)
+- **Accessibilità**: Supporto scaling 0.8x - 1.3x
 
-### Components
-- `ChatBubble` - Message display with status indicators
-- `MessageComposer` - Voice-to-text input with animations
-- `QuickReplyChips` - Context-aware quick responses
-- `AvatarCustomizer` - Interactive avatar personalization
-- `StatCard` - Wellness metrics with sparklines
-- `EscalationModal` - Human coach request dialog
+### 🧩 Componenti Lo-Fi
+- `LoFiMessageBubble` - Bolle messaggio con stile minimalista
+- `LoFiInputComposer` - Campo input con animazioni fluide
+- `LoFiQuickSuggestions` - Chip suggerimenti contestuali
+- `LoFiEmptyState` - Stati vuoto con illustrazioni minimali
+- `LoFiErrorState` - Gestione errori elegante e rassicurante
 
-## 🚀 Getting Started
+## 🚀 Installazione
 
-### Prerequisites
+### Prerequisiti
 
-- Flutter SDK 3.16.0 or higher
-- Dart SDK 3.2.0 or higher
-- iOS 12.0+ / Android API level 21+
-- Xcode 14+ (for iOS development)
-- Android Studio with Android SDK (for Android development)
+- Flutter SDK 3.16.0+
+- Dart SDK 3.2.0+  
+- iOS 12.0+ / Android API 21+
+- Xcode 14+ (per sviluppo iOS)
+- Android Studio con Android SDK
 
-### Installation
+### Setup Progetto
 
-1. **Clone the repository**:
+1. **Clone del repository**:
    ```bash
-   git clone https://github.com/your-org/applicazione_mental_coach.git
+   git clone <repository-url>
    cd applicazione_mental_coach
    ```
 
-2. **Install dependencies**:
+2. **Installazione dipendenze**:
    ```bash
    flutter pub get
    ```
 
-3. **Generate localization files**:
+3. **Generazione localizzazioni**:
    ```bash
    flutter gen-l10n
    ```
 
-4. **Run code generation**:
+4. **Build e run**:
    ```bash
-   dart run build_runner build --delete-conflicting-outputs
-   ```
-
-5. **Run the app**:
-   ```bash
-   # Debug mode
+   # Modalità debug
    flutter run
    
-   # Release mode
+   # Modalità release
    flutter run --release
    
-   # Specific device
+   # Dispositivo specifico
    flutter run -d <device_id>
    ```
 
-### Platform-Specific Setup
+### Configurazione Piattaforma
 
-#### iOS Setup
-1. Open `ios/Runner.xcworkspace` in Xcode
-2. Configure signing & capabilities
-3. Add HealthKit entitlement:
-   ```xml
-   <key>com.apple.developer.healthkit</key>
-   <true/>
-   ```
-4. Update `Info.plist` with health data usage descriptions
+#### Setup iOS
+1. Aprire `ios/Runner.xcworkspace` in Xcode
+2. Configurare signing e capabilities
+3. Aggiornare `Info.plist` per permessi necessari
 
-#### Android Setup
-1. Update `android/app/src/main/AndroidManifest.xml`
-2. Add Health Connect permissions:
+#### Setup Android
+1. Aprire `android/app/src/main/AndroidManifest.xml`  
+2. Configurare permessi e target SDK
    ```xml
-   <uses-permission android:name="android.permission.health.READ_STEPS" />
-   <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+   <uses-permission android:name="android.permission.INTERNET" />
+   <uses-permission android:name="android.permission.RECORD_AUDIO" />
    ```
 
-## 🛠 Development
+## 🏧 Architettura
 
-### Project Structure
+### Struttura del Progetto
 ```
 lib/
-├── core/
-│   ├── config/           # App configuration
-│   ├── routing/          # Navigation & routing
-│   ├── theme/            # Theme definitions
-│   └── utils/            # Utility functions
-├── design_system/
-│   ├── components/       # Reusable UI components
-│   └── tokens/           # Design tokens (colors, typography, spacing)
-├── features/
-│   ├── auth/             # Authentication
-│   ├── chat/             # AI chat functionality
-│   ├── dashboard/        # Analytics & metrics
-│   ├── avatar/           # Avatar customization
-│   ├── onboarding/       # First-time user experience
-│   └── settings/         # App settings & privacy
-├── shared/
-│   ├── models/           # Data models
-│   ├── services/         # Business logic services
-│   ├── widgets/          # Shared widgets
-│   └── providers/        # State management
-└── main.dart             # App entry point
+├── design_system/           # Sistema di design lo-fi completo
+│   ├── components/          # Componenti riutilizzabili
+│   ├── tokens/              # Design tokens (colori, spacing, etc)
+│   ├── theme/               # Tema Material 3 customizzato
+│   └── responsive/          # Utilities responsive
+├── features/                # Organizzazione per funzionalità
+│   ├── chat/                # Chat e messaging
+│   ├── onboarding/          # Prima esperienza utente
+│   └── settings/            # Configurazioni app
+├── shared/                  # Codice condiviso
+│   ├── services/            # Servizi business logic
+│   ├── models/              # Data models
+│   └── utils/               # Utilities generiche
+├── l10n/                    # Localizzazione multilingua
+└── main.dart                 # Entry point applicazione
 ```
 
-### Architecture Patterns
+### Principi Architetturali
 
-- **State Management**: Riverpod for dependency injection and state
-- **Navigation**: GoRouter for type-safe routing
-- **Local Storage**: Hive for encrypted local data
-- **API Client**: Dio with interceptors for HTTP requests
-- **Real-time Chat**: WebSocket with Socket.io client
+1. **Feature-First** - Organizzazione per funzionalità
+2. **Single Responsibility** - Un compito per classe
+3. **Dependency Injection** - Con Riverpod provider
+4. **Immutable State** - Stati immutabili e predicibili
+5. **Test-Driven** - Coverage >90% per core logic
 
-## 🧪 Testing
+### Stack Tecnologico
+- **State Management**: Riverpod per DI e state
+- **Navigation**: GoRouter type-safe
+- **Local Storage**: Hive cifrato
+- **HTTP Client**: Dio con interceptors
+- **Animazioni**: AnimationController custom
 
-### Quick Test Commands
+## 🧪 Testing Completo
+
+### Copertura Test
+- **Unit Tests**: >95% per business logic
+- **Widget Tests**: Tutti i componenti core  
+- **Integration Tests**: Flussi utente principali
+- **Accessibility Tests**: Compliance WCAG 2.1
+
+### Comandi Test Rapidi
 ```bash
-# Run all tests
+# Tutti i test
 flutter test
 
-# Run with coverage
+# Con coverage
 flutter test --coverage
 
-# Run integration tests
+# Test integrazione
 flutter test integration_test/
 
 # Golden tests (UI regression)
 flutter test --update-goldens
 ```
 
-## 📦 Building
+## 📦 Build & Deploy
 
-### Release Builds
+### Build Release
 ```bash
 # Android
 flutter build apk --release
 flutter build appbundle --release
 
-# iOS
+# iOS  
 flutter build ios --release
 ```
 
-## 🔌 API Integration
+### Performance Ottimizzazioni
+- **Widget Stateless** - Preferenza const constructors
+- **Build Scope** - Rebuild minimization
+- **Lazy Loading** - Liste pigre ottimizzate
+- **Memory Management** - Disposal corretto controllers
 
-The app connects to a microservices backend with:
-- **Chat Service**: Real-time AI conversations
-- **Health Service**: Wearable data integration  
-- **Analytics Service**: Wellness metrics
-- **Escalation Service**: Human coach handoff
+## 🎨 Design System
 
-API documentation: [api_specification.yaml](api_specification.yaml)
+### Design Tokens
+Il file `design_tokens.json` contiene tutti i tokens sincronizzati con Figma:
 
-## 🔒 Security & Privacy
+```json
+{
+  "colors": {
+    "light": {
+      "primary": "#7DAEA9",
+      "background": "#FBF9F8"
+    }
+  },
+  "typography": {
+    "fontFamily": "Inter",
+    "fontSizes": { "md": 16, "lg": 18 }
+  }
+}
+```
 
-- **GDPR Compliant**: Data export, deletion, consent management
-- **Encryption**: AES-256 for sensitive data
-- **Privacy-First**: Analytics opt-in, notification obfuscation
-- **Secure Auth**: JWT tokens, biometric support (planned)
+### Processo Sync Figma
+1. **Designer**: Aggiorna tokens in Figma
+2. **Export**: Genera JSON con plugin tokens
+3. **Import**: Aggiorna `design_tokens.json`
+4. **Code Gen**: Script aggiorna costanti Flutter
+5. **Test**: Verifica consistenza visuale
 
-## 📊 Component Showcase
+## 🔒 Sicurezza & Privacy
 
-### ChatBubble Component
+### Data Protection
+- **Local Storage** - Dati sensibili mai in cloud
+- **Encryption** - Messaggi cifrati localmente AES-256
+- **Biometric Auth** - Optional fingerprint/FaceID
+- **Session Management** - Token refresh automatico
+
+### Privacy Features
+- **No Tracking** - Zero analytics di terze parti
+- **Data Minimal** - Raccolta dati minimale
+- **User Control** - Export/delete completo dati
+- **Transparency** - Privacy policy chiara
+
+## 🧩 Componenti Lo-Fi
+
+### LoFiMessageBubble
+Bolle messaggio con stile minimalista e animazioni fluide.
+
 ```dart
-ChatBubble(
-  message: "I understand that training can feel overwhelming sometimes.",
-  type: ChatBubbleType.ai,
+LoFiMessageBubble(
+  message: "Ciao! Come posso aiutarti oggi?",
+  type: MessageType.bot,
   timestamp: DateTime.now(),
-  status: ChatBubbleStatus.delivered,
   isAnimated: true,
 )
 ```
 
-### MessageComposer Component  
+### LoFiInputComposer  
+Campo input con registrazione vocale e allegati.
+
 ```dart
-MessageComposer(
-  onSendMessage: (message) => sendToAI(message),
-  hintText: 'Share what\'s on your mind...',
-  supportsSpeech: true,
-  onVoiceStart: () => startRecording(),
-  onVoiceStop: () => stopRecording(),
+LoFiInputComposer(
+  onSendMessage: (message) => _sendMessage(message),
+  onVoiceStart: () => _startVoiceRecording(),
+  placeholder: "Scrivi qui...",
 )
 ```
 
-### AvatarCustomizer Component
+### LoFiQuickSuggestions
+Chip suggerimenti contestuali con animazioni smooth.
+
 ```dart
-AvatarCustomizer(
-  onConfigChanged: (config) => saveAvatarConfig(config),
-  initialConfig: AvatarConfig(
-    style: AvatarStyle.modern,
-    expression: AvatarExpression.determined,
-    primaryColor: AppColors.deepTeal,
-    secondaryColor: AppColors.softBlue,
-  ),
-  showPreview: true,
+LoFiQuickSuggestions(
+  suggestions: ["Come stai?", "Parliamo di ansia", "Esercizi mindfulness"],
+  onSuggestionTap: (suggestion) => _selectSuggestion(suggestion),
 )
 ```
 
-### StatCard Component
+### LoFiErrorState / LoFiEmptyState
+Stati di errore e vuoto con illustrazioni minimali.
+
 ```dart
-StatCard(
-  title: 'Mood Score',
-  value: '8.2/10',
-  subtitle: 'Above average',
-  icon: Icons.mood,
-  trend: StatTrend.up,
-  trendValue: '+0.5',
-  variant: StatCardVariant.success,
-  sparklineData: [7.5, 7.8, 8.0, 7.9, 8.2, 8.1, 8.2],
+LoFiEmptyState(
+  title: "Nessuna conversazione",
+  description: "Inizia una nuova chat per cominciare",
+  actionText: "Nuova Chat",
+  onAction: () => _startNewChat(),
 )
 ```
 
-## 🤝 Contributing
+## 🤝 Contributi
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make changes following our coding standards
-4. Add tests for new functionality
-5. Commit changes (`git commit -m 'Add amazing feature'`)
-6. Push to branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+### Come Contribuire
+1. **Fork** il repository
+2. **Create** feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** changes (`git commit -m 'Add amazing feature'`)
+4. **Push** branch (`git push origin feature/amazing-feature`)  
+5. **Open** Pull Request
 
-## 📄 Documentation
+### Coding Standards
+- **Dart Style Guide** - Seguire dart style oficial
+- **Comments** - Documentazione comprehensive per API pubbliche
+- **Tests** - Copertura >90% per nuove feature
+- **Accessibility** - Supporto screen reader obbligatorio
 
-- [Backend Architecture](backend_architecture.md) - Complete backend system design
-- [API Specification](api_specification.yaml) - OpenAPI 3.0 specification
-- [Component Library](lib/design_system/components/) - Design system components
-- [Theme System](lib/core/theme/) - App theming and styling
+## 🌍 Internazionalizzazione
 
-## 🚀 Quick Start Commands
+Supporto completo per Italiano e Inglese:
+
+```dart
+// Utilizzo
+Text(AppLocalizations.of(context)!.welcomeMessage)
+
+// Configurazione
+MaterialApp(
+  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  supportedLocales: AppLocalizations.supportedLocales,
+)
+```
+
+### File di Localizzazione
+- `lib/l10n/app_en.arb` - Inglese  
+- `lib/l10n/app_it.arb` - Italiano
+
+## ♿ Accessibilità
+
+KAIX include accessibilità completa:
+
+- **Screen Reader** - Label semantici per VoiceOver/TalkBack
+- **Contrasto** - Ratio 4.5:1+ per tutti i testi
+- **Dimensioni Touch** - Target 44x44pt minimi
+- **Navigazione** - Supporto completo da tastiera
+- **Annunci Live** - Per messaggi chat in tempo reale
+
+## 📁 Documentazione
+
+- [Design Tokens Mapping](docs/design-to-code-mapping.md) - Mapping completo Figma-Flutter
+- [Figma Export Guide](docs/figma-export-guide.md) - Guida export design system
+- [Component Library](lib/design_system/components/) - Componenti design system
+- [Theme System](lib/design_system/theme/) - Sistema tema customizzato
+
+## 📄 Roadmap
+
+### Fase 2 - Features Avanzate
+- [ ] **Sync Cloud** - Backup conversazioni sicuro
+- [ ] **Voice Messages** - Messaggi vocali nativi
+- [ ] **Smart Notifications** - Promemoria personalizzati
+- [ ] **Progress Tracking** - Analisi benessere mentale
+- [ ] **Community** - Gruppi supporto anonimi
+
+### Fase 3 - AI Enhancement  
+- [ ] **Sentiment Analysis** - Riconoscimento emotivo avanzato
+- [ ] **Personalized Coaching** - AI training personalizzato
+- [ ] **Crisis Detection** - Intervento automatico emergenze
+- [ ] **Wellness Integration** - Sync Apple Health/Google Fit
+
+## 🚀 Comandi Rapidi
 
 ```bash
-# Setup project
+# Setup progetto
 git clone <repo> && cd applicazione_mental_coach
-flutter pub get && dart run build_runner build
+flutter pub get && flutter gen-l10n
 
 # Run app  
 flutter run
@@ -285,6 +358,28 @@ flutter build ios --release  # iOS
 flutter analyze && dart format .
 ```
 
+## 👥 Team & Licenza
+
+**Design System Team**
+- Design Lead: [Nome]
+- Flutter Developer: [Nome]  
+- UX Researcher: [Nome]
+
+**Contatti**
+- 📧 Email: team@kaixapp.com
+- 🐦 Twitter: @kaixapp
+- 💬 Discord: [Server Invite]
+
+### 📄 Licenza
+
+Questo progetto è licenziato sotto MIT License - vedi [LICENSE](LICENSE) per dettagli.
+
 ---
 
-**Built with ❤️ for the mental wellness of athletes worldwide**
+*"Design che calma, tecnologia che cura"* - **KAIX Team**
+
+**Versione**: 1.0.0  
+**Build**: 1 (Phase 2 Complete)  
+**Flutter**: 3.16.0+ Required  
+**Dart**: 3.2.0+ Required  
+**Ultimo Aggiornamento**: Gennaio 2025

@@ -82,7 +82,7 @@ class MainNavigation extends StatelessWidget {
     required bool isSelected,
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = isDarkMode ? AppColors.warmGold : AppColors.warmTerracotta;
+    final primaryColor = isDarkMode ? AppColors.secondary : AppColors.primary;
     final inactiveColor = isDarkMode 
         ? AppColors.darkTextSecondary 
         : AppColors.grey500;

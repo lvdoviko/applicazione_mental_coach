@@ -276,9 +276,9 @@ class _StatCardState extends State<StatCard>
   Color _getAccentColor() {
     switch (widget.variant) {
       case StatCardVariant.primary:
-        return AppColors.warmTerracotta;
+        return AppColors.primary;
       case StatCardVariant.secondary:
-        return AppColors.warmGold;
+        return AppColors.secondary;
       case StatCardVariant.success:
         return AppColors.success;
       case StatCardVariant.warning:

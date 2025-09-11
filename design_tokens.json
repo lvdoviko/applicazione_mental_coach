@@ -1,0 +1,160 @@
+{
+  "colors": {
+    "light": {
+      "background": "#FBF9F8",
+      "surface": "#FFFFFF",
+      "surfaceVariant": "#F8F6F5",
+      "primary": "#7DAEA9",
+      "secondary": "#E6D9F2",
+      "accent": "#D4C4E8",
+      "textPrimary": "#0F1724",
+      "textSecondary": "#6B7280",
+      "textTertiary": "#9CA3AF",
+      "border": "#E5E7EB",
+      "borderFocus": "#7DAEA9",
+      "userBubble": "#DCEEF9",
+      "userBubbleText": "#0F1724",
+      "botBubble": "#FFF7EA",
+      "botBubbleText": "#0F1724",
+      "success": "#86EFAC",
+      "warning": "#FDE68A",
+      "error": "#FCA5A5",
+      "info": "#BAE6FD",
+      "skeleton": "#F3F4F6",
+      "skeletonHighlight": "#FFFFFF"
+    },
+    "dark": {
+      "background": "#0F1117",
+      "surface": "#161B22",
+      "surfaceVariant": "#21262D",
+      "primary": "#7DAEA9",
+      "secondary": "#E6D9F2",
+      "accent": "#D4C4E8",
+      "textPrimary": "#E6EDF3",
+      "textSecondary": "#7D8590",
+      "textTertiary": "#656D76",
+      "border": "#30363D",
+      "borderFocus": "#7DAEA9",
+      "userBubble": "#1C2128",
+      "userBubbleText": "#E6EDF3",
+      "botBubble": "#21262D",
+      "botBubbleText": "#E6EDF3",
+      "success": "#238636",
+      "warning": "#9A6700",
+      "error": "#DA3633",
+      "info": "#0969DA",
+      "skeleton": "#21262D",
+      "skeletonHighlight": "#30363D"
+    }
+  },
+  "typography": {
+    "fontFamily": "Inter",
+    "fontFamilyFallback": ["-apple-system", "BlinkMacSystemFont", "Roboto", "sans-serif"],
+    "fontWeights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semiBold": 600,
+      "bold": 700
+    },
+    "fontSizes": {
+      "xs": 10,
+      "sm": 12,
+      "base": 14,
+      "md": 16,
+      "lg": 18,
+      "xl": 20,
+      "2xl": 24,
+      "3xl": 28,
+      "4xl": 34
+    },
+    "lineHeights": {
+      "tight": 1.25,
+      "normal": 1.4,
+      "relaxed": 1.6
+    },
+    "letterSpacing": {
+      "tight": "-0.025em",
+      "normal": "0",
+      "wide": "0.025em"
+    }
+  },
+  "spacing": {
+    "scale": [0, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96],
+    "semantic": {
+      "xs": 4,
+      "sm": 8,
+      "md": 12,
+      "lg": 16,
+      "xl": 24,
+      "2xl": 32,
+      "3xl": 40,
+      "4xl": 48,
+      "5xl": 64
+    }
+  },
+  "borderRadius": {
+    "none": 0,
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "xl": 24,
+    "full": 9999
+  },
+  "shadows": {
+    "sm": {
+      "blur": 6,
+      "y": 2,
+      "opacity": 0.06
+    },
+    "md": {
+      "blur": 10,
+      "y": 4,
+      "opacity": 0.08
+    },
+    "lg": {
+      "blur": 16,
+      "y": 6,
+      "opacity": 0.1
+    }
+  },
+  "animations": {
+    "durations": {
+      "micro": 120,
+      "small": 200,
+      "medium": 350,
+      "large": 600
+    },
+    "curves": {
+      "easeOut": [0.0, 0.0, 0.2, 1.0],
+      "easeIn": [0.4, 0.0, 1.0, 1.0],
+      "easeInOut": [0.4, 0.0, 0.2, 1.0]
+    }
+  },
+  "components": {
+    "messageComposer": {
+      "minHeight": 54,
+      "borderRadius": 12,
+      "padding": {
+        "horizontal": 16,
+        "vertical": 12
+      }
+    },
+    "messageBubble": {
+      "borderRadius": 16,
+      "padding": {
+        "horizontal": 16,
+        "vertical": 12
+      },
+      "marginBottom": 8,
+      "maxWidth": 0.8
+    },
+    "quickReplyChip": {
+      "borderRadius": 20,
+      "padding": {
+        "horizontal": 16,
+        "vertical": 8
+      }
+    }
+  }
+}

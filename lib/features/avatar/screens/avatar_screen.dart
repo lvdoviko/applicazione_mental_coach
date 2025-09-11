@@ -19,8 +19,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
   AvatarConfig _currentConfig = const AvatarConfig(
     style: AvatarStyle.modern,
     expression: AvatarExpression.neutral,
-    primaryColor: AppColors.warmTerracotta,
-    secondaryColor: AppColors.warmGold,
+    primaryColor: AppColors.primary,
+    secondaryColor: AppColors.secondary,
   );
 
   @override
@@ -89,8 +89,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        indicatorColor: AppColors.warmTerracotta,
-        labelColor: AppColors.warmTerracotta,
+        indicatorColor: AppColors.primary,
+        labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.grey500,
         labelStyle: AppTypography.bodyMedium.copyWith(
           fontWeight: AppTypography.medium,
@@ -165,7 +165,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected 
-                ? AppColors.warmTerracotta 
+                ? AppColors.primary 
                 : (Theme.of(context).brightness == Brightness.dark 
                     ? AppColors.grey700 
                     : AppColors.grey200),
@@ -190,7 +190,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
                     preset.name,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: AppTypography.medium,
-                      color: isSelected ? AppColors.warmTerracotta : null,
+                      color: isSelected ? AppColors.primary : null,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -221,8 +221,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.classic,
           expression: AvatarExpression.determined,
-          primaryColor: AppColors.warmTerracotta,
-          secondaryColor: AppColors.warmGold,
+          primaryColor: AppColors.primary,
+          secondaryColor: AppColors.secondary,
           accessory: 'cap',
         ),
       ),
@@ -232,8 +232,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.modern,
           expression: AvatarExpression.focused,
-          primaryColor: AppColors.warmGold,
-          secondaryColor: AppColors.warmYellow,
+          primaryColor: AppColors.secondary,
+          secondaryColor: AppColors.accent,
           accessory: 'headband',
         ),
       ),
@@ -243,8 +243,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.minimal,
           expression: AvatarExpression.neutral,
-          primaryColor: AppColors.warmYellow,
-          secondaryColor: AppColors.warmOrange,
+          primaryColor: AppColors.accent,
+          secondaryColor: AppColors.warning,
         ),
       ),
       AvatarPreset(
@@ -253,7 +253,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
         config: const AvatarConfig(
           style: AvatarStyle.sport,
           expression: AvatarExpression.happy,
-          primaryColor: AppColors.warmOrange,
+          primaryColor: AppColors.warning,
           secondaryColor: Color(0xFF8B5CF6),
         ),
       ),
@@ -264,7 +264,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
           style: AvatarStyle.modern,
           expression: AvatarExpression.determined,
           primaryColor: Color(0xFFEC4899),
-          secondaryColor: AppColors.warmTerracotta,
+          secondaryColor: AppColors.primary,
           accessory: 'glasses',
         ),
       ),
@@ -275,7 +275,7 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
           style: AvatarStyle.minimal,
           expression: AvatarExpression.focused,
           primaryColor: Color(0xFF10B981),
-          secondaryColor: AppColors.warmGold,
+          secondaryColor: AppColors.secondary,
         ),
       ),
     ];
@@ -319,8 +319,8 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
                 _currentConfig = const AvatarConfig(
                   style: AvatarStyle.modern,
                   expression: AvatarExpression.neutral,
-                  primaryColor: AppColors.warmTerracotta,
-                  secondaryColor: AppColors.warmGold,
+                  primaryColor: AppColors.primary,
+                  secondaryColor: AppColors.secondary,
                 );
               });
               Navigator.of(context).pop();

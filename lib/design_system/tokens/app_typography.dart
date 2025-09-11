@@ -4,8 +4,9 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 class AppTypography {
   AppTypography._();
 
-  // Font Family - Using system default for iOS-style look
-  static const String fontFamily = '.AppleSystemUIFont'; // iOS system font
+  // Font Family - Inter for cross-platform consistency, with system fallbacks
+  static const String fontFamily = 'Inter';
+  static const List<String> fontFallbacks = ['-apple-system', 'BlinkMacSystemFont', 'Roboto', 'sans-serif'];
 
   // Font Weights - iOS style
   static const FontWeight ultraLight = FontWeight.w100;
@@ -18,23 +19,23 @@ class AppTypography {
   static const FontWeight heavy = FontWeight.w800;
   static const FontWeight black = FontWeight.w900;
 
-  // Text Styles - Light Theme - iOS Style
+  // Text Styles - Lo-Fi Minimal Style
   static TextStyle get headingLarge => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 34,
         fontWeight: bold,
         color: AppColors.textPrimary,
-        height: 1.24,
-        letterSpacing: -0.5,
+        height: 1.25,
+        letterSpacing: -0.025,
       );
 
   static TextStyle get headingMedium => const TextStyle(
         fontFamily: fontFamily,
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: semiBold,
         color: AppColors.textPrimary,
-        height: 1.27,
-        letterSpacing: -0.2,
+        height: 1.4,
+        letterSpacing: 0,
       );
 
   static TextStyle get largeTitle => const TextStyle(
@@ -84,37 +85,37 @@ class AppTypography {
 
   static TextStyle get bodyLarge => const TextStyle(
         fontFamily: fontFamily,
-        fontSize: 17,
+        fontSize: 18,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.44,
-        letterSpacing: -0.02,
+        height: 1.6,
+        letterSpacing: 0,
       );
 
   static TextStyle get body => const TextStyle(
         fontFamily: fontFamily,
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.47,
-        letterSpacing: -0.01,
+        height: 1.4,
+        letterSpacing: 0,
       );
 
   static TextStyle get bodyMedium => const TextStyle(
         fontFamily: fontFamily,
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.47,
-        letterSpacing: -0.01,
+        height: 1.4,
+        letterSpacing: 0,
       );
 
   static TextStyle get bodySmall => const TextStyle(
         fontFamily: fontFamily,
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: regular,
-        color: AppColors.grey600,
-        height: 1.38,
+        color: AppColors.textSecondary,
+        height: 1.4,
       );
 
   static TextStyle get buttonLarge => const TextStyle(
@@ -186,30 +187,43 @@ class AppTypography {
         letterSpacing: 1.5,
       );
 
-  // Chat Specific Styles
+  // Chat Specific Styles - Lo-Fi Minimal
   static TextStyle get chatBubbleUser => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 16,
         fontWeight: regular,
         color: AppColors.userBubbleText,
         height: 1.4,
+        letterSpacing: 0,
       );
 
-  static TextStyle get chatBubbleAI => const TextStyle(
+  static TextStyle get chatBubbleBot => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 16,
         fontWeight: regular,
-        color: AppColors.aiBubbleText,
+        color: AppColors.botBubbleText,
         height: 1.4,
+        letterSpacing: 0,
       );
 
   static TextStyle get chatTimestamp => const TextStyle(
         fontFamily: fontFamily,
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: regular,
-        color: AppColors.grey500,
-        height: 1.2,
+        color: AppColors.textTertiary,
+        height: 1.25,
       );
+
+  static TextStyle get composerPlaceholder => const TextStyle(
+        fontFamily: fontFamily,
+        fontSize: 16,
+        fontWeight: regular,
+        color: AppColors.textTertiary,
+        height: 1.4,
+      );
+
+  // Legacy alias
+  static TextStyle get chatBubbleAI => chatBubbleBot;
 
   // Dark Theme Variants
   static TextStyle get h1Dark => h1.copyWith(color: AppColors.darkTextPrimary);

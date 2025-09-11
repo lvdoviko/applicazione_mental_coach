@@ -76,13 +76,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.warmTerracotta.withOpacity(0.1),
-            AppColors.warmGold.withOpacity(0.1),
+            AppColors.primary.withOpacity(0.1),
+            AppColors.secondary.withOpacity(0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.warmTerracotta.withOpacity(0.2),
+          color: AppColors.primary.withOpacity(0.2),
         ),
       ),
       child: Column(
@@ -93,12 +93,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: AppColors.warmTerracotta.withOpacity(0.2),
+                  color: AppColors.primary.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.psychology,
-                  color: AppColors.warmTerracotta,
+                  color: AppColors.primary,
                   size: 24,
                 ),
               ),
@@ -140,7 +140,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               icon: Icons.chat_bubble_outline,
               label: 'Sessions',
               value: '23',
-              color: AppColors.warmGold,
+              color: AppColors.secondary,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -150,7 +150,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               icon: Icons.favorite_border,
               label: 'Mood Score',
               value: '8.2',
-              color: AppColors.warmYellow,
+              color: AppColors.accent,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -160,7 +160,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               icon: Icons.trending_up,
               label: 'Progress',
               value: '+15%',
-              color: AppColors.warmOrange,
+              color: AppColors.warning,
             ),
           ),
         ],
@@ -239,7 +239,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       vertical: AppSpacing.sm,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.warmTerracotta : Colors.transparent,
+                      color: isSelected ? AppColors.primary : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -326,10 +326,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: AppColors.warmYellow.withOpacity(0.05),
+        color: AppColors.accent.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.warmYellow.withOpacity(0.2),
+          color: AppColors.accent.withOpacity(0.2),
         ),
       ),
       child: Column(
@@ -339,7 +339,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Icon(
                 Icons.favorite,
-                color: AppColors.warmYellow,
+                color: AppColors.accent,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -409,7 +409,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: [
           Icon(
             icon,
-            color: AppColors.warmYellow,
+            color: AppColors.accent,
             size: 18,
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -418,7 +418,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: Text(
               value,
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.warmYellow,
+                color: AppColors.accent,
                 fontWeight: AppTypography.bold,
               ),
               textAlign: TextAlign.center,
@@ -534,8 +534,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.warmGold.withOpacity(0.1),
-            AppColors.warmOrange.withOpacity(0.1),
+            AppColors.secondary.withOpacity(0.1),
+            AppColors.warning.withOpacity(0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
@@ -547,7 +547,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Icon(
                 Icons.lightbulb_outline,
-                color: AppColors.warmOrange,
+                color: AppColors.warning,
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -606,28 +606,28 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         subtitle: 'Discussed stress management techniques',
         time: '2h ago',
         icon: Icons.chat_bubble_outline,
-        color: AppColors.warmTerracotta,
+        color: AppColors.primary,
       ),
       DashboardActivity(
         title: 'Workout Completed',
         subtitle: 'Strength training • 45 minutes',
         time: '5h ago',
         icon: Icons.fitness_center,
-        color: AppColors.warmYellow,
+        color: AppColors.accent,
       ),
       DashboardActivity(
         title: 'Mood Check-in',
         subtitle: 'Feeling energized and focused',
         time: '1d ago',
         icon: Icons.mood,
-        color: AppColors.warmOrange,
+        color: AppColors.warning,
       ),
       DashboardActivity(
         title: 'Avatar Updated',
         subtitle: 'Changed expression to determined',
         time: '2d ago',
         icon: Icons.face,
-        color: AppColors.warmGold,
+        color: AppColors.secondary,
       ),
     ];
   }

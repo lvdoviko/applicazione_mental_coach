@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
+import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
+import 'package:applicazione_mental_coach/design_system/tokens/app_animations.dart';
 
 class AppTheme {
   AppTheme._();
@@ -50,40 +52,40 @@ class AppTheme {
     );
   }
 
-  // Color Schemes
+  // Lo-Fi Minimal Color Schemes
   static const ColorScheme _lightColorScheme = ColorScheme(
     brightness: Brightness.light,
-    primary: AppColors.warmTerracotta,
+    primary: AppColors.primary,
     onPrimary: AppColors.white,
-    secondary: AppColors.warmOrange,
-    onSecondary: AppColors.white,
-    tertiary: AppColors.warmYellow,
+    secondary: AppColors.secondary,
+    onSecondary: AppColors.textPrimary,
+    tertiary: AppColors.accent,
     onTertiary: AppColors.textPrimary,
     error: AppColors.error,
-    onError: AppColors.white,
-    surface: AppColors.white,
+    onError: AppColors.textPrimary,
+    surface: AppColors.surface,
     onSurface: AppColors.textPrimary,
-    surfaceContainerHighest: AppColors.grey100,
-    onSurfaceVariant: AppColors.grey600,
-    outline: AppColors.grey300,
+    surfaceContainerHighest: AppColors.surfaceVariant,
+    onSurfaceVariant: AppColors.textSecondary,
+    outline: AppColors.border,
     outlineVariant: AppColors.grey200,
   );
 
   static const ColorScheme _darkColorScheme = ColorScheme(
     brightness: Brightness.dark,
-    primary: AppColors.warmGold,
+    primary: AppColors.primary,
     onPrimary: AppColors.white,
-    secondary: AppColors.warmYellow,
-    onSecondary: AppColors.textPrimary,
-    tertiary: AppColors.warmOrange,
-    onTertiary: AppColors.white,
+    secondary: AppColors.secondary,
+    onSecondary: AppColors.darkTextPrimary,
+    tertiary: AppColors.accent,
+    onTertiary: AppColors.darkTextPrimary,
     error: AppColors.error,
     onError: AppColors.white,
     surface: AppColors.darkSurface,
     onSurface: AppColors.darkTextPrimary,
-    surfaceContainerHighest: AppColors.grey800,
+    surfaceContainerHighest: AppColors.darkSurfaceVariant,
     onSurfaceVariant: AppColors.darkTextSecondary,
-    outline: AppColors.grey600,
+    outline: AppColors.darkBorder,
     outlineVariant: AppColors.grey700,
   );
 
@@ -139,189 +141,234 @@ class AppTheme {
   static ElevatedButtonThemeData get _elevatedButtonTheme =>
       ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.warmTerracotta,
+          backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
           textStyle: AppTypography.buttonLarge,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16), // More iOS-like rounded corners
+            borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // More generous padding
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.buttonPadding * 2,
+            vertical: AppSpacing.buttonPadding,
+          ),
           elevation: 0,
-          minimumSize: const Size(0, 54), // iOS button height
+          minimumSize: Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
   static ElevatedButtonThemeData get _darkElevatedButtonTheme =>
       ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.warmGold,
+          backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
           textStyle: AppTypography.buttonLarge,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16), // More iOS-like rounded corners
+            borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // More generous padding
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.buttonPadding * 2,
+            vertical: AppSpacing.buttonPadding,
+          ),
           elevation: 0,
-          minimumSize: const Size(0, 54), // iOS button height
+          minimumSize: Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
   static TextButtonThemeData get _textButtonTheme => TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.warmTerracotta,
+          foregroundColor: AppColors.primary,
           textStyle: AppTypography.buttonMedium,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          minimumSize: const Size(0, 44), // iOS minimum touch target
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.md,
+          ),
+          minimumSize: const Size(0, 44),
         ),
       );
 
   static TextButtonThemeData get _darkTextButtonTheme => TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.warmGold,
+          foregroundColor: AppColors.primary,
           textStyle: AppTypography.buttonMedium,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          minimumSize: const Size(0, 44), // iOS minimum touch target
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.md,
+          ),
+          minimumSize: const Size(0, 44),
         ),
       );
 
   static OutlinedButtonThemeData get _outlinedButtonTheme =>
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.warmTerracotta,
+          foregroundColor: AppColors.primary,
           textStyle: AppTypography.buttonMedium,
-          side: const BorderSide(color: AppColors.warmTerracotta, width: 1.5), // Slightly thicker iOS-style border
+          side: BorderSide(color: AppColors.primary, width: 1.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          minimumSize: const Size(0, 54), // iOS button height
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.buttonPadding * 2,
+            vertical: AppSpacing.buttonPadding,
+          ),
+          minimumSize: Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
   static OutlinedButtonThemeData get _darkOutlinedButtonTheme =>
       OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.warmGold,
+          foregroundColor: AppColors.primary,
           textStyle: AppTypography.buttonMedium,
-          side: const BorderSide(color: AppColors.warmGold, width: 1.5), // Slightly thicker iOS-style border
+          side: BorderSide(color: AppColors.primary, width: 1.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          minimumSize: const Size(0, 54), // iOS button height
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.buttonPadding * 2,
+            vertical: AppSpacing.buttonPadding,
+          ),
+          minimumSize: Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
   static InputDecorationTheme get _inputDecorationTheme =>
       InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.grey100,
+        fillColor: AppColors.surfaceVariant,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16), // More iOS-like rounded corners
-          borderSide: BorderSide.none, // iOS-style no border when not focused
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.warmTerracotta, width: 2),
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
+          borderSide: const BorderSide(color: AppColors.borderFocus, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16), // More generous iOS padding
-        hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.grey500),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.composerPadding,
+          vertical: AppSpacing.composerPadding,
+        ),
+        hintStyle: AppTypography.composerPlaceholder,
       );
 
   static InputDecorationTheme get _darkInputDecorationTheme =>
       InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkSurface,
+        fillColor: AppColors.darkSurfaceVariant,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.grey600),
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.grey600),
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.warmGold, width: 2),
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
+          borderSide: const BorderSide(color: AppColors.borderFocus, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.error),
+          borderRadius: BorderRadius.circular(AppBorderRadius.composer),
+          borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        hintStyle:
-            AppTypography.bodyMedium.copyWith(color: AppColors.darkTextSecondary),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.composerPadding,
+          vertical: AppSpacing.composerPadding,
+        ),
+        hintStyle: AppTypography.composerPlaceholder.copyWith(
+          color: AppColors.darkTextSecondary,
+        ),
       );
 
   static CardThemeData get _cardTheme => CardThemeData(
-        color: AppColors.white,
+        color: AppColors.surface,
         elevation: 0,
+        shadowColor: AppColors.textPrimary.withOpacity(0.08),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), // More iOS-like rounded corners
+          borderRadius: BorderRadius.circular(AppBorderRadius.card),
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // More generous iOS spacing
+        margin: EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding,
+          vertical: AppSpacing.md,
+        ),
       );
 
   static CardThemeData get _darkCardTheme => CardThemeData(
         color: AppColors.darkSurface,
         elevation: 0,
+        shadowColor: AppColors.darkTextPrimary.withOpacity(0.1),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), // More iOS-like rounded corners
+          borderRadius: BorderRadius.circular(AppBorderRadius.card),
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // More generous iOS spacing
+        margin: EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding,
+          vertical: AppSpacing.md,
+        ),
       );
 
   static ChipThemeData get _chipTheme => ChipThemeData(
-        backgroundColor: AppColors.grey100,
-        selectedColor: AppColors.warmTerracotta,
-        labelStyle: AppTypography.bodySmall,
+        backgroundColor: AppColors.surfaceVariant,
+        selectedColor: AppColors.primary,
+        labelStyle: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppBorderRadius.chip),
+        ),
+        side: BorderSide.none,
+        showCheckmark: false,
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.chipPaddingHorizontal,
+          vertical: AppSpacing.chipPaddingVertical,
         ),
       );
 
   static ChipThemeData get _darkChipTheme => ChipThemeData(
-        backgroundColor: AppColors.grey700,
-        selectedColor: AppColors.warmGold,
+        backgroundColor: AppColors.darkSurfaceVariant,
+        selectedColor: AppColors.primary,
         labelStyle: AppTypography.bodySmall.copyWith(color: AppColors.darkTextPrimary),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppBorderRadius.chip),
+        ),
+        side: BorderSide.none,
+        showCheckmark: false,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.chipPaddingHorizontal,
+          vertical: AppSpacing.chipPaddingVertical,
         ),
       );
 
   static FloatingActionButtonThemeData get _fabTheme =>
       const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.warmTerracotta,
+        backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         elevation: 0,
       );
 
   static FloatingActionButtonThemeData get _darkFabTheme =>
       const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.warmGold,
+        backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         elevation: 0,
       );
 
   static BottomNavigationBarThemeData get _bottomNavTheme =>
       BottomNavigationBarThemeData(
-        backgroundColor: AppColors.white,
-        selectedItemColor: AppColors.warmTerracotta,
-        unselectedItemColor: AppColors.grey500,
+        backgroundColor: AppColors.surface,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: AppTypography.caption,
         unselectedLabelStyle: AppTypography.caption,
@@ -331,7 +378,7 @@ class AppTheme {
   static BottomNavigationBarThemeData get _darkBottomNavTheme =>
       BottomNavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
-        selectedItemColor: AppColors.warmGold,
+        selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.darkTextSecondary,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: AppTypography.captionDark,
@@ -340,13 +387,13 @@ class AppTheme {
       );
 
   static DividerThemeData get _dividerTheme => const DividerThemeData(
-        color: AppColors.grey200,
+        color: AppColors.border,
         thickness: 1,
         space: 1,
       );
 
   static DividerThemeData get _darkDividerTheme => const DividerThemeData(
-        color: AppColors.grey700,
+        color: AppColors.darkBorder,
         thickness: 1,
         space: 1,
       );
@@ -354,7 +401,7 @@ class AppTheme {
   static SwitchThemeData get _switchTheme => SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.warmTerracotta;
+            return AppColors.primary;
           }
           return AppColors.grey400;
         }),
@@ -363,7 +410,7 @@ class AppTheme {
   static SwitchThemeData get _darkSwitchTheme => SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.warmGold;
+            return AppColors.primary;
           }
           return AppColors.grey400;
         }),
