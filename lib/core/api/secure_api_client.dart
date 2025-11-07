@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
+import 'package:uuid/uuid.dart';
+import '../config/app_config.dart';
 import '../security/token_storage_service.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
@@ -10,22 +12,21 @@ import '../../features/health/models/wearable_snapshot.dart';
 /// Secure HTTP client for KAIX backend API communication
 /// - Zero LLM keys stored on client
 /// - JWT authentication with auto-refresh
+/// - Guest authentication support
 /// - Certificate pinning for security
 /// - Comprehensive error handling
 class SecureApiClient {
-  static const String baseUrl = 'https://api.kaixplatform.com/v1';
-  static const Duration timeout = Duration(seconds: 30);
-  
   final Dio _dio;
   final TokenStorageService _tokenStorage;
-  
+  final Uuid _uuid = const Uuid();
+
   SecureApiClient({
     required TokenStorageService tokenStorage,
     String? customBaseUrl,
   }) : _tokenStorage = tokenStorage,
        _dio = Dio() {
-    
-    _configureDio(customBaseUrl ?? baseUrl);
+
+    _configureDio(customBaseUrl ?? AppConfig.baseUrl);
     _setupInterceptors();
     _setupCertificatePinning();
   }
@@ -33,13 +34,15 @@ class SecureApiClient {
   void _configureDio(String baseUrl) {
     _dio.options = BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: timeout,
-      receiveTimeout: timeout,
-      sendTimeout: timeout,
+      connectTimeout: AppConfig.requestTimeout,
+      receiveTimeout: AppConfig.requestTimeout,
+      sendTimeout: AppConfig.requestTimeout,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'User-Agent': 'KAIX-Mental-Coach/1.0',
+        'X-Tenant-Id': AppConfig.tenantId,
+        'X-Api-Key': AppConfig.apiKey,
       },
     );
   }
@@ -66,14 +69,45 @@ class SecureApiClient {
   bool _validateCertificate(cert, String host) {
     // In production, implement actual certificate pinning
     // For now, use default validation for development
-    if (host.contains('kaixplatform.com') || host.contains('localhost')) {
+    if (host.contains('miptechnologies.tech') ||
+        host.contains('kaixplatform.com') ||
+        host.contains('localhost')) {
       // Add your certificate hash validation here
       return true;
     }
     return false;
   }
-  
+
   // === Authentication Endpoints ===
+
+  /// Authenticate as guest user (anonymous)
+  Future<GuestAuthResponse> authenticateGuest({String? guestId}) async {
+    try {
+      final response = await _dio.post('/v1/auth/guest', data: {
+        'guest_id': guestId ?? 'guest_${_uuid.v4()}',
+        'device_info': {
+          'platform': 'flutter',
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      });
+
+      final guestResponse = GuestAuthResponse.fromJson(response.data);
+
+      // Store guest token as JWT token (reuse existing storage)
+      await _tokenStorage.storeTokens(
+        jwtToken: guestResponse.sessionToken,
+        refreshToken: guestResponse.sessionToken, // Guest uses same token
+        jwtExpiry: guestResponse.expiryDateTime,
+      );
+
+      return guestResponse;
+    } catch (e) {
+      if (e is DioException && e.error is ApiException) {
+        throw e.error as ApiException;
+      }
+      throw AuthException('Guest authentication failed: $e');
+    }
+  }
   
   /// Login user with username/password
   Future<AuthResponse> login({

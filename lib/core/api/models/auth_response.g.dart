@@ -49,6 +49,20 @@ Map<String, dynamic> _$ApiErrorResponseToJson(ApiErrorResponse instance) =>
       'details': instance.details,
     };
 
+GuestAuthResponse _$GuestAuthResponseFromJson(Map<String, dynamic> json) =>
+    GuestAuthResponse(
+      sessionToken: json['session_token'] as String,
+      guestId: json['guest_id'] as String,
+      expiresIn: (json['expires_in'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$GuestAuthResponseToJson(GuestAuthResponse instance) =>
+    <String, dynamic>{
+      'session_token': instance.sessionToken,
+      'guest_id': instance.guestId,
+      'expires_in': instance.expiresIn,
+    };
+
 SnapshotUploadResponse _$SnapshotUploadResponseFromJson(
         Map<String, dynamic> json) =>
     SnapshotUploadResponse(

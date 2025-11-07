@@ -11,11 +11,27 @@ class AppConfig {
   static const bool enableAnalytics = false; // Privacy-first default
   static const bool enableCrashReporting = false; // Privacy-first default
   
-  // API Configuration
-  static const String baseUrl = 'https://api.aiwellbeingcoach.com';
-  static const String wsUrl = 'wss://api.aiwellbeingcoach.com/ws';
+  // API Configuration - MIP Technologies Backend
+  static const String baseUrl = 'https://api.miptechnologies.tech/api';
+  static const String wsUrl = 'wss://api.miptechnologies.tech/api/v1/ws/chat';
   static const Duration requestTimeout = Duration(seconds: 30);
   static const Duration chatTimeout = Duration(minutes: 5);
+
+  // Multi-tenant Configuration
+  static const String tenantId = 'wordpress-plugin-test';
+  static const String apiKey = 'wp-test-0d809b36852247dd0e5d94673168d63444197c39da657dc8a2ca3d8546b62126';
+
+  // WebSocket Configuration
+  static const Duration wsConnectionTimeout = Duration(seconds: 10);
+  static const Duration wsHeartbeatInterval = Duration(seconds: 30);
+  static const Duration wsHeartbeatTimeout = Duration(seconds: 10);
+  static const int wsMaxReconnectAttempts = 5;
+  static const Duration wsReconnectInitialDelay = Duration(seconds: 1);
+  static const Duration wsReconnectMaxDelay = Duration(seconds: 30);
+
+  // Auth Configuration
+  static const Duration tokenRefreshBuffer = Duration(minutes: 5);
+  static const Duration guestTokenExpiry = Duration(hours: 24);
   
   // Rate Limiting (Cost optimization)
   static const int maxMessagesPerDay = 100;

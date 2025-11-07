@@ -12,6 +12,7 @@ import '../../../core/services/connectivity_service.dart';
 import '../../../core/api/secure_api_client.dart';
 import '../../../core/security/token_storage_service.dart';
 import '../services/chat_websocket_service.dart';
+import '../services/guest_auth_service.dart';
 import '../services/offline_fallback_engine.dart';
 import '../models/chat_message.dart';
 
@@ -37,6 +38,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   
   // Services
   late ChatWebSocketService _chatService;
+  late GuestAuthService _guestAuthService;
   late OfflineFallbackEngine _offlineEngine;
   late ConnectivityService _connectivityService;
   late SecureApiClient _apiClient;
@@ -92,9 +94,13 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   void _initializeServices() {
     _tokenStorage = TokenStorageService();
     _apiClient = SecureApiClient(tokenStorage: _tokenStorage);
+    _guestAuthService = GuestAuthService(tokenStorage: _tokenStorage);
     _connectivityService = ConnectivityService();
     _offlineEngine = OfflineFallbackEngine(connectivityService: _connectivityService);
-    _chatService = ChatWebSocketService(apiClient: _apiClient);
+    _chatService = ChatWebSocketService(
+      apiClient: _apiClient,
+      guestAuthService: _guestAuthService,
+    );
   }
 
   void _setupListeners() {
@@ -310,20 +316,21 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
   void _sendTypingIndicator(bool isTyping) {
     if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
-      _chatService.sendTyping(isTyping);
+      if (isTyping) {
+        _chatService.sendTypingStart();
+      } else {
+        _chatService.sendTypingStop();
+      }
     }
   }
 
   Future<void> _requestEscalation() async {
     try {
       if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
-        await _chatService.requestEscalation(
-          'user_requested',
-          message: 'User requested human support',
-        );
-        _showStatusMessage('Escalation request sent. A human coach will respond soon.', isError: false);
+        // Note: Escalation removed from new protocol - show message
+        _showStatusMessage('Human support request noted. Our team will reach out soon.', isError: false);
       } else {
-        _showStatusMessage('Escalation requires internet connection. Please try again when online.', isError: true);
+        _showStatusMessage('Request requires internet connection. Please try again when online.', isError: true);
       }
     } catch (e) {
       _showStatusMessage('Failed to send escalation request. Please try again.', isError: true);

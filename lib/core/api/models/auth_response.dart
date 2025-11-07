@@ -75,24 +75,51 @@ class ApiErrorResponse {
   Map<String, dynamic> toJson() => _$ApiErrorResponseToJson(this);
 }
 
+/// Guest authentication response model
+@JsonSerializable()
+class GuestAuthResponse {
+  @JsonKey(name: 'session_token')
+  final String sessionToken;
+
+  @JsonKey(name: 'guest_id')
+  final String guestId;
+
+  @JsonKey(name: 'expires_in')
+  final int expiresIn; // seconds (typically 86400 = 24h)
+
+  const GuestAuthResponse({
+    required this.sessionToken,
+    required this.guestId,
+    required this.expiresIn,
+  });
+
+  /// Calculate expiry DateTime
+  DateTime get expiryDateTime => DateTime.now().add(Duration(seconds: expiresIn));
+
+  factory GuestAuthResponse.fromJson(Map<String, dynamic> json) =>
+      _$GuestAuthResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$GuestAuthResponseToJson(this);
+}
+
 /// Health snapshot upload response
 @JsonSerializable()
 class SnapshotUploadResponse {
   @JsonKey(name: 'snapshot_id')
   final String snapshotId;
-  
+
   @JsonKey(name: 'pinecone_id')
   final String? pineconeId;
-  
+
   @JsonKey(name: 'processed_at')
   final String processedAt;
-  
+
   const SnapshotUploadResponse({
     required this.snapshotId,
     this.pineconeId,
     required this.processedAt,
   });
-  
+
   factory SnapshotUploadResponse.fromJson(Map<String, dynamic> json) =>
       _$SnapshotUploadResponseFromJson(json);
 

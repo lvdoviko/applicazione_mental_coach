@@ -7,12 +7,18 @@ import 'package:applicazione_mental_coach/core/theme/app_theme.dart';
 import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/core/config/app_config.dart';
 import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
+import 'package:applicazione_mental_coach/features/chat/models/chat_message.dart';
+import 'package:applicazione_mental_coach/features/chat/models/chat_session.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive for local storage
   await Hive.initFlutter();
+
+  // Register Hive adapters for chat models
+  Hive.registerAdapter(ChatSessionAdapter()); // TypeId: 11
+  // Note: ChatMessage uses JSON serialization, not Hive adapter
   
   // Set device orientation preferences
   await SystemChrome.setPreferredOrientations([

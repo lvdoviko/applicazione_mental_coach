@@ -173,21 +173,38 @@ class ChatMessage extends Equatable {
 
   // === Methods ===
 
+  /// Copy message with updated fields
+  ChatMessage copyWith({
+    String? id,
+    String? text,
+    ChatMessageType? type,
+    DateTime? timestamp,
+    ChatMessageStatus? status,
+    String? sessionId,
+    Map<String, dynamic>? metadata,
+    double? confidenceScore,
+    String? modelUsed,
+    int? processingTimeMs,
+    bool? escalationNeeded,
+  }) {
+    return ChatMessage(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      type: type ?? this.type,
+      timestamp: timestamp ?? this.timestamp,
+      status: status ?? this.status,
+      sessionId: sessionId ?? this.sessionId,
+      metadata: metadata ?? this.metadata,
+      confidenceScore: confidenceScore ?? this.confidenceScore,
+      modelUsed: modelUsed ?? this.modelUsed,
+      processingTimeMs: processingTimeMs ?? this.processingTimeMs,
+      escalationNeeded: escalationNeeded ?? this.escalationNeeded,
+    );
+  }
+
   /// Copy message with updated status
   ChatMessage copyWithStatus(ChatMessageStatus newStatus) {
-    return ChatMessage(
-      id: id,
-      text: text,
-      type: type,
-      timestamp: timestamp,
-      status: newStatus,
-      sessionId: sessionId,
-      metadata: metadata,
-      confidenceScore: confidenceScore,
-      modelUsed: modelUsed,
-      processingTimeMs: processingTimeMs,
-      escalationNeeded: escalationNeeded,
-    );
+    return copyWith(status: newStatus);
   }
 
   /// Check if message is from user
