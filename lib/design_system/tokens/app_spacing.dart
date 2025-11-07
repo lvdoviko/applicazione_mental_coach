@@ -38,6 +38,10 @@ class AppSpacing {
   static const double chatAvatarSize = 32;
   static const double chatAvatarMargin = sm; // 8
 
+  // Legacy aliases for backward compatibility
+  static const double chatBubbleMargin = messageBubbleMargin;
+  static const double chatBubblePadding = messageBubblePadding;
+
   // Quick reply chips
   static const double chipSpacing = sm; // 8
   static const double chipPaddingVertical = sm; // 8

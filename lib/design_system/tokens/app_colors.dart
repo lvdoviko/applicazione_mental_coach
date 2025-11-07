@@ -74,6 +74,10 @@ class AppColors {
   // Warm tone colors used throughout the app
   static const Color warmTerracotta = Color(0xFFE07A5F);
   static const Color warmGold = Color(0xFFF2CC8F);
+  static const Color warmOrange = Color(0xFFFF9F66);
+  static const Color warmPeach = Color(0xFFFFD4B8);
+  static const Color warmYellow = Color(0xFFFFF4CC);
+  static const Color warmCoral = Color(0xFFFFB4A2);
 
   // Legacy aliases for backward compatibility
   static const Color aiBubble = botBubble;

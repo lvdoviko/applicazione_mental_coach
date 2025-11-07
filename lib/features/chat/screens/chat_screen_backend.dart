@@ -96,6 +96,8 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     _apiClient = SecureApiClient(tokenStorage: _tokenStorage);
     _guestAuthService = GuestAuthService(tokenStorage: _tokenStorage);
     _connectivityService = ConnectivityService();
+    // Initialize connectivity service
+    _connectivityService.initialize();
     _offlineEngine = OfflineFallbackEngine(connectivityService: _connectivityService);
     _chatService = ChatWebSocketService(
       apiClient: _apiClient,

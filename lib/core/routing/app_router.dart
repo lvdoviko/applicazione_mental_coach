@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:applicazione_mental_coach/features/onboarding/screens/onboarding_screen.dart';
-import 'package:applicazione_mental_coach/features/chat/screens/chat_screen.dart';
+import 'package:applicazione_mental_coach/features/chat/screens/chat_screen_backend.dart';
 import 'package:applicazione_mental_coach/features/dashboard/screens/dashboard_screen.dart';
 import 'package:applicazione_mental_coach/features/avatar/screens/avatar_screen.dart';
 import 'package:applicazione_mental_coach/features/settings/screens/settings_screen.dart';
@@ -37,11 +37,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) => MainNavigation(child: child),
         routes: [
-          // Chat Screen (Primary)
+          // Chat Screen (Primary) - Using WebSocket Backend
           GoRoute(
             path: AppRoute.chat.path,
             name: 'chat',
-            builder: (context, state) => const ChatScreen(),
+            builder: (context, state) => const ChatScreenBackend(),
           ),
           
           // Dashboard
