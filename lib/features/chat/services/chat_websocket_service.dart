@@ -164,7 +164,7 @@ class ChatWebSocketService {
   Future<void> _refreshWebSocketToken() async {
     try {
       _currentToken = await _apiClient.getWebSocketToken();
-    } on ApiException catch (e) {
+    } on ApiException {
       throw const ChatException('Failed to get WebSocket token');
     } catch (e) {
       throw const ChatException('Failed to get WebSocket token');

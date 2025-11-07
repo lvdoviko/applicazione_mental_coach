@@ -109,7 +109,7 @@ class SecureApiClient {
     try {
       final refreshToken = await _tokenStorage.getRefreshToken();
       if (refreshToken == null) {
-        throw TokenException('No refresh token available');
+        throw const TokenException('No refresh token available');
       }
       
       final response = await _dio.post('/auth/refresh', data: {

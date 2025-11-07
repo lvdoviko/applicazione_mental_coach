@@ -71,6 +71,10 @@ class AppColors {
   static const Color darkSkeleton = Color(0xFF21262D);
   static const Color darkSkeletonHighlight = Color(0xFF30363D);
 
+  // Warm tone colors used throughout the app
+  static const Color warmTerracotta = Color(0xFFE07A5F);
+  static const Color warmGold = Color(0xFFF2CC8F);
+
   // Legacy aliases for backward compatibility
   static const Color aiBubble = botBubble;
   static const Color aiBubbleText = botBubbleText;

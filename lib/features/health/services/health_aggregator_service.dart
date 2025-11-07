@@ -251,7 +251,7 @@ class HealthAggregatorService {
   /// Calculate sleep metrics from aggregated data
   SleepMetrics _calculateSleepMetrics(List<double> sleepHours, String window) {
     if (sleepHours.isEmpty) {
-      return SleepMetrics(
+      return const SleepMetrics(
         avgHours: 0.0,
         efficiency: 0.0,
         lastNightsHours: [],
@@ -318,7 +318,7 @@ class HealthAggregatorService {
         type: 'general',
         durationMin: 45, // Estimated
         intensity: 6, // Estimated
-        timestamp: DateTime.now().subtract(Duration(hours: 4)),
+        timestamp: DateTime.now().subtract(const Duration(hours: 4)),
       );
     }
     
@@ -332,7 +332,7 @@ class HealthAggregatorService {
 
   /// Create default self-report metrics (would be populated from UI)
   SelfReportMetrics _createDefaultSelfReport() {
-    return SelfReportMetrics(
+    return const SelfReportMetrics(
       mood: 3, // Neutral
       anxiety: 3, // Low-moderate
       stressLevel: 3,
@@ -342,7 +342,7 @@ class HealthAggregatorService {
 
   /// Create default context metrics
   ContextMetrics _createDefaultContext() {
-    return ContextMetrics(
+    return const ContextMetrics(
       travelFlag: false,
       // daysToCompetition would be set from user's calendar/goals
     );

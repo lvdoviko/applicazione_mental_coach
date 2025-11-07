@@ -119,7 +119,7 @@ class _HealthDashboardScreenState extends ConsumerState<HealthDashboardScreen> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Row(
             children: [
-              Icon(Icons.sync, size: 16, color: AppColors.grey500),
+              const Icon(Icons.sync, size: 16, color: AppColors.grey500),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 syncStatus,
@@ -129,7 +129,7 @@ class _HealthDashboardScreenState extends ConsumerState<HealthDashboardScreen> {
               ),
               const Spacer(),
               if (ref.watch(healthDataProvider).isSyncing)
-                SizedBox(
+                const SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
@@ -223,7 +223,7 @@ class _HealthDashboardScreenState extends ConsumerState<HealthDashboardScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.error_outline, color: Colors.red),
+          const Icon(Icons.error_outline, color: Colors.red),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -247,7 +247,7 @@ class _HealthDashboardScreenState extends ConsumerState<HealthDashboardScreen> {
           ),
           IconButton(
             onPressed: _refreshHealthData,
-            icon: Icon(Icons.refresh, color: Colors.red),
+            icon: const Icon(Icons.refresh, color: Colors.red),
           ),
         ],
       ),
@@ -260,7 +260,7 @@ class _HealthDashboardScreenState extends ConsumerState<HealthDashboardScreen> {
       padding: const EdgeInsets.all(AppSpacing.xxl),
       child: Column(
         children: [
-          Icon(
+          const Icon(
             Icons.data_usage,
             size: 64,
             color: AppColors.grey400,
@@ -489,7 +489,7 @@ class _HealthDashboardScreenState extends ConsumerState<HealthDashboardScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green),
+            const Icon(Icons.check_circle, color: Colors.green),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
@@ -533,7 +533,7 @@ class _HealthDashboardScreenState extends ConsumerState<HealthDashboardScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning, color: Colors.orange),
+          const Icon(Icons.warning, color: Colors.orange),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(

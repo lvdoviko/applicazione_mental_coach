@@ -24,7 +24,7 @@ class IOSChatBubble extends StatelessWidget {
     final isUser = type == IOSChatBubbleType.user;
     
     return Container(
-      margin: EdgeInsets.symmetric(
+      margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.xs,
       ),
@@ -71,7 +71,7 @@ class IOSChatBubble extends StatelessWidget {
     return Container(
       width: 32,
       height: 32,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.warmTerracotta,
         shape: BoxShape.circle,
       ),

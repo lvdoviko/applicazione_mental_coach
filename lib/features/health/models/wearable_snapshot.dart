@@ -142,18 +142,21 @@ class WearableSnapshot extends Equatable {
     int riskScore = 0;
     
     // Sleep risk factors
-    if (sleep.avgHours < 6.0) riskScore += 3;
-    else if (sleep.avgHours < 7.0) riskScore += 1;
+    if (sleep.avgHours < 6.0) {
+      riskScore += 3;
+    } else if (sleep.avgHours < 7.0) riskScore += 1;
     
     if (sleep.efficiency < 80) riskScore += 2;
     
     // HRV risk factors
-    if (physio.hrvDeltaPct < -20) riskScore += 3;
-    else if (physio.hrvDeltaPct < -10) riskScore += 1;
+    if (physio.hrvDeltaPct < -20) {
+      riskScore += 3;
+    } else if (physio.hrvDeltaPct < -10) riskScore += 1;
     
     // Mental state risk factors
-    if (selfReport.anxiety >= 8) riskScore += 3;
-    else if (selfReport.anxiety >= 6) riskScore += 1;
+    if (selfReport.anxiety >= 8) {
+      riskScore += 3;
+    } else if (selfReport.anxiety >= 6) riskScore += 1;
     
     if (selfReport.mood <= 2) riskScore += 2;
     
@@ -223,7 +226,7 @@ class WearableSnapshot extends Equatable {
     final buffer = StringBuffer();
     
     // Time context
-    buffer.writeln('Health Summary (${window}):');
+    buffer.writeln('Health Summary ($window):');
     
     // Sleep metrics
     buffer.writeln('Sleep: ${sleep.avgHours.toStringAsFixed(1)}h avg, ${sleep.efficiency}% efficiency');

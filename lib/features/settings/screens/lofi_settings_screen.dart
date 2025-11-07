@@ -138,7 +138,7 @@ class _LoFiSettingsScreenState extends State<LoFiSettingsScreen> {
                   ],
                 ),
               ),
-              Icon(
+              const Icon(
                 Icons.chevron_right,
                 color: AppColors.textTertiary,
                 size: 20,
@@ -401,7 +401,7 @@ class _LoFiSettingsScreenState extends State<LoFiSettingsScreen> {
           color: AppColors.textTertiary,
         ),
       ),
-      trailing: Icon(
+      trailing: const Icon(
         Icons.chevron_right,
         color: AppColors.textTertiary,
         size: 20,
@@ -453,7 +453,7 @@ class _LoFiSettingsScreenState extends State<LoFiSettingsScreen> {
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: AppColors.primary,
+        activeThumbColor: AppColors.primary,
       ),
     );
   }

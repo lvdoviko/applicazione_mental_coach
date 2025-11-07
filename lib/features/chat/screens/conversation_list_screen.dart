@@ -129,7 +129,7 @@ class _ConversationListScreenState extends State<ConversationListScreen>
                 decoration: InputDecoration(
                   hintText: 'Search conversations...',
                   hintStyle: AppTypography.composerPlaceholder,
-                  prefixIcon: Icon(
+                  prefixIcon: const Icon(
                     Icons.search,
                     color: AppColors.textSecondary,
                   ),
@@ -223,7 +223,7 @@ class _ConversationListScreenState extends State<ConversationListScreen>
         ),
         shape: BoxShape.circle,
       ),
-      child: Icon(
+      child: const Icon(
         Icons.psychology_outlined,
         color: AppColors.surface,
         size: 24,
@@ -285,7 +285,7 @@ class _ConversationListScreenState extends State<ConversationListScreen>
         ),
         if (conversation.isPinned) ...[
           const SizedBox(height: AppSpacing.xs),
-          Icon(
+          const Icon(
             Icons.push_pin,
             size: 16,
             color: AppColors.primary,
@@ -324,11 +324,11 @@ class _ConversationListScreenState extends State<ConversationListScreen>
             Container(
               width: 80,
               height: 80,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.surfaceVariant,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.chat_bubble_outline,
                 size: 40,
                 color: AppColors.textTertiary,
@@ -360,11 +360,11 @@ class _ConversationListScreenState extends State<ConversationListScreen>
     return FloatingActionButton(
       onPressed: _createNewConversation,
       backgroundColor: AppColors.primary,
+      tooltip: 'Start new conversation',
       child: Icon(
         Icons.add,
         color: AppColors.surface,
       ),
-      tooltip: 'Start new conversation',
     );
   }
 

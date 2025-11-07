@@ -25,7 +25,7 @@ class HealthTrendsCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(Icons.timeline, size: 48, color: AppColors.grey400),
+            const Icon(Icons.timeline, size: 48, color: AppColors.grey400),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Dati insufficienti per le tendenze',
@@ -50,20 +50,13 @@ class HealthTrendsCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.grey200),
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(0, 2),
-            blurRadius: 8,
-            color: Colors.black.withValues(alpha: 0.05),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.trending_up, color: AppColors.warmTerracotta),
+              const Icon(Icons.trending_up, color: AppColors.warmTerracotta),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Tendenze Recenti',
@@ -93,7 +86,7 @@ class HealthTrendsCard extends StatelessWidget {
             _calculateStressTrend(),
             _getStressTrendDescription(),
             Icons.psychology,
-            AppColors.warmYellow,
+            AppColors.warning,
           ),
         ],
       ),

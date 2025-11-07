@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
-import 'package:applicazione_mental_coach/design_system/components/stat_card.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -76,14 +75,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primary.withOpacity(0.1),
-            AppColors.secondary.withOpacity(0.1),
+            AppColors.warmGold.withOpacity(0.15),
+            AppColors.warmTerracotta.withOpacity(0.1),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
-        ),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,15 +87,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.warmGold.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
-                  Icons.psychology,
-                  color: AppColors.primary,
-                  size: 24,
+                  Icons.star_outline,
+                  color: AppColors.warmGold,
+                  size: 28,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -108,14 +104,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Good ${_getTimeOfDayGreeting()}!',
-                      style: AppTypography.h3,
+                      'Ciao! Come stai oggi?',
+                      style: AppTypography.h3.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'Here\'s your wellness overview',
+                      'Scopri i tuoi progressi quotidiani',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.grey600,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -138,19 +137,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             flex: 1,
             child: _buildQuickStat(
               icon: Icons.chat_bubble_outline,
-              label: 'Sessions',
+              label: 'Conversazioni',
               value: '23',
-              color: AppColors.secondary,
+              color: AppColors.warmTerracotta,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             flex: 1,
             child: _buildQuickStat(
-              icon: Icons.favorite_border,
-              label: 'Mood Score',
+              icon: Icons.sentiment_satisfied_outlined,
+              label: 'Umore',
               value: '8.2',
-              color: AppColors.accent,
+              color: AppColors.warmGold,
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -158,9 +157,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             flex: 1,
             child: _buildQuickStat(
               icon: Icons.trending_up,
-              label: 'Progress',
+              label: 'Progressi',
               value: '+15%',
-              color: AppColors.warning,
+              color: AppColors.success,
             ),
           ),
         ],
@@ -175,14 +174,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     required Color color,
   }) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 80),
+      constraints: const BoxConstraints(minHeight: 90),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
             color: color,
-            size: 18,
+            size: 24,
           ),
           const SizedBox(height: AppSpacing.xs),
           FittedBox(
@@ -191,7 +195,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               value,
               style: AppTypography.h4.copyWith(
                 color: color,
-                fontWeight: AppTypography.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -200,7 +204,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             fit: BoxFit.scaleDown,
             child: Text(
               label,
-              style: AppTypography.caption,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
             ),
@@ -215,15 +222,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Analytics Period',
-          style: AppTypography.h4,
+          'Periodo di Analisi',
+          style: AppTypography.h4.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Container(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: AppColors.grey100,
-            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.warmGold.withOpacity(0.1),
+                AppColors.warmTerracotta.withOpacity(0.1),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -235,18 +249,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
+                      horizontal: AppSpacing.md,
                       vertical: AppSpacing.sm,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
+                      color: isSelected ? AppColors.warmTerracotta : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       period,
                       style: AppTypography.bodySmall.copyWith(
-                        color: isSelected ? AppColors.white : AppColors.grey600,
-                        fontWeight: isSelected ? AppTypography.medium : AppTypography.regular,
+                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -264,61 +278,77 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Wellness Metrics',
-          style: AppTypography.h4,
+          'Il Tuo Benessere',
+          style: AppTypography.h4.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: AppSpacing.md,
-          mainAxisSpacing: AppSpacing.md,
-          childAspectRatio: 1.2,
-          children: [
-            StatCard(
-              title: 'Mood Score',
-              value: '8.2/10',
-              subtitle: 'Above average',
-              icon: Icons.mood,
-              trend: StatTrend.up,
-              trendValue: '+0.5',
-              variant: StatCardVariant.success,
-              sparklineData: [7.5, 7.8, 8.0, 7.9, 8.2, 8.1, 8.2],
-            ),
-            StatCard(
-              title: 'Stress Level',
-              value: '3.1/10',
-              subtitle: 'Low stress',
-              icon: Icons.spa,
-              trend: StatTrend.down,
-              trendValue: '-1.2',
-              variant: StatCardVariant.primary,
-              sparklineData: [4.5, 4.2, 3.8, 3.5, 3.3, 3.2, 3.1],
-            ),
-            StatCard(
-              title: 'Energy',
-              value: '7.8/10',
-              subtitle: 'Good energy',
-              icon: Icons.battery_charging_full,
-              trend: StatTrend.up,
-              trendValue: '+0.3',
-              variant: StatCardVariant.warning,
-              sparklineData: [7.2, 7.4, 7.6, 7.5, 7.7, 7.9, 7.8],
-            ),
-            StatCard(
-              title: 'Sleep Quality',
-              value: '85%',
-              subtitle: 'Good sleep',
-              icon: Icons.bedtime,
-              trend: StatTrend.up,
-              trendValue: '+5%',
-              variant: StatCardVariant.info,
-              sparklineData: [78, 80, 82, 83, 84, 86, 85],
-            ),
-          ],
-        ),
+        _buildSimpleMetricsGrid(),
       ],
+    );
+  }
+
+  Widget _buildSimpleMetricsGrid() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: AppSpacing.md,
+      mainAxisSpacing: AppSpacing.md,
+      childAspectRatio: 1.3,
+      children: [
+        _buildSimpleMetricCard(Icons.sentiment_satisfied_outlined, 'Umore', '8.2', 'Fantastico!', AppColors.warmGold),
+        _buildSimpleMetricCard(Icons.spa_outlined, 'Stress', '3.1', 'Rilassato', AppColors.success),
+        _buildSimpleMetricCard(Icons.bolt_outlined, 'Energia', '7.8', 'Pieno di energia', AppColors.warmTerracotta),
+        _buildSimpleMetricCard(Icons.bedtime_outlined, 'Sonno', '85%', 'Riposato', AppColors.info),
+      ],
+    );
+  }
+
+  Widget _buildSimpleMetricCard(IconData icon, String title, String value, String status, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 2,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            value,
+            style: AppTypography.h4.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            title,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            status,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 10,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -326,27 +356,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: AppColors.accent.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.accent.withOpacity(0.2),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.success.withOpacity(0.1),
+            AppColors.info.withOpacity(0.1),
+          ],
         ),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.favorite,
+              const Icon(
+                Icons.monitor_heart_outlined,
                 color: AppColors.accent,
-                size: 24,
+                size: 28,
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Health Integration',
+                'Attività Fisica',
                 style: AppTypography.h4.copyWith(
                   color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -357,41 +390,40 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                 flex: 1,
                 child: _buildHealthStat(
-                  'Steps',
-                  '8,542',
-                  'today',
                   Icons.directions_walk,
+                  'Passi',
+                  '8,542',
+                  'oggi',
                 ),
               ),
-              const SizedBox(width: AppSpacing.xs),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 flex: 1,
                 child: _buildHealthStat(
-                  'Heart Rate',
-                  '72 bpm',
-                  'avg',
                   Icons.favorite,
+                  'Cuore',
+                  '72 bpm',
+                  'media',
                 ),
               ),
-              const SizedBox(width: AppSpacing.xs),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 flex: 1,
                 child: _buildHealthStat(
-                  'Workouts',
-                  '3',
-                  'this week',
                   Icons.fitness_center,
+                  'Allenamenti',
+                  '3',
+                  'questa settimana',
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          FittedBox(
-            fit: BoxFit.scaleDown,
+          Center(
             child: Text(
-              'Data synced from Apple Health • Last update: 2 hours ago',
+              'Dati da Apple Health • Aggiornato 2 ore fa',
               style: AppTypography.caption.copyWith(
-                color: AppColors.grey500,
+                color: AppColors.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -401,25 +433,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildHealthStat(String label, String value, String period, IconData icon) {
+  Widget _buildHealthStat(IconData icon, String label, String value, String period) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 90),
+      constraints: const BoxConstraints(minHeight: 100),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: AppColors.accent,
-            size: 18,
-          ),
+          Icon(icon, color: AppColors.accent, size: 20),
           const SizedBox(height: AppSpacing.xs),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.accent,
-                fontWeight: AppTypography.bold,
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
@@ -429,7 +462,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             fit: BoxFit.scaleDown,
             child: Text(
               label,
-              style: AppTypography.caption,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
             ),
@@ -439,7 +475,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: Text(
               period,
               style: AppTypography.caption.copyWith(
-                color: AppColors.grey500,
+                color: AppColors.textSecondary,
                 fontSize: 10,
               ),
               textAlign: TextAlign.center,
@@ -456,8 +492,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Recent Activity',
-          style: AppTypography.h4,
+          'Ultime Attività',
+          style: AppTypography.h4.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         ..._getRecentActivities().map(
@@ -472,28 +510,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark 
-            ? AppColors.darkSurface 
-            : AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [
+            activity.color.withOpacity(0.1),
+            activity.color.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark 
-              ? AppColors.grey700 
-              : AppColors.grey200,
+          color: activity.color.withOpacity(0.2),
+          width: 2,
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: activity.color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: activity.color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               activity.icon,
               color: activity.color,
-              size: 20,
+              size: 24,
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -504,22 +544,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 Text(
                   activity.title,
                   style: AppTypography.bodyMedium.copyWith(
-                    fontWeight: AppTypography.medium,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   activity.subtitle,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.grey600,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
-          Text(
-            activity.time,
-            style: AppTypography.caption,
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: activity.color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              activity.time,
+              style: AppTypography.caption.copyWith(
+                color: activity.color,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),
@@ -534,41 +588,43 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.secondary.withOpacity(0.1),
-            AppColors.warning.withOpacity(0.1),
+            AppColors.warmGold.withOpacity(0.1),
+            AppColors.warmTerracotta.withOpacity(0.1),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.lightbulb_outline,
                 color: AppColors.warning,
-                size: 24,
+                size: 28,
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Insights & Recommendations',
-                style: AppTypography.h4,
+                'Consigli del Giorno',
+                style: AppTypography.h4.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
           _buildInsightItem(
-            '🌟 Great progress this week!',
-            'Your mood scores have been consistently above average. Keep up the excellent work with your wellness routine.',
+            '🌟 Fantastico Lavoro!',
+            'Il tuo umore è stato costantemente alto questa settimana. Continua così con la tua routine di benessere!',
           ),
           _buildInsightItem(
-            '💤 Consider improving sleep',
-            'Your energy levels could benefit from better sleep consistency. Try setting a regular bedtime.',
+            '😴 Dormi Meglio',
+            'I tuoi livelli di energia potrebbero migliorare con un sonno più regolare. Prova a impostare un orario fisso per andare a dormire.',
           ),
           _buildInsightItem(
-            '🏃‍♀️ Active recovery recommended',
-            'Based on your workout intensity, some light active recovery could help with stress management.',
+            '🚶‍♀️ Muoviti di Più',
+            'Una camminata leggera dopo gli allenamenti intensi può aiutarti a gestire meglio lo stress.',
           ),
         ],
       ),
@@ -602,42 +658,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   List<DashboardActivity> _getRecentActivities() {
     return [
       DashboardActivity(
-        title: 'Chat Session',
-        subtitle: 'Discussed stress management techniques',
-        time: '2h ago',
+        title: 'Sessione di Chat',
+        subtitle: 'Abbiamo parlato di tecniche per gestire lo stress',
+        time: '2h fa',
         icon: Icons.chat_bubble_outline,
-        color: AppColors.primary,
+        color: AppColors.warmTerracotta,
       ),
       DashboardActivity(
-        title: 'Workout Completed',
-        subtitle: 'Strength training • 45 minutes',
-        time: '5h ago',
+        title: 'Allenamento Completato',
+        subtitle: 'Allenamento di forza • 45 minuti',
+        time: '5h fa',
         icon: Icons.fitness_center,
-        color: AppColors.accent,
+        color: AppColors.success,
       ),
       DashboardActivity(
-        title: 'Mood Check-in',
-        subtitle: 'Feeling energized and focused',
-        time: '1d ago',
+        title: 'Check-in Umore',
+        subtitle: 'Ti senti pieno di energia e concentrato',
+        time: '1g fa',
         icon: Icons.mood,
-        color: AppColors.warning,
+        color: AppColors.warmGold,
       ),
       DashboardActivity(
-        title: 'Avatar Updated',
-        subtitle: 'Changed expression to determined',
-        time: '2d ago',
+        title: 'Avatar Aggiornato',
+        subtitle: 'Cambiata espressione in determinato',
+        time: '2g fa',
         icon: Icons.face,
-        color: AppColors.secondary,
+        color: AppColors.info,
       ),
     ];
   }
 
-  String _getTimeOfDayGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'morning';
-    if (hour < 17) return 'afternoon';
-    return 'evening';
-  }
 
   Future<void> _refreshData() async {
     // TODO: Implement data refresh from API

@@ -178,7 +178,7 @@ class _LoFiErrorStateState extends State<LoFiErrorState>
       alignment: Alignment.topRight,
       child: IconButton(
         onPressed: widget.onDismiss,
-        icon: Icon(
+        icon: const Icon(
           Icons.close,
           color: AppColors.textSecondary,
           size: 20,

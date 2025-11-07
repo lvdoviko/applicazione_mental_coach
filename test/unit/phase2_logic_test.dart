@@ -142,7 +142,7 @@ void main() {
         final message = ChatMessage.system(
           'Session started',
           sessionId: 'test_session',
-          metadata: {'type': 'session_start'},
+          metadata: const {'type': 'session_start'},
         );
         
         expect(message.isSystem, isTrue);

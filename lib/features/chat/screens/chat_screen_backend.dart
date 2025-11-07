@@ -236,7 +236,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     final welcomeMessage = ChatMessage.ai(
       'Hello! I\'m your AI Wellbeing Coach. I\'m here to support you on your mental wellness journey. How are you feeling today?',
       sessionId: _chatService.currentSessionId,
-      metadata: {'welcome_message': true},
+      metadata: const {'welcome_message': true},
     );
 
     setState(() => _messages.add(welcomeMessage));
@@ -574,20 +574,84 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       return const SizedBox.shrink();
     }
 
-    final quickReplies = [
-      'I\'m feeling stressed',
-      'Having trouble sleeping',
-      'Need motivation',
-      'Feeling overwhelmed',
-    ];
+    final quickReplies = _getIntelligentQuickReplies();
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: QuickReplyChips(
         replies: quickReplies,
         onReplySelected: (reply) => _sendMessage(reply),
       ),
     );
+  }
+
+  List<String> _getIntelligentQuickReplies() {
+    // If no messages, show smart suggestions based on time of day
+    if (_messages.isEmpty) {
+      return [
+        "Sto attraversando un periodo difficile",
+        "Ho bisogno di supporto emotivo",
+        "Mi sento sopraffatto",
+        "Vorrei parlare di ansia",
+      ];
+    }
+    
+    final lastMessage = _messages.last;
+    
+    // Don't show suggestions after user messages
+    if (lastMessage.type == ChatMessageType.user) return [];
+    
+    // Contextual analysis based on AI's response
+    final content = lastMessage.text.toLowerCase();
+    
+    // Emotional support
+    if (content.contains('difficult') || content.contains('struggling')) {
+      return [
+        "Grazie, mi aiuta molto",
+        "Voglio provare questo approccio", 
+        "Hai altri consigli?",
+        "Come posso iniziare?",
+      ];
+    }
+    
+    // Questions about feelings
+    if (content.contains('feeling') || content.contains('how are you')) {
+      return [
+        "Mi sento triste oggi",
+        "Sono stressato dal lavoro",
+        "Ho problemi di autostima", 
+        "Non riesco a dormire bene",
+      ];
+    }
+    
+    // Goal and progress topics
+    if (content.contains('goal') || content.contains('progress')) {
+      return [
+        "Voglio fissare un obiettivo",
+        "Come posso migliorare?",
+        "Ho raggiunto un traguardo",
+        "Sto facendo progressi",
+      ];
+    }
+    
+    // Immediate help requests
+    if (content.contains('help') || content.contains('support')) {
+      return [
+        "Ho bisogno di aiuto ora",
+        "Cosa posso fare oggi?", 
+        "Come gestisco questa situazione?",
+        "Parliamo di strategie pratiche",
+      ];
+    }
+    
+    // Default mental health starters
+    return [
+      "Sì, esattamente così",
+      "È proprio quello che provo",
+      "Mi capisci davvero", 
+      "Dimmi di più su questo",
+    ];
   }
 
   Widget _buildMessageComposer() {

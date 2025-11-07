@@ -215,21 +215,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               horizontal: AppSpacing.messageBubblePadding,
               vertical: AppSpacing.md,
             ),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.botBubble,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
                 bottomRight: Radius.circular(16),
                 bottomLeft: Radius.circular(4),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.textPrimary.withOpacity(0.06),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
             child: _buildAnimatedDots(),
           ),
@@ -278,21 +271,72 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   List<String> _getContextualSuggestions() {
-    if (_messages.isEmpty) return QuickSuggestionPresets.general;
+    // If no messages, show smart suggestions based on time of day
+    if (_messages.isEmpty) {
+      return QuickSuggestionPresets.getSmartSuggestions(
+        timeOfDay: TimeOfDay.now(),
+        isFirstMessage: true,
+      );
+    }
     
     final lastMessage = _messages.last;
+    
+    // Don't show suggestions after user messages (let AI respond first)
     if (lastMessage.type == MessageType.user) return [];
     
-    // Context-based suggestions based on AI's last message
-    if (lastMessage.content.contains('overwhelming')) {
+    // Advanced contextual analysis of AI's last message
+    final content = lastMessage.content.toLowerCase();
+    
+    // Emotional support patterns
+    if (content.contains('difficult') || content.contains('hard time') || 
+        content.contains('struggling') || content.contains('overwhelming')) {
       return QuickSuggestionPresets.getContextualSuggestions('supportive');
-    } else if (lastMessage.content.contains('feeling')) {
-      return QuickSuggestionPresets.getContextualSuggestions('empathetic');
-    } else if (lastMessage.content.contains('tell me more')) {
+    }
+    
+    // Questions about feelings/emotions
+    if (content.contains('how are you feeling') || content.contains('tell me about') ||
+        content.contains('what\'s on your mind') || content.contains('how does that make you feel')) {
+      return QuickSuggestionPresets.getContextualSuggestions('emotional_states');
+    }
+    
+    // Goal-setting and progress
+    if (content.contains('goal') || content.contains('improve') || 
+        content.contains('progress') || content.contains('work on')) {
+      return QuickSuggestionPresets.getContextualSuggestions('progress_goals');
+    }
+    
+    // Relationship topics
+    if (content.contains('family') || content.contains('relationship') || 
+        content.contains('partner') || content.contains('friends')) {
+      return QuickSuggestionPresets.getContextualSuggestions('relationships');
+    }
+    
+    // Self-care and wellness
+    if (content.contains('stress') || content.contains('anxiety') || 
+        content.contains('sleep') || content.contains('relax')) {
+      return QuickSuggestionPresets.getContextualSuggestions('self_care');
+    }
+    
+    // AI asking for more information
+    if (content.contains('tell me more') || content.contains('can you explain') || 
+        content.contains('what happened') || content.contains('describe')) {
       return QuickSuggestionPresets.getContextualSuggestions('curious');
     }
     
-    return QuickSuggestionPresets.empathetic;
+    // AI giving advice or suggestions
+    if (content.contains('suggest') || content.contains('recommend') || 
+        content.contains('try this') || content.contains('help you')) {
+      return QuickSuggestionPresets.getContextualSuggestions('supportive');
+    }
+    
+    // Motivational contexts
+    if (content.contains('you can do this') || content.contains('keep going') || 
+        content.contains('progress') || content.contains('achievement')) {
+      return QuickSuggestionPresets.getContextualSuggestions('motivational');
+    }
+    
+    // Default to empathetic responses for general conversation
+    return QuickSuggestionPresets.getContextualSuggestions('empathetic');
   }
 
   Widget _buildInputComposer() {

@@ -102,7 +102,7 @@ class _ConsentPermissionsScreenState extends ConsumerState<ConsentPermissionsScr
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.privacy_tip_outlined,
             size: 80,
             color: AppColors.primary,
@@ -133,7 +133,7 @@ class _ConsentPermissionsScreenState extends ConsumerState<ConsentPermissionsScr
             ),
             child: Row(
               children: [
-                Icon(Icons.security, color: AppColors.success),
+                const Icon(Icons.security, color: AppColors.success),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -259,7 +259,7 @@ class _ConsentPermissionsScreenState extends ConsumerState<ConsentPermissionsScr
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: AppColors.error),
+                  const Icon(Icons.info_outline, color: AppColors.error),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
@@ -294,7 +294,7 @@ class _ConsentPermissionsScreenState extends ConsumerState<ConsentPermissionsScr
         children: [
           Row(
             children: [
-              Icon(Icons.favorite_outline, color: AppColors.primary),
+              const Icon(Icons.favorite_outline, color: AppColors.primary),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'HealthKit Access',
@@ -320,7 +320,7 @@ class _ConsentPermissionsScreenState extends ConsumerState<ConsentPermissionsScr
               child: Row(
                 children: [
                   const SizedBox(width: AppSpacing.md),
-                  Icon(Icons.check_circle_outline, size: 16, color: AppColors.success),
+                  const Icon(Icons.check_circle_outline, size: 16, color: AppColors.success),
                   const SizedBox(width: AppSpacing.xs),
                   Text(item, style: AppTypography.bodySmall),
                 ],
@@ -618,7 +618,7 @@ class _ConsentPermissionsScreenState extends ConsumerState<ConsentPermissionsScr
         children: [
           Row(
             children: [
-              Icon(Icons.warning_amber_outlined, color: AppColors.warning),
+              const Icon(Icons.warning_amber_outlined, color: AppColors.warning),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 'Permissions Denied',
@@ -717,7 +717,7 @@ class _ConsentPermissionsScreenState extends ConsumerState<ConsentPermissionsScr
       // final prefs = await SharedPreferences.getInstance();
       // final permissionsService = HealthPermissionsService(prefs);
       // final granted = await permissionsService.requestPermissions();
-      final granted = true; // Simulate successful permission grant
+      const granted = true; // Simulate successful permission grant
       
       setState(() {
         _healthKitPermissionGranted = granted;

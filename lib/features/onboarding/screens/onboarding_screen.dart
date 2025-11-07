@@ -142,7 +142,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   ),
                 ),
               ),
-              _buildActionButtons(l10n!),
+              _buildActionButtons(l10n),
               const SizedBox(height: AppSpacing.elementSpacing),
             ],
           ),
@@ -179,7 +179,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         ),
         shape: BoxShape.circle,
       ),
-      child: Icon(
+      child: const Icon(
         Icons.psychology_outlined,
         size: 56,
         color: AppColors.primary,

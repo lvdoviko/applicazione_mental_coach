@@ -125,18 +125,31 @@ class _LoFiQuickSuggestionsState extends State<LoFiQuickSuggestions>
       child: SlideTransition(
         position: _slideAnimation,
         child: Container(
-          height: 44,
+          constraints: const BoxConstraints(
+            minHeight: 44,
+            maxHeight: 80,
+          ),
           padding: widget.padding,
-          child: ListView.separated(
+          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
-            itemCount: widget.suggestions.length,
-            separatorBuilder: (context, index) => 
-                const SizedBox(width: AppSpacing.chipSpacing),
-            itemBuilder: (context, index) {
-              final suggestion = widget.suggestions[index];
-              return _buildSuggestionChip(suggestion, index);
-            },
+            child: IntrinsicHeight(
+              child: Row(
+                children: widget.suggestions.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final suggestion = entry.value;
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      right: index < widget.suggestions.length - 1 
+                        ? AppSpacing.chipSpacing 
+                        : 0,
+                    ),
+                    child: _buildSuggestionChip(suggestion, index),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ),
       ),
@@ -163,15 +176,25 @@ class _LoFiQuickSuggestionsState extends State<LoFiQuickSuggestions>
           borderRadius: BorderRadius.circular(20),
           onTap: () => _onSuggestionTap(suggestion),
           child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: 200,
+              minHeight: 32,
+            ),
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.chipPaddingHorizontal,
-              vertical: AppSpacing.chipPaddingVertical,
+              vertical: AppSpacing.chipPaddingVertical + 2,
             ),
-            child: Text(
-              suggestion,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
+            child: Center(
+              child: Text(
+                suggestion,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -188,45 +211,108 @@ class _LoFiQuickSuggestionsState extends State<LoFiQuickSuggestions>
 
 /// Predefined suggestion sets for different contexts
 class QuickSuggestionPresets {
+  // Mental Health Context - Anticipating common user needs
+  static const List<String> mentalHealthStarters = [
+    "Sto attraversando un periodo difficile",
+    "Ho bisogno di supporto emotivo", 
+    "Mi sento sopraffatto",
+    "Vorrei parlare di ansia",
+  ];
+
+  static const List<String> emotionalStates = [
+    "Mi sento triste oggi",
+    "Ho problemi di autostima",
+    "Sono stressato dal lavoro",
+    "Non riesco a dormire bene",
+  ];
+
+  // Progress & Goals - Action-oriented
+  static const List<String> progressGoals = [
+    "Voglio fissare un obiettivo",
+    "Come posso migliorare?",
+    "Ho raggiunto un traguardo",
+    "Sto facendo progressi",
+  ];
+
+  // Immediate Help - Urgent support
+  static const List<String> immediateHelp = [
+    "Ho bisogno di aiuto ora",
+    "Cosa posso fare oggi?",
+    "Come gestisco questa situazione?",
+    "Parliamo di strategie pratiche",
+  ];
+
+  // Relationship & Social
+  static const List<String> relationships = [
+    "Ho problemi in famiglia",
+    "Difficoltà nelle relazioni",
+    "Mi sento solo",
+    "Conflitti con gli altri",
+  ];
+
+  // Self-Care & Wellness
+  static const List<String> selfCare = [
+    "Come prendermi cura di me?",
+    "Tecniche di rilassamento",
+    "Voglio migliorare le abitudini",
+    "Bilanciare lavoro e vita",
+  ];
+
+  // Empathetic responses (when AI asks about feelings)
   static const List<String> empathetic = [
-    "Tell me more",
-    "I understand", 
-    "That sounds hard",
-    "You're not alone",
+    "Sì, esattamente così",
+    "È proprio quello che provo", 
+    "Mi capisci davvero",
+    "Dimmi di più su questo",
   ];
 
+  // Supportive (when receiving advice)
   static const List<String> supportive = [
-    "I'm here for you",
-    "Let's work through this",
-    "You've got this",
-    "Take your time",
+    "Grazie, mi aiuta molto",
+    "Voglio provare questo approccio",
+    "Hai altri consigli?",
+    "Come posso iniziare?",
   ];
 
+  // Curious (when exploring topics)
   static const List<String> curious = [
-    "What happened?",
-    "How did it feel?",
-    "What's on your mind?",
-    "Can you share more?",
+    "Puoi spiegarmi meglio?",
+    "Come funziona esattamente?",
+    "Hai esempi pratici?",
+    "Quali sono i passi successivi?",
   ];
 
+  // Motivational responses
   static const List<String> motivational = [
-    "Keep going",
-    "I believe in you", 
-    "You're strong",
-    "Progress matters",
+    "Sono pronto a cambiare",
+    "Voglio impegnarmi di più", 
+    "Ce la posso fare",
+    "Continuerò a lavorarci",
   ];
 
+  // General conversation starters
   static const List<String> general = [
-    "Yes",
-    "No",
-    "Maybe later",
-    "I need help",
-    "Thank you",
+    "Ciao, come stai?",
+    "Parlami del tuo approccio",
+    "Ho una domanda",
+    "Grazie per l'aiuto",
   ];
 
-  /// Get contextual suggestions based on conversation state
+  /// Get contextual suggestions based on conversation state and user intent
   static List<String> getContextualSuggestions(String context) {
     switch (context.toLowerCase()) {
+      case 'mental_health':
+        return mentalHealthStarters;
+      case 'emotional_states':
+        return emotionalStates;
+      case 'progress_goals':
+        return progressGoals;
+      case 'immediate_help':
+        return immediateHelp;
+      case 'relationships':
+        return relationships;
+      case 'self_care':
+        return selfCare;
       case 'empathetic':
         return empathetic;
       case 'supportive':
@@ -238,5 +324,54 @@ class QuickSuggestionPresets {
       default:
         return general;
     }
+  }
+
+  /// Get intelligent suggestions based on time of day and common patterns
+  static List<String> getSmartSuggestions({
+    required TimeOfDay timeOfDay,
+    String? lastTopic,
+    bool isFirstMessage = false,
+  }) {
+    if (isFirstMessage) {
+      final hour = timeOfDay.hour;
+      if (hour < 10) {
+        return [
+          "Buongiorno, come ti senti oggi?",
+          "Ho dormito male stanotte",
+          "Inizio la giornata con ansia",
+          "Voglio iniziare bene la giornata",
+        ];
+      } else if (hour < 14) {
+        return [
+          "Come sta andando la mattinata?",
+          "Sono stressato dal lavoro",
+          "Ho bisogno di motivazione",
+          "Pausa pranzo, riflettiamo",
+        ];
+      } else if (hour < 18) {
+        return [
+          "Il pomeriggio è pesante",
+          "Sono stanco mentalmente",
+          "Come gestire lo stress?",
+          "Ho bisogno di energia",
+        ];
+      } else {
+        return [
+          "Come è andata la giornata?",
+          "Mi sento emotivamente scarico",
+          "Voglio rilassarmi stasera",
+          "Riflettiamo sulla giornata",
+        ];
+      }
+    }
+
+    // Return contextual based on last topic discussed
+    if (lastTopic?.contains('stress') == true) {
+      return getContextualSuggestions('self_care');
+    } else if (lastTopic?.contains('relationship') == true) {
+      return getContextualSuggestions('relationships');
+    }
+    
+    return mentalHealthStarters;
   }
 }

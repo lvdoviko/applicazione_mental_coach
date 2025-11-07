@@ -57,7 +57,7 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkException(
+        return const NetworkException(
           'Request timeout. Please check your internet connection.',
           code: 'TIMEOUT',
         );
@@ -66,16 +66,16 @@ class ErrorInterceptor extends Interceptor {
         return _handleResponseError(err);
         
       case DioExceptionType.cancel:
-        return NetworkException('Request was cancelled', code: 'CANCELLED');
+        return const NetworkException('Request was cancelled', code: 'CANCELLED');
         
       case DioExceptionType.connectionError:
-        return NetworkException(
+        return const NetworkException(
           'Connection failed. Please check your internet connection.',
           code: 'CONNECTION_ERROR',
         );
         
       case DioExceptionType.badCertificate:
-        return CertificatePinningException(
+        return const CertificatePinningException(
           'Certificate validation failed. Potential security risk detected.',
           code: 'CERT_PINNING_FAILED',
         );
@@ -83,7 +83,7 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.unknown:
       default:
         if (err.error is SocketException) {
-          return NetworkException(
+          return const NetworkException(
             'No internet connection available.',
             code: 'NO_INTERNET',
           );

@@ -267,7 +267,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       value: value,
       onChanged: onChanged,
-      activeColor: AppColors.primary,
+      activeThumbColor: AppColors.primary,
     );
   }
 
@@ -405,11 +405,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.emergency, color: AppColors.error),
-            const SizedBox(width: AppSpacing.sm),
-            const Text('Emergency Resources'),
+            Icon(Icons.emergency, color: AppColors.error),
+            SizedBox(width: AppSpacing.sm),
+            Text('Emergency Resources'),
           ],
         ),
         content: Column(
@@ -484,11 +484,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
-            const Icon(Icons.warning, color: AppColors.error),
-            const SizedBox(width: AppSpacing.sm),
-            const Text('Delete Account'),
+            Icon(Icons.warning, color: AppColors.error),
+            SizedBox(width: AppSpacing.sm),
+            Text('Delete Account'),
           ],
         ),
         content: const Text(
@@ -528,7 +528,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         width: 64,
         height: 64,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [AppColors.primary, AppColors.secondary],
           ),
           borderRadius: BorderRadius.circular(16),

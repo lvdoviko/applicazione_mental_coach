@@ -139,7 +139,7 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
           top: BorderSide(
@@ -224,7 +224,7 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
           child: Container(
             width: AppSpacing.composerMinHeight,
             height: AppSpacing.composerMinHeight,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),
@@ -290,7 +290,7 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
         child: Container(
           width: AppSpacing.composerMinHeight,
           height: AppSpacing.composerMinHeight,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppColors.surfaceVariant,
             shape: BoxShape.circle,
           ),

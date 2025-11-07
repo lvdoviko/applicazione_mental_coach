@@ -156,7 +156,7 @@ class AuthInterceptor extends Interceptor {
     try {
       final refreshToken = await _tokenStorage.getRefreshToken();
       if (refreshToken == null) {
-        throw AuthException('No refresh token available');
+        throw const AuthException('No refresh token available');
       }
       
       final response = await _dio.post('/v1/auth/refresh', data: {

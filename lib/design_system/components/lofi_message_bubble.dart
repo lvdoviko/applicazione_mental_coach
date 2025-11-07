@@ -188,6 +188,8 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
             ),
             if (widget.type == MessageType.user) ...[
               const SizedBox(width: AppSpacing.sm),
+              _buildUserAvatar(),
+              const SizedBox(width: AppSpacing.sm),
               _buildStatusIndicator(),
             ],
           ],
@@ -217,6 +219,27 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
     );
   }
 
+  Widget _buildUserAvatar() {
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.warmTerracotta.withOpacity(0.8),
+            AppColors.warmGold.withOpacity(0.6),
+          ],
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(
+        Icons.person,
+        color: AppColors.surface,
+        size: 16,
+      ),
+    );
+  }
+
   Widget _buildBubble() {
     final isUser = widget.type == MessageType.user;
     final backgroundColor = isUser ? AppColors.userBubble : AppColors.botBubble;
@@ -229,13 +252,6 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: _getBorderRadius(isUser),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.textPrimary.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.messageBubblePadding,

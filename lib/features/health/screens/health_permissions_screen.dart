@@ -90,7 +90,7 @@ class _HealthPermissionsScreenState extends ConsumerState<HealthPermissionsScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
+          const Icon(
             Icons.health_and_safety,
             size: 48,
             color: AppColors.warmTerracotta,
@@ -128,7 +128,7 @@ class _HealthPermissionsScreenState extends ConsumerState<HealthPermissionsScree
           children: [
             Row(
               children: [
-                Icon(Icons.privacy_tip, color: AppColors.warmGold),
+                const Icon(Icons.privacy_tip, color: AppColors.warmGold),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Consenso al Trattamento Dati',
@@ -171,7 +171,7 @@ class _HealthPermissionsScreenState extends ConsumerState<HealthPermissionsScree
               children: [
                 TextButton(
                   onPressed: () => _showPrivacyPolicy(),
-                  child: Text(
+                  child: const Text(
                     'Leggi la Privacy Policy',
                     style: TextStyle(color: AppColors.warmTerracotta),
                   ),
@@ -179,7 +179,7 @@ class _HealthPermissionsScreenState extends ConsumerState<HealthPermissionsScree
                 const SizedBox(width: AppSpacing.md),
                 TextButton(
                   onPressed: () => _showDataUsageInfo(),
-                  child: Text(
+                  child: const Text(
                     'Come usiamo i dati',
                     style: TextStyle(color: AppColors.warmTerracotta),
                   ),
@@ -260,7 +260,7 @@ class _HealthPermissionsScreenState extends ConsumerState<HealthPermissionsScree
         ),
         child: Row(
           children: [
-            Icon(Icons.lock, color: AppColors.grey400),
+            const Icon(Icons.lock, color: AppColors.grey400),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
@@ -423,7 +423,7 @@ class _HealthPermissionsScreenState extends ConsumerState<HealthPermissionsScree
             onChanged: _healthDataConsent 
                 ? (value) => _requestSpecificPermission(key, value)
                 : null,
-            activeColor: info['color'] as Color,
+            activeThumbColor: info['color'] as Color,
           ),
         ),
       );

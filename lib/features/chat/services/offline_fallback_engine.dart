@@ -264,7 +264,7 @@ class OfflineFallbackEngine {
     return ChatMessage.system(
       "You're currently offline. I can provide basic support and wellness tips, but my full capabilities will resume when you're connected. For urgent mental health concerns, please contact a healthcare professional.",
       sessionId: sessionId,
-      metadata: {
+      metadata: const {
         'offline_mode': true,
         'message_type': 'explanation',
       },
@@ -276,7 +276,7 @@ class OfflineFallbackEngine {
     return ChatMessage.system(
       "I notice you're offline. For personalized guidance and my full coaching capabilities, please check your internet connection.",
       sessionId: sessionId,
-      metadata: {
+      metadata: const {
         'offline_mode': true,
         'message_type': 'reconnection_suggestion',
       },

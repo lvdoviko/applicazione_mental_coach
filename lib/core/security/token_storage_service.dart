@@ -62,7 +62,7 @@ class TokenStorageService {
     if (expiryString == null) return true;
     
     final expiry = DateTime.parse(expiryString);
-    return DateTime.now().isAfter(expiry.subtract(Duration(minutes: 5))); // 5min buffer
+    return DateTime.now().isAfter(expiry.subtract(const Duration(minutes: 5))); // 5min buffer
   }
   
   /// Clear all stored tokens

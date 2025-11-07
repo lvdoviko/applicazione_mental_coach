@@ -30,13 +30,6 @@ class HealthMetricsCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(0, 2),
-            blurRadius: 8,
-            color: Colors.black.withValues(alpha: 0.05),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

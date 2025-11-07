@@ -108,7 +108,7 @@ class _LoFiTypingIndicatorState extends State<LoFiTypingIndicator>
       hint: 'The AI coach is currently composing a response',
       liveRegion: true,
       child: Container(
-        margin: EdgeInsets.only(
+        margin: const EdgeInsets.only(
           right: AppSpacing.massive,
           bottom: AppSpacing.messageBubbleMargin,
         ),
@@ -152,21 +152,14 @@ class _LoFiTypingIndicatorState extends State<LoFiTypingIndicator>
         minWidth: 80,
         maxWidth: 120,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.botBubble,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
           bottomLeft: Radius.circular(4),
           bottomRight: Radius.circular(16),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.textPrimary.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,

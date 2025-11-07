@@ -147,12 +147,12 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.buttonPadding * 2,
             vertical: AppSpacing.buttonPadding,
           ),
           elevation: 0,
-          minimumSize: Size(0, AppSpacing.composerMinHeight),
+          minimumSize: const Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
@@ -165,12 +165,12 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.buttonPadding * 2,
             vertical: AppSpacing.buttonPadding,
           ),
           elevation: 0,
-          minimumSize: Size(0, AppSpacing.composerMinHeight),
+          minimumSize: const Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
@@ -181,7 +181,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
           ),
@@ -196,7 +196,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl,
             vertical: AppSpacing.md,
           ),
@@ -209,15 +209,15 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           textStyle: AppTypography.buttonMedium,
-          side: BorderSide(color: AppColors.primary, width: 1.5),
+          side: const BorderSide(color: AppColors.primary, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.buttonPadding * 2,
             vertical: AppSpacing.buttonPadding,
           ),
-          minimumSize: Size(0, AppSpacing.composerMinHeight),
+          minimumSize: const Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
@@ -226,15 +226,15 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           textStyle: AppTypography.buttonMedium,
-          side: BorderSide(color: AppColors.primary, width: 1.5),
+          side: const BorderSide(color: AppColors.primary, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppBorderRadius.button),
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.buttonPadding * 2,
             vertical: AppSpacing.buttonPadding,
           ),
-          minimumSize: Size(0, AppSpacing.composerMinHeight),
+          minimumSize: const Size(0, AppSpacing.composerMinHeight),
         ),
       );
 
@@ -258,7 +258,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppBorderRadius.composer),
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.composerPadding,
           vertical: AppSpacing.composerPadding,
         ),
@@ -285,7 +285,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppBorderRadius.composer),
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.composerPadding,
           vertical: AppSpacing.composerPadding,
         ),
@@ -301,7 +301,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppBorderRadius.card),
         ),
-        margin: EdgeInsets.symmetric(
+        margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.screenPadding,
           vertical: AppSpacing.md,
         ),
@@ -314,7 +314,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppBorderRadius.card),
         ),
-        margin: EdgeInsets.symmetric(
+        margin: const EdgeInsets.symmetric(
           horizontal: AppSpacing.screenPadding,
           vertical: AppSpacing.md,
         ),
@@ -329,7 +329,7 @@ class AppTheme {
         ),
         side: BorderSide.none,
         showCheckmark: false,
-        padding: EdgeInsets.symmetric(
+        padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.chipPaddingHorizontal,
           vertical: AppSpacing.chipPaddingVertical,
         ),
