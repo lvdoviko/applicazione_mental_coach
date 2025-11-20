@@ -70,19 +70,25 @@ class ChatWebSocketService {
   /// Connect to WebSocket chat service with guest authentication
   Future<void> connect({String? sessionId}) async {
     if (_isConnecting || _isConnected) {
+      debugPrint('Already connecting or connected, skipping...');
       return;
     }
 
+    debugPrint('🔌 Starting WebSocket connection process...');
     _isConnecting = true;
     _currentSessionId = sessionId ?? _generateSessionId();
     _connectionController.add(ChatConnectionStatus.connecting);
 
     try {
       // Step 1: Authenticate as guest and get session token
+      debugPrint('📱 Step 1: Authenticating as guest...');
       await _authenticateGuest();
+      debugPrint('✅ Guest authentication successful');
 
       // Step 2: Connect to WebSocket with token, tenant, and key
+      debugPrint('🌐 Step 2: Connecting to WebSocket...');
       await _connectWebSocket();
+      debugPrint('✅ WebSocket connection established');
 
       _isConnected = true;
       _isConnecting = false;
@@ -90,9 +96,13 @@ class ChatWebSocketService {
       _connectionController.add(ChatConnectionStatus.connected);
 
       // Step 3: Start heartbeat monitoring
+      debugPrint('💓 Step 3: Starting heartbeat...');
       _startHeartbeat();
+      debugPrint('✅ Connection complete!');
 
     } catch (e) {
+      debugPrint('❌ Connection failed: $e');
+      debugPrint('Error type: ${e.runtimeType}');
       _isConnecting = false;
       _handleConnectionError(e);
     }

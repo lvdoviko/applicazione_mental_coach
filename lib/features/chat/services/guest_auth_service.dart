@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/security/token_storage_service.dart';
@@ -34,10 +35,13 @@ class GuestAuthService {
   /// Initialize guest authentication
   /// Creates or retrieves existing guest session
   Future<GuestAuthResult> authenticateAsGuest() async {
+    debugPrint('🔐 Starting guest authentication...');
+
     // Check if we have an existing valid guest session
     final existingToken = await _getStoredGuestToken();
     if (existingToken != null && !await _isGuestTokenExpired()) {
       final guestId = await _getOrCreateGuestId();
+      debugPrint('✅ Using cached guest token for: $guestId');
       return GuestAuthResult(
         guestId: guestId,
         sessionToken: existingToken,
@@ -47,9 +51,14 @@ class GuestAuthService {
 
     // Create new guest session
     final guestId = await _getOrCreateGuestId();
+    debugPrint('🆔 Guest ID: $guestId');
 
     try {
       _dio.options.baseUrl = AppConfig.baseUrl;
+
+      debugPrint('📡 Calling: ${AppConfig.baseUrl}/v1/auth/guest');
+      debugPrint('🏢 Tenant: ${AppConfig.tenantId}');
+      debugPrint('🔑 API Key: ${AppConfig.apiKey.substring(0, 20)}...');
 
       final response = await _dio.post(
         '/v1/auth/guest',
@@ -66,12 +75,18 @@ class GuestAuthService {
         },
       );
 
+      debugPrint('📥 Response status: ${response.statusCode}');
+      debugPrint('📥 Response data: ${response.data}');
+
       final sessionToken = response.data['session_token'] as String?;
       final expiresIn = response.data['expires_in'] as int? ?? 86400; // Default 24h
 
       if (sessionToken == null) {
         throw GuestAuthException('Invalid response: missing session_token');
       }
+
+      debugPrint('🎫 Got session token (${sessionToken.length} chars)');
+      debugPrint('⏰ Expires in: ${expiresIn}s');
 
       // Store the guest session token
       await _storeGuestToken(
@@ -84,12 +99,14 @@ class GuestAuthService {
         sessionToken: sessionToken,
         isNewGuest: true,
       );
-    } on DioException catch (e) {
-      throw GuestAuthException(
-        'Guest authentication failed: ${e.message}',
-        statusCode: e.response?.statusCode,
-      );
     } catch (e) {
+      debugPrint('❌ Guest authentication error: $e');
+      if (e is DioException) {
+        debugPrint('❌ DioException type: ${e.type}');
+        debugPrint('❌ Response: ${e.response?.data}');
+        debugPrint('❌ Status: ${e.response?.statusCode}');
+        debugPrint('❌ Message: ${e.message}');
+      }
       throw GuestAuthException('Guest authentication failed: $e');
     }
   }
