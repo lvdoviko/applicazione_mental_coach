@@ -32,7 +32,7 @@ class RpmAvatarCreator extends ConsumerStatefulWidget {
 }
 
 class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
-  late final WebViewController _controller;
+  WebViewController? _controller;
   bool _isLoading = true;
   bool _isDownloading = false;
   double _downloadProgress = 0.0;
@@ -51,16 +51,77 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {
-            setState(() => _isLoading = true);
+            if (mounted) {
+              setState(() => _isLoading = true);
+            }
           },
-          onPageFinished: (url) {
-            setState(() => _isLoading = false);
+          onPageFinished: (url) async {
+            if (mounted) {
+              setState(() => _isLoading = false);
+            }
+            
+            // Inject JavaScript to monitor for avatar URL
+            await _controller?.runJavaScript('''
+              (function() {
+                var foundUrl = false;
+                
+                // Function to check for avatar URL
+                function checkForAvatarUrl() {
+                  if (foundUrl) return true;
+                  
+                  // Check all input fields
+                  var inputs = document.querySelectorAll('input');
+                  for (var i = 0; i < inputs.length; i++) {
+                    var val = inputs[i].value || '';
+                    if (val.includes('models.readyplayer.me') && val.includes('.glb')) {
+                      foundUrl = true;
+                      window.${RpmConfig.jsChannelName}.postMessage(JSON.stringify({
+                        eventName: 'avatar.found',
+                        url: val.trim()
+                      }));
+                      return true;
+                    }
+                  }
+                  
+                  // Check page text
+                  var bodyText = document.body.innerText || '';
+                  var match = bodyText.match(/https:\\/\\/models\\.readyplayer\\.me\\/[a-zA-Z0-9-]+\\.glb/);
+                  if (match) {
+                    foundUrl = true;
+                    window.${RpmConfig.jsChannelName}.postMessage(JSON.stringify({
+                      eventName: 'avatar.found',
+                      url: match[0]
+                    }));
+                    return true;
+                  }
+                  
+                  return false;
+                }
+                
+                // Check immediately
+                checkForAvatarUrl();
+                
+                // Set up observer for DOM changes (stops after finding URL)
+                var observer = new MutationObserver(function() {
+                  if (checkForAvatarUrl()) {
+                    observer.disconnect();
+                  }
+                });
+                
+                observer.observe(document.body, {
+                  childList: true,
+                  subtree: true
+                });
+              })();
+            ''');
           },
           onWebResourceError: (error) {
-            setState(() {
-              _errorMessage = 'Failed to load editor: ${error.description}';
-              _isLoading = false;
-            });
+            if (mounted) {
+              setState(() {
+                _errorMessage = 'Failed to load editor: ${error.description}';
+                _isLoading = false;
+              });
+            }
           },
         ),
       )
@@ -77,8 +138,8 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
       final data = jsonDecode(message.message) as Map<String, dynamic>;
       final eventName = data['eventName'] as String?;
 
-      if (eventName == 'v1.avatar.exported') {
-        final avatarUrl = data['data']?['url'] as String?;
+      if (eventName == 'v1.avatar.exported' || eventName == 'avatar.found') {
+        final avatarUrl = data['data']?['url'] as String? ?? data['url'] as String?;
         
         if (avatarUrl != null && RpmConfig.isValidRpmUrl(avatarUrl)) {
           _downloadAvatar(avatarUrl);
@@ -91,8 +152,83 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
     }
   }
 
+  /// Extract avatar URL from current page (fallback method)
+  Future<void> _extractAvatarUrlFromPage() async {
+    if (_controller == null) {
+      _showError('WebView not initialized');
+      return;
+    }
+
+    try {
+      // First, try to get the current URL
+      final currentUrl = await _controller!.currentUrl();
+      if (currentUrl != null) {
+        // Check if current URL contains avatar URL as parameter
+        final uri = Uri.parse(currentUrl);
+        final avatarUrl = uri.queryParameters['url'] ?? 
+                         uri.queryParameters['avatarUrl'] ??
+                         uri.queryParameters['model'];
+        
+        if (avatarUrl != null && RpmConfig.isValidRpmUrl(avatarUrl)) {
+          _downloadAvatar(avatarUrl);
+          return;
+        }
+      }
+
+      // Execute JavaScript to find the avatar URL in the page
+      final result = await _controller!.runJavaScriptReturningResult(
+        '''
+        (function() {
+          // Method 1: Try to find the URL in an input field
+          var inputs = document.querySelectorAll('input');
+          for (var i = 0; i < inputs.length; i++) {
+            var val = inputs[i].value || '';
+            if (val.includes('models.readyplayer.me') && val.includes('.glb')) {
+              return val.trim();
+            }
+          }
+          
+          // Method 2: Search in all text content
+          var bodyText = document.body.innerText || document.body.textContent || '';
+          var urlPattern = /https:\\/\\/models\\.readyplayer\\.me\\/[a-zA-Z0-9-]+\\.glb/;
+          var match = bodyText.match(urlPattern);
+          if (match) {
+            return match[0];
+          }
+          
+          // Method 3: Search in all links
+          var links = document.querySelectorAll('a');
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].href || '';
+            if (href.includes('models.readyplayer.me') && href.includes('.glb')) {
+              return href;
+            }
+          }
+          
+          return '';
+        })();
+        '''
+      );
+
+      final urlString = result?.toString() ?? '';
+      
+      if (urlString.isNotEmpty && 
+          urlString != 'null' && 
+          urlString != '<null>' &&
+          RpmConfig.isValidRpmUrl(urlString)) {
+        _downloadAvatar(urlString);
+      } else {
+        _showError('Could not find avatar URL. Please wait for the avatar to finish generating.');
+      }
+    } catch (e) {
+      _showError('Failed to extract URL: $e');
+    }
+  }
+
   /// Download avatar with progress tracking
   Future<void> _downloadAvatar(String url) async {
+    if (!mounted) return;
+    
     setState(() {
       _isDownloading = true;
       _downloadProgress = 0.0;
@@ -120,6 +256,8 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
   }
 
   void _showError(String message) {
+    if (!mounted) return;
+    
     setState(() {
       _errorMessage = message;
       _isDownloading = false;
@@ -170,11 +308,19 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
           },
         ),
       ),
+      floatingActionButton: !_isDownloading && !_isLoading && _errorMessage == null
+          ? FloatingActionButton.extended(
+              onPressed: _extractAvatarUrlFromPage,
+              backgroundColor: AppColors.primary,
+              icon: const Icon(Icons.download),
+              label: const Text('Use This Avatar'),
+            )
+          : null,
       body: Stack(
         children: [
           // WebView
-          if (_errorMessage == null)
-            WebViewWidget(controller: _controller),
+          if (_errorMessage == null && _controller != null)
+            WebViewWidget(controller: _controller!),
 
           // Error state
           if (_errorMessage != null)
