@@ -22,11 +22,12 @@ class MainNavigation extends StatelessWidget {
 
   Widget _buildBottomNav(BuildContext context) {
     final currentLocation = GoRouterState.of(context).matchedLocation;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // Force dark mode
+    const isDarkMode = true;
 
     return Container(
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkSurface : AppColors.white,
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
       ),
       child: SafeArea(
         child: Padding(
@@ -81,11 +82,9 @@ class MainNavigation extends StatelessWidget {
     required AppRoute route,
     required bool isSelected,
   }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = isDarkMode ? AppColors.secondary : AppColors.primary;
-    final inactiveColor = isDarkMode 
-        ? AppColors.darkTextSecondary 
-        : AppColors.grey500;
+    // Force dark mode colors
+    const primaryColor = AppColors.secondary;
+    const inactiveColor = AppColors.textSecondary;
 
     return Expanded(
       child: Material(

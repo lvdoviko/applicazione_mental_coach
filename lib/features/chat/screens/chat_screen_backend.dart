@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../design_system/tokens/app_colors.dart';
 import '../../../design_system/tokens/app_typography.dart';
 import '../../../design_system/tokens/app_spacing.dart';
-import '../../../design_system/components/ios_chat_bubble.dart';
+import '../../../design_system/components/lofi_message_bubble.dart'; // Updated import
 import '../../../design_system/components/ios_button.dart';
 import '../../../design_system/components/message_composer.dart';
 import '../../../design_system/components/quick_reply_chips.dart';
@@ -37,10 +37,10 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   final List<ChatMessage> _messages = [];
   
   // Services
-  late ChatWebSocketService _chatService;
+  ChatWebSocketService? _chatService;
   late GuestAuthService _guestAuthService;
   late OfflineFallbackEngine _offlineEngine;
-  late ConnectivityService _connectivityService;
+  ConnectivityService? _connectivityService;
   late SecureApiClient _apiClient;
   late TokenStorageService _tokenStorage;
   
@@ -48,6 +48,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   bool _isLoading = false;
   bool _isTyping = false;
   bool _isOnline = true;
+  bool _isCrisisMode = false; // Safety Net State
   ChatConnectionStatus _connectionStatus = ChatConnectionStatus.disconnected;
   
   // Subscriptions
@@ -82,7 +83,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.detached:
-        _chatService.disconnect();
+        _chatService?.disconnect();
         break;
       case AppLifecycleState.hidden:
         break;
@@ -93,12 +94,11 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     _tokenStorage = TokenStorageService();
     _apiClient = SecureApiClient(tokenStorage: _tokenStorage);
     _guestAuthService = GuestAuthService(tokenStorage: _tokenStorage);
-    _connectivityService = ConnectivityService();
-
     // Initialize connectivity service (MUST be awaited)
-    await _connectivityService.initialize();
+    _connectivityService = ConnectivityService();
+    await _connectivityService!.initialize();
 
-    _offlineEngine = OfflineFallbackEngine(connectivityService: _connectivityService);
+    _offlineEngine = OfflineFallbackEngine(connectivityService: _connectivityService!);
     _chatService = ChatWebSocketService(
       apiClient: _apiClient,
       guestAuthService: _guestAuthService,
@@ -110,24 +110,26 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   }
 
   void _setupListeners() {
+    if (_chatService == null || _connectivityService == null) return;
+
     // Listen to chat messages
-    _messageSubscription = _chatService.messageStream.listen(
+    _messageSubscription = _chatService!.messageStream.listen(
       _handleIncomingMessage,
       onError: _handleChatError,
     );
 
     // Listen to connection status
-    _connectionSubscription = _chatService.connectionStream.listen(
+    _connectionSubscription = _chatService!.connectionStream.listen(
       _handleConnectionStatusChange,
     );
 
     // Listen to chat errors
-    _errorSubscription = _chatService.errorStream.listen(
+    _errorSubscription = _chatService!.errorStream.listen(
       _handleChatError,
     );
 
     // Listen to connectivity changes
-    _connectivitySubscription = _connectivityService.statusStream.listen(
+    _connectivitySubscription = _connectivityService!.statusStream.listen(
       _handleConnectivityChange,
     );
   }
@@ -139,15 +141,18 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
     try {
       // Initialize connectivity service
-      await _connectivityService.initialize();
+      if (_connectivityService == null) {
+        _connectivityService = ConnectivityService();
+        await _connectivityService!.initialize();
+      }
       
       // Check if we're online
-      final isOnline = _connectivityService.isConnected;
+      final isOnline = _connectivityService!.isConnected;
       setState(() => _isOnline = isOnline);
 
       if (isOnline) {
         // Connect to WebSocket chat service
-        await _chatService.connect(sessionId: widget.initialSessionId);
+        await _chatService?.connect(sessionId: widget.initialSessionId);
         
         // Add welcome message if this is a new session
         if (_messages.isEmpty) {
@@ -179,6 +184,11 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
       _isTyping = false;
       _messages.add(message);
+      
+      // Check for crisis escalation
+      if (message.escalationNeeded) {
+        _isCrisisMode = true;
+      }
     });
 
     _scrollToBottom();
@@ -246,8 +256,8 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
   void _addWelcomeMessage() {
     final welcomeMessage = ChatMessage.ai(
-      'Hello! I\'m your AI Wellbeing Coach. I\'m here to support you on your mental wellness journey. How are you feeling today?',
-      sessionId: _chatService.currentSessionId,
+      'Ciao! Sono il tuo Mental Performance Coach. Sono qui per ottimizzare il tuo mindset. Come ti senti oggi?',
+      sessionId: _chatService?.currentSessionId,
       metadata: const {'welcome_message': true},
     );
 
@@ -257,7 +267,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
   void _addOfflineModeMessage() {
     final offlineMessage = _offlineEngine.generateOfflineModeExplanation(
-      sessionId: _chatService.currentSessionId,
+      sessionId: _chatService?.currentSessionId,
     );
 
     setState(() => _messages.add(offlineMessage));
@@ -270,7 +280,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     // Create user message
     final userMessage = ChatMessage.user(
       text.trim(),
-      sessionId: _chatService.currentSessionId,
+      sessionId: _chatService?.currentSessionId,
     );
 
     setState(() {
@@ -283,7 +293,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     try {
       if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
         // Send via WebSocket
-        await _chatService.sendMessage(text.trim());
+        await _chatService?.sendMessage(text.trim());
         
         // Update message status to sent
         setState(() {
@@ -297,7 +307,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
         // Use offline fallback
         final offlineResponse = _offlineEngine.generateOfflineResponse(
           text.trim(),
-          sessionId: _chatService.currentSessionId,
+          sessionId: _chatService?.currentSessionId,
         );
 
         setState(() {
@@ -323,9 +333,9 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   void _sendTypingIndicator(bool isTyping) {
     if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
       if (isTyping) {
-        _chatService.sendTypingStart();
+        _chatService?.sendTypingStart();
       } else {
-        _chatService.sendTypingStop();
+        _chatService?.sendTypingStop();
       }
     }
   }
@@ -372,25 +382,55 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     _connectionSubscription?.cancel();
     _errorSubscription?.cancel();
     _connectivitySubscription?.cancel();
-    _chatService.dispose();
-    _connectivityService.dispose();
+    _chatService?.dispose();
+    _connectivityService?.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: Column(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      color: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: _buildAppBar(),
+        body: Column(
+          children: [
+            if (_isCrisisMode) _buildSafetyNetBanner(),
+            if (_connectionStatus != ChatConnectionStatus.connected)
+              _buildConnectionStatusBanner(),
+            Expanded(
+              child: _buildMessagesList(),
+            ),
+            if (_isTyping)
+              _buildTypingIndicator(),
+            _buildQuickReplies(),
+            _buildMessageComposer(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSafetyNetBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      color: AppColors.warmTerracotta.withOpacity(0.2),
+      child: Row(
         children: [
-          if (_connectionStatus != ChatConnectionStatus.connected)
-            _buildConnectionStatusBanner(),
+          const Icon(Icons.shield, color: AppColors.warmTerracotta),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: _buildMessagesList(),
+            child: Text(
+              'Protocollo di Sicurezza Attivo. Vuoi parlare con un umano?',
+              style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+            ),
           ),
-          if (_isTyping)
-            _buildTypingIndicator(),
-          _buildQuickReplies(),
-          _buildMessageComposer(),
+          TextButton(
+            onPressed: _requestEscalation,
+            child: const Text('CHIAMA', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
     );
@@ -398,21 +438,25 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
       elevation: 0,
       title: Row(
         children: [
           Container(
             width: 36,
             height: 36,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.warmGold, AppColors.warmTerracotta],
-              ),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.5),
+                  blurRadius: 10,
+                ),
+              ],
             ),
             child: const Icon(
-              Icons.psychology,
+              Icons.auto_awesome,
               color: AppColors.white,
               size: 20,
             ),
@@ -423,13 +467,13 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'AI Wellbeing Coach',
-                  style: AppTypography.h4,
+                  'Kaix Coach',
+                  style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
                 ),
                 Text(
-                  _getConnectionStatusText(),
+                  _isCrisisMode ? 'Safety Mode' : _getConnectionStatusText(),
                   style: AppTypography.caption.copyWith(
-                    color: _getConnectionStatusColor(),
+                    color: _isCrisisMode ? AppColors.warmTerracotta : _getConnectionStatusColor(),
                   ),
                 ),
               ],
@@ -528,17 +572,42 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       itemCount: _messages.length,
       itemBuilder: (context, index) {
         final message = _messages[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-          child: IOSChatBubble(
-            message: message.displayText,
-            type: message.isUser ? IOSChatBubbleType.user : IOSChatBubbleType.ai,
-            timestamp: message.timestamp,
-            isLoading: message.isSending,
-          ),
+        return LoFiMessageBubble(
+          message: message.displayText,
+          type: _mapMessageType(message.type),
+          timestamp: message.timestamp,
+          status: _mapMessageStatus(message.status),
+          citation: message.citation,
+          onRetry: message.isError ? () => _sendMessage(message.text) : null,
         );
       },
     );
+  }
+
+  MessageType _mapMessageType(ChatMessageType type) {
+    switch (type) {
+      case ChatMessageType.user:
+        return MessageType.user;
+      case ChatMessageType.ai:
+        return MessageType.bot;
+      case ChatMessageType.system:
+        return MessageType.system;
+      default:
+        return MessageType.bot;
+    }
+  }
+
+  MessageStatus _mapMessageStatus(ChatMessageStatus status) {
+    switch (status) {
+      case ChatMessageStatus.sending:
+        return MessageStatus.sending;
+      case ChatMessageStatus.sent:
+        return MessageStatus.sent;
+      case ChatMessageStatus.delivered:
+        return MessageStatus.delivered;
+      case ChatMessageStatus.error:
+        return MessageStatus.error;
+    }
   }
 
   Widget _buildTypingIndicator() {
@@ -600,7 +669,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   }
 
   List<String> _getIntelligentQuickReplies() {
-    // If no messages, show smart suggestions based on time of day
+    if (_isCrisisMode) return ['Parla con un umano', 'Esercizio di respirazione'];
     if (_messages.isEmpty) {
       return [
         "Sto attraversando un periodo difficile",
@@ -673,8 +742,8 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       child: MessageComposer(
         onSendMessage: _sendMessage,
         hintText: _isOnline 
-            ? 'Share what\'s on your mind...'
-            : 'Limited responses available offline...',
+            ? 'Scrivi o parla...'
+            : 'Risposte limitate offline...',
         enabled: !_isLoading,
         supportsSpeech: _isOnline, // Voice input only when online
         onVoiceStart: () => _sendTypingIndicator(true),

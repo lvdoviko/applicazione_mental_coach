@@ -26,8 +26,12 @@ class ConnectivityService {
   /// Check if currently disconnected
   bool get isDisconnected => _currentStatus == ConnectivityStatus.disconnected;
 
+  bool _isInitialized = false;
+
   /// Initialize the connectivity service
   Future<void> initialize() async {
+    if (_isInitialized) return;
+    
     _statusController = StreamController<ConnectivityStatus>.broadcast();
     
     // Get initial connectivity status
@@ -38,6 +42,8 @@ class ConnectivityService {
       _onConnectivityChanged,
       onError: _onConnectivityError,
     );
+    
+    _isInitialized = true;
   }
 
   /// Manually check connectivity status

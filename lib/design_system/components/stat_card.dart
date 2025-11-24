@@ -255,7 +255,7 @@ class _StatCardState extends State<StatCard>
 
   Color _getBackgroundColor(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? AppColors.darkSurface : AppColors.white;
+    return isDarkMode ? AppColors.surface : AppColors.white;
   }
 
   Color _getBorderColor(BuildContext context) {
@@ -265,12 +265,12 @@ class _StatCardState extends State<StatCard>
 
   Color _getTextPrimaryColor(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    return isDarkMode ? AppColors.textPrimary : AppColors.textPrimary;
   }
 
   Color _getTextSecondaryColor(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    return isDarkMode ? AppColors.darkTextSecondary : AppColors.grey600;
+    return isDarkMode ? AppColors.textSecondary : AppColors.grey600;
   }
 
   Color _getAccentColor() {

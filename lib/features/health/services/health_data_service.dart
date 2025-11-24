@@ -149,18 +149,9 @@ class HealthDataService {
     if (!Platform.isIOS) return false;
     
     try {
-      // Enable background delivery for critical health types
-      final criticalTypes = [
-        HealthDataType.HEART_RATE,
-        HealthDataType.HEART_RATE_VARIABILITY_SDNN,
-        HealthDataType.SLEEP_IN_BED,
-      ];
-      
-      for (final type in criticalTypes) {
-        await _health.enableBackgroundDelivery(type, HealthDataUpdateFrequency.IMMEDIATE);
-      }
-      
-      return true;
+      // TODO: Update for new health package API
+      // Background delivery API has changed or is removed in this version
+      return false;
     } catch (e) {
       throw Exception('Failed to enable background delivery: $e');
     }
@@ -171,9 +162,7 @@ class HealthDataService {
     if (!Platform.isIOS) return;
     
     try {
-      for (final type in _healthTypes) {
-        await _health.disableBackgroundDelivery(type);
-      }
+      // TODO: Update for new health package API
     } catch (e) {
       throw Exception('Failed to disable background delivery: $e');
     }
@@ -214,7 +203,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             heartRateSamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: 'bpm',
             ));
           }
@@ -224,7 +213,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             hrvSamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: 'ms',
             ));
           }
@@ -234,7 +223,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             restingHrSamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: 'bpm',
             ));
           }
@@ -255,7 +244,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             stepSamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: 'count',
             ));
           }
@@ -265,7 +254,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             activeEnergySamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: 'kcal',
             ));
           }
@@ -288,7 +277,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             bloodOxygenSamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: '%',
             ));
           }
@@ -365,7 +354,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             heartRateSamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: 'bpm',
             ));
           }
@@ -375,7 +364,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             stepSamples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: 'count',
             ));
           }
@@ -405,7 +394,7 @@ class HealthDataService {
           if (point.value is NumericHealthValue) {
             spo2Samples.add(HealthSample(
               timestamp: point.dateFrom,
-              value: (point.value as NumericHealthValue).numericValue,
+              value: (point.value as NumericHealthValue).numericValue.toDouble(),
               unit: '%',
             ));
           }

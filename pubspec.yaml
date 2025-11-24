@@ -64,6 +64,13 @@ dependencies:
   json_serializable: ^6.8.0
   json_annotation: ^4.9.0
   
+  # 3D Avatar (Ready Player Me)
+  o3d: ^3.1.0
+  webview_flutter: ^4.4.0
+  webview_flutter_android: ^3.12.0
+  webview_flutter_wkwebview: ^3.9.0
+  path_provider: ^2.1.0
+  
   # Testing & Development
   equatable: ^2.0.5
 
@@ -95,6 +102,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/animations/
+    - assets/animations/Standing_Greeting.glb
     - assets/avatars/
     
   # fonts:

@@ -4,207 +4,167 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
-import 'package:applicazione_mental_coach/design_system/components/avatar_customizer.dart';
+import 'package:applicazione_mental_coach/features/avatar/providers/avatar_provider.dart';
+import 'package:applicazione_mental_coach/features/avatar/widgets/avatar_viewer_3d.dart';
+import 'package:applicazione_mental_coach/features/avatar/widgets/rpm_avatar_creator.dart';
+import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart';
 
-class AvatarScreen extends ConsumerStatefulWidget {
+/// Avatar Screen - Manage 3D Coach Avatar
+/// 
+/// Features:
+/// - View current 3D avatar
+/// - Create/Edit avatar via Ready Player Me
+/// - Delete avatar
+class AvatarScreen extends ConsumerWidget {
   const AvatarScreen({super.key});
 
   @override
-  ConsumerState<AvatarScreen> createState() => _AvatarScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final avatarState = ref.watch(avatarProvider);
 
-class _AvatarScreenState extends ConsumerState<AvatarScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  AvatarConfig _currentConfig = const AvatarConfig(
-    style: AvatarStyle.modern,
-    expression: AvatarExpression.neutral,
-    primaryColor: AppColors.primary,
-    secondaryColor: AppColors.secondary,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          _buildTabBar(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildCustomizeTab(),
-                _buildPresetsTab(),
-              ],
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        title: Text(
+          'Your Coach Avatar',
+          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        actions: [
+          if (avatarState is AvatarStateLoaded &&
+              avatarState.config is AvatarConfigLoaded)
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Delete Avatar',
+              onPressed: () => _showDeleteConfirmation(context, ref),
             ),
-          ),
         ],
       ),
+      body: _buildBody(context, ref, avatarState),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      title: const Text('Avatar Customization'),
-      actions: [
-        TextButton(
-          onPressed: _saveAvatarConfig,
-          child: const Text('Save'),
-        ),
-        IconButton(
-          onPressed: _resetToDefaults,
-          icon: const Icon(Icons.refresh),
-          tooltip: 'Reset to defaults',
-        ),
-      ],
-    );
+  Widget _buildBody(BuildContext context, WidgetRef ref, AvatarState state) {
+    return switch (state) {
+      AvatarStateLoading() => _buildLoadingState(),
+      AvatarStateLoaded(:final config) => _buildLoadedState(context, ref, config),
+      AvatarStateError(:final failure) => _buildErrorState(context, ref, failure.message),
+      AvatarStateDownloading(:final progress) => _buildDownloadingState(progress),
+    };
   }
 
-  Widget _buildTabBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark 
-            ? AppColors.darkSurface 
-            : AppColors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).brightness == Brightness.dark 
-                ? AppColors.grey700 
-                : AppColors.grey200,
-          ),
-        ),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicatorColor: AppColors.primary,
-        labelColor: AppColors.primary,
-        unselectedLabelColor: AppColors.grey500,
-        labelStyle: AppTypography.bodyMedium.copyWith(
-          fontWeight: AppTypography.medium,
-        ),
-        tabs: const [
-          Tab(text: 'Customize'),
-          Tab(text: 'Presets'),
-        ],
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
       ),
     );
   }
 
-  Widget _buildCustomizeTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: AvatarCustomizer(
-        initialConfig: _currentConfig,
-        onConfigChanged: (config) {
-          setState(() => _currentConfig = config);
-        },
-        showPreview: true,
-      ),
-    );
-  }
+  Widget _buildLoadedState(BuildContext context, WidgetRef ref, AvatarConfig config) {
+    if (config is AvatarConfigEmpty) {
+      return _buildEmptyState(context);
+    }
 
-  Widget _buildPresetsTab() {
+    final loadedConfig = config as AvatarConfigLoaded;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'Choose a Preset',
-            style: AppTypography.h3,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'Quick start with these professionally designed avatars',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.grey600,
+          // 3D Avatar Preview
+          Center(
+            child: Container(
+              width: 300,
+              height: 400,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: AvatarViewer3D(
+                config: loadedConfig,
+                width: 300,
+                height: 400,
+                enableCameraControls: true,
+                autoRotate: true,
+                animationName: 'idle',
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: AppSpacing.lg,
-            mainAxisSpacing: AppSpacing.lg,
-            childAspectRatio: 0.8,
-            children: _getPresets().map(
-              (preset) => _buildPresetCard(preset),
-            ).toList(),
+
+          // Avatar Info
+          _buildInfoCard(loadedConfig),
+          const SizedBox(height: AppSpacing.lg),
+
+          // Edit Button
+          ElevatedButton.icon(
+            onPressed: () => _openAvatarCreator(context),
+            icon: const Icon(Icons.edit),
+            label: const Text('Edit Avatar'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPresetCard(AvatarPreset preset) {
-    final isSelected = _isSameConfig(_currentConfig, preset.config);
-
-    return GestureDetector(
-      onTap: () => setState(() => _currentConfig = preset.config),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark 
-              ? AppColors.darkSurface 
-              : AppColors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected 
-                ? AppColors.primary 
-                : (Theme.of(context).brightness == Brightness.dark 
-                    ? AppColors.grey700 
-                    : AppColors.grey200),
-            width: isSelected ? 2 : 1,
-          ),
-        ),
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              flex: 3,
-              child: AvatarPreview(
-                config: preset.config,
-                size: 80,
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.2),
+                    AppColors.secondary.withOpacity(0.2),
+                  ],
+                ),
+              ),
+              child: const Icon(
+                Icons.psychology,
+                size: 60,
+                color: AppColors.textSecondary,
               ),
             ),
+            const SizedBox(height: AppSpacing.xl),
+            Text(
+              'Create Your Coach',
+              style: AppTypography.h2.copyWith(color: AppColors.textPrimary),
+            ),
             const SizedBox(height: AppSpacing.md),
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: [
-                  Text(
-                    preset.name,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: AppTypography.medium,
-                      color: isSelected ? AppColors.primary : null,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    preset.description,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.grey600,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+            Text(
+              'Design a personalized 3D avatar for your mental coach',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            ElevatedButton.icon(
+              onPressed: () => _openAvatarCreator(context),
+              icon: const Icon(Icons.add),
+              label: const Text('Create Avatar'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.md,
+                ),
               ),
             ),
           ],
@@ -213,100 +173,157 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
     );
   }
 
-  List<AvatarPreset> _getPresets() {
-    return [
-      AvatarPreset(
-        name: 'Classic Athlete',
-        description: 'Traditional and focused',
-        config: const AvatarConfig(
-          style: AvatarStyle.classic,
-          expression: AvatarExpression.determined,
-          primaryColor: AppColors.primary,
-          secondaryColor: AppColors.secondary,
-          accessory: 'cap',
+  Widget _buildErrorState(BuildContext context, WidgetRef ref, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: AppColors.error,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              'Oops!',
+              style: AppTypography.h2.copyWith(color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              message,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            ElevatedButton(
+              onPressed: () => ref.read(avatarProvider.notifier).reload(),
+              child: const Text('Retry'),
+            ),
+          ],
         ),
-      ),
-      AvatarPreset(
-        name: 'Modern Competitor',
-        description: 'Contemporary and confident',
-        config: const AvatarConfig(
-          style: AvatarStyle.modern,
-          expression: AvatarExpression.focused,
-          primaryColor: AppColors.secondary,
-          secondaryColor: AppColors.accent,
-          accessory: 'headband',
-        ),
-      ),
-      AvatarPreset(
-        name: 'Zen Warrior',
-        description: 'Calm and centered',
-        config: const AvatarConfig(
-          style: AvatarStyle.minimal,
-          expression: AvatarExpression.neutral,
-          primaryColor: AppColors.accent,
-          secondaryColor: AppColors.warning,
-        ),
-      ),
-      AvatarPreset(
-        name: 'Happy Champion',
-        description: 'Optimistic and energetic',
-        config: const AvatarConfig(
-          style: AvatarStyle.sport,
-          expression: AvatarExpression.happy,
-          primaryColor: AppColors.warning,
-          secondaryColor: Color(0xFF8B5CF6),
-        ),
-      ),
-      AvatarPreset(
-        name: 'Team Leader',
-        description: 'Strong and inspiring',
-        config: const AvatarConfig(
-          style: AvatarStyle.modern,
-          expression: AvatarExpression.determined,
-          primaryColor: Color(0xFFEC4899),
-          secondaryColor: AppColors.primary,
-          accessory: 'glasses',
-        ),
-      ),
-      AvatarPreset(
-        name: 'Mindful Athlete',
-        description: 'Thoughtful and balanced',
-        config: const AvatarConfig(
-          style: AvatarStyle.minimal,
-          expression: AvatarExpression.focused,
-          primaryColor: Color(0xFF10B981),
-          secondaryColor: AppColors.secondary,
-        ),
-      ),
-    ];
-  }
-
-  bool _isSameConfig(AvatarConfig config1, AvatarConfig config2) {
-    return config1.style == config2.style &&
-           config1.expression == config2.expression &&
-           config1.primaryColor == config2.primaryColor &&
-           config1.secondaryColor == config2.secondaryColor &&
-           config1.accessory == config2.accessory;
-  }
-
-  void _saveAvatarConfig() async {
-    // TODO: Save avatar config to persistent storage
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Avatar configuration saved!'),
-        backgroundColor: AppColors.success,
-        duration: Duration(seconds: 2),
       ),
     );
   }
 
-  void _resetToDefaults() {
+  Widget _buildDownloadingState(double progress) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              'Downloading avatar...',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              '${(progress * 100).toInt()}%',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(AvatarConfigLoaded config) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Avatar Details',
+            style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildInfoRow('Last Updated', _formatDate(config.lastUpdated)),
+          if (config.gender != null)
+            _buildInfoRow('Gender', config.gender!),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          Text(
+            value,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays == 0) {
+      return 'Today';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
+  }
+
+  void _openAvatarCreator(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const RpmAvatarCreator(),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reset Avatar'),
-        content: const Text(
-          'Are you sure you want to reset your avatar to the default configuration? This action cannot be undone.',
+        backgroundColor: AppColors.surface,
+        title: Text(
+          'Delete Avatar',
+          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+        ),
+        content: Text(
+          'Are you sure you want to delete your coach avatar? This action cannot be undone.',
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
         actions: [
           TextButton(
@@ -315,35 +332,16 @@ class _AvatarScreenState extends ConsumerState<AvatarScreen>
           ),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                _currentConfig = const AvatarConfig(
-                  style: AvatarStyle.modern,
-                  expression: AvatarExpression.neutral,
-                  primaryColor: AppColors.primary,
-                  secondaryColor: AppColors.secondary,
-                );
-              });
+              ref.read(avatarProvider.notifier).deleteAvatar();
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
             ),
-            child: const Text('Reset'),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
   }
-}
-
-class AvatarPreset {
-  final String name;
-  final String description;
-  final AvatarConfig config;
-
-  AvatarPreset({
-    required this.name,
-    required this.description,
-    required this.config,
-  });
 }

@@ -5,32 +5,15 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_typography.da
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_animations.dart';
 
-/// **Lo-Fi Message Bubble Component**
+/// **Performance Message Bubble Component**
 /// 
 /// **Functional Description:**
-/// Soft, rounded message bubbles with distinct styling for user/bot messages.
-/// Includes smooth fade-in animations and proper spacing.
+/// High-performance message bubbles with citation support (RAG) and distinct styling.
 /// 
 /// **Visual Specifications:**
-/// - User bubble: #DCEEF9 background, #0F1724 text
-/// - Bot bubble: #FFF7EA background, #0F1724 text  
-/// - Border radius: 16px with tail variations
-/// - Padding: 16px horizontal, 12px vertical
-/// - Typography: Inter 16px regular, 1.4 line-height
-/// - Shadow: Subtle 0.06 opacity for depth
-/// 
-/// **Component Name:** LoFiMessageBubble
-/// 
-/// **Accessibility:**
-/// - Semantic labels for message type
-/// - High contrast text (4.5:1 ratio)
-/// - VoiceOver message grouping
-/// - Timestamp announcements
-/// 
-/// **Performance:**
-/// - Stateless widget with const constructors
-/// - Minimal rebuild scope
-/// - Optimized animation controllers
+/// - User bubble: Deep Indigo
+/// - Bot bubble: Dark Surface
+/// - Citation: Clickable chip for RAG transparency
 enum MessageType { user, bot, system }
 enum MessageStatus { sending, sent, delivered, read, error }
 
@@ -41,6 +24,7 @@ class LoFiMessageBubble extends StatefulWidget {
   final DateTime timestamp;
   final bool isAnimated;
   final VoidCallback? onRetry;
+  final String? citation; // New: RAG Citation
 
   const LoFiMessageBubble({
     super.key,
@@ -50,6 +34,7 @@ class LoFiMessageBubble extends StatefulWidget {
     required this.timestamp,
     this.isAnimated = false,
     this.onRetry,
+    this.citation,
   });
 
   @override
@@ -203,17 +188,19 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
       width: 28,
       height: 28,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withOpacity(0.8),
-            AppColors.secondary.withOpacity(0.6),
-          ],
-        ),
+        color: AppColors.primary,
         shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.4),
+            blurRadius: 8,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: const Icon(
-        Icons.psychology_outlined,
-        color: AppColors.surface,
+        Icons.auto_awesome, // Abstract/AI icon
+        color: AppColors.white,
         size: 16,
       ),
     );
@@ -224,17 +211,13 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
       width: 28,
       height: 28,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.warmTerracotta.withOpacity(0.8),
-            AppColors.warmGold.withOpacity(0.6),
-          ],
-        ),
+        color: AppColors.surfaceVariant,
         shape: BoxShape.circle,
+        border: Border.all(color: AppColors.border),
       ),
       child: const Icon(
         Icons.person,
-        color: AppColors.surface,
+        color: AppColors.textSecondary,
         size: 16,
       ),
     );
@@ -243,8 +226,7 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
   Widget _buildBubble() {
     final isUser = widget.type == MessageType.user;
     final backgroundColor = isUser ? AppColors.userBubble : AppColors.botBubble;
-    final textColor = isUser ? AppColors.userBubbleText : AppColors.botBubbleText;
-
+    
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -252,6 +234,7 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: _getBorderRadius(isUser),
+        border: isUser ? null : Border.all(color: AppColors.border),
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.messageBubblePadding,
@@ -266,10 +249,43 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
                 ? AppTypography.chatBubbleUser
                 : AppTypography.chatBubbleBot,
           ),
+          if (widget.citation != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            _buildCitationChip(),
+          ],
           if (_shouldShowTimestamp()) ...[
             const SizedBox(height: AppSpacing.xs),
-            _buildTimestamp(textColor),
+            _buildTimestamp(isUser ? AppColors.textPrimary : AppColors.textSecondary),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCitationChip() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.menu_book, size: 12, color: AppColors.primary),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              widget.citation!,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );

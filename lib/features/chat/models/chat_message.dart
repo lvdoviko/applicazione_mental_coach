@@ -44,6 +44,9 @@ class ChatMessage extends Equatable {
   @JsonKey(name: 'escalation_needed')
   final bool escalationNeeded;
 
+  /// RAG Citation source
+  final String? citation;
+
   const ChatMessage({
     required this.id,
     required this.text,
@@ -56,6 +59,7 @@ class ChatMessage extends Equatable {
     this.modelUsed,
     this.processingTimeMs,
     this.escalationNeeded = false,
+    this.citation,
   });
 
   // === Factory Constructors ===
@@ -87,6 +91,7 @@ class ChatMessage extends Equatable {
     String? modelUsed,
     int? processingTimeMs,
     bool escalationNeeded = false,
+    String? citation,
   }) {
     return ChatMessage(
       id: _generateId(),
@@ -100,6 +105,7 @@ class ChatMessage extends Equatable {
       modelUsed: modelUsed,
       processingTimeMs: processingTimeMs,
       escalationNeeded: escalationNeeded,
+      citation: citation,
     );
   }
 
@@ -168,6 +174,7 @@ class ChatMessage extends Equatable {
       modelUsed: data['model_used'] as String?,
       processingTimeMs: data['processing_time_ms'] as int?,
       escalationNeeded: data['escalation_needed'] as bool? ?? false,
+      citation: data['citation'] as String?,
     );
   }
 
@@ -186,6 +193,7 @@ class ChatMessage extends Equatable {
     String? modelUsed,
     int? processingTimeMs,
     bool? escalationNeeded,
+    String? citation,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -199,6 +207,7 @@ class ChatMessage extends Equatable {
       modelUsed: modelUsed ?? this.modelUsed,
       processingTimeMs: processingTimeMs ?? this.processingTimeMs,
       escalationNeeded: escalationNeeded ?? this.escalationNeeded,
+      citation: citation ?? this.citation,
     );
   }
 
@@ -244,6 +253,7 @@ class ChatMessage extends Equatable {
       'session_id': sessionId,
       'timestamp': timestamp.toIso8601String(),
       if (metadata != null) 'metadata': metadata,
+      if (citation != null) 'citation': citation,
     };
   }
 
@@ -259,7 +269,7 @@ class ChatMessage extends Equatable {
   @override
   List<Object?> get props => [
     id, text, type, timestamp, status, sessionId, metadata,
-    confidenceScore, modelUsed, processingTimeMs, escalationNeeded,
+    confidenceScore, modelUsed, processingTimeMs, escalationNeeded, citation,
   ];
 
   // === Private Helpers ===
@@ -287,7 +297,7 @@ class ChatMessage extends Equatable {
 
   @override
   String toString() {
-    return 'ChatMessage(id: $id, type: $type, text: "${text.length > 50 ? '${text.substring(0, 50)}...' : text}", status: $status)';
+    return 'ChatMessage(id: $id, type: $type, text: "${text.length > 50 ? '${text.substring(0, 50)}...' : text}", status: $status, citation: $citation)';
   }
 }
 

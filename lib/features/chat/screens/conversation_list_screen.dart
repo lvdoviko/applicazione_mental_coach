@@ -67,7 +67,7 @@ class _ConversationListScreenState extends State<ConversationListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -139,7 +139,7 @@ class _ConversationListScreenState extends State<ConversationListScreen>
                     vertical: AppSpacing.md,
                   ),
                 ),
-                semanticsLabel: 'Search conversations',
+                ),
               ),
             )
           : const SizedBox.shrink(),

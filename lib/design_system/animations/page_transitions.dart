@@ -22,8 +22,8 @@ class LoFiPageTransitions {
   static const Duration _duration = Duration(milliseconds: 350);
   
   /// Gentle slide from right with fade
-  static PageRouteBuilder slideFromRight(Widget page) {
-    return PageRouteBuilder(
+  static PageRouteBuilder<T> slideFromRight<T>(Widget page) {
+    return PageRouteBuilder<T>(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: _duration,
       reverseTransitionDuration: _duration,
@@ -59,8 +59,8 @@ class LoFiPageTransitions {
   }
 
   /// Gentle slide from bottom for modals
-  static PageRouteBuilder slideFromBottom(Widget page) {
-    return PageRouteBuilder(
+  static PageRouteBuilder<T> slideFromBottom<T>(Widget page) {
+    return PageRouteBuilder<T>(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: _duration,
       reverseTransitionDuration: _duration,
@@ -96,8 +96,8 @@ class LoFiPageTransitions {
   }
 
   /// Subtle scale and fade for dialogs
-  static PageRouteBuilder scaleAndFade(Widget page) {
-    return PageRouteBuilder(
+  static PageRouteBuilder<T> scaleAndFade<T>(Widget page) {
+    return PageRouteBuilder<T>(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: _duration,
       reverseTransitionDuration: _duration,
@@ -109,7 +109,7 @@ class LoFiPageTransitions {
           end: 1.0,
         ).animate(CurvedAnimation(
           parent: animation,
-          curve: AppAnimations.easeOutBack,
+          curve: Curves.easeOutBack,
         ));
 
         final fadeAnimation = Tween<double>(
@@ -132,8 +132,8 @@ class LoFiPageTransitions {
   }
 
   /// Simple fade for subtle transitions
-  static PageRouteBuilder fadeIn(Widget page) {
-    return PageRouteBuilder(
+  static PageRouteBuilder<T> fadeIn<T>(Widget page) {
+    return PageRouteBuilder<T>(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: _duration,
       reverseTransitionDuration: _duration,
@@ -155,8 +155,8 @@ class LoFiPageTransitions {
   }
 
   /// Shared axis transition for related screens
-  static PageRouteBuilder sharedAxis(Widget page, {bool isVertical = false}) {
-    return PageRouteBuilder(
+  static PageRouteBuilder<T> sharedAxis<T>(Widget page, {bool isVertical = false}) {
+    return PageRouteBuilder<T>(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionDuration: _duration,
       reverseTransitionDuration: _duration,
@@ -227,18 +227,18 @@ class LoFiPageTransitions {
 /// Extension to simplify navigation with lo-fi transitions
 extension NavigationExtensions on NavigatorState {
   Future<T?> pushWithSlide<T>(Widget page) {
-    return push<T>(LoFiPageTransitions.slideFromRight(page));
+    return push<T>(LoFiPageTransitions.slideFromRight<T>(page));
   }
 
   Future<T?> pushWithFade<T>(Widget page) {
-    return push<T>(LoFiPageTransitions.fadeIn(page));
+    return push<T>(LoFiPageTransitions.fadeIn<T>(page));
   }
 
   Future<T?> pushModalWithSlide<T>(Widget page) {
-    return push<T>(LoFiPageTransitions.slideFromBottom(page));
+    return push<T>(LoFiPageTransitions.slideFromBottom<T>(page));
   }
 
   Future<T?> pushWithScale<T>(Widget page) {
-    return push<T>(LoFiPageTransitions.scaleAndFade(page));
+    return push<T>(LoFiPageTransitions.scaleAndFade<T>(page));
   }
 }

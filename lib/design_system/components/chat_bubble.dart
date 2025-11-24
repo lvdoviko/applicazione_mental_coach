@@ -96,7 +96,7 @@ class ChatBubble extends StatelessWidget {
     } else {
       bubbleColor = isDarkMode ? AppColors.grey700 : AppColors.aiBubble;
       textColor = isDarkMode 
-          ? AppColors.darkTextPrimary 
+          ? AppColors.textPrimary 
           : AppColors.aiBubbleText;
     }
 

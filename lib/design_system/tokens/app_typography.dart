@@ -19,13 +19,13 @@ class AppTypography {
   static const FontWeight heavy = FontWeight.w800;
   static const FontWeight black = FontWeight.w900;
 
-  // Text Styles - Lo-Fi Minimal Style
+  // Text Styles - Performance Design
   static TextStyle get headingLarge => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 34,
         fontWeight: bold,
         color: AppColors.textPrimary,
-        height: 1.25,
+        height: 1.3,
         letterSpacing: -0.025,
       );
 
@@ -43,7 +43,7 @@ class AppTypography {
         fontSize: 34,
         fontWeight: bold,
         color: AppColors.textPrimary,
-        height: 1.24,
+        height: 1.3,
         letterSpacing: -0.5,
       );
 
@@ -52,7 +52,7 @@ class AppTypography {
         fontSize: 28,
         fontWeight: bold,
         color: AppColors.textPrimary,
-        height: 1.24,
+        height: 1.3,
         letterSpacing: -0.3,
       );
 
@@ -61,7 +61,7 @@ class AppTypography {
         fontSize: 22,
         fontWeight: bold,
         color: AppColors.textPrimary,
-        height: 1.27,
+        height: 1.35,
         letterSpacing: -0.2,
       );
 
@@ -70,7 +70,7 @@ class AppTypography {
         fontSize: 20,
         fontWeight: semiBold,
         color: AppColors.textPrimary,
-        height: 1.3,
+        height: 1.4,
         letterSpacing: -0.1,
       );
 
@@ -79,7 +79,7 @@ class AppTypography {
         fontSize: 17,
         fontWeight: semiBold,
         color: AppColors.textPrimary,
-        height: 1.35,
+        height: 1.4,
         letterSpacing: -0.05,
       );
 
@@ -88,7 +88,7 @@ class AppTypography {
         fontSize: 18,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.6,
+        height: 1.6, // Optimized for readability
         letterSpacing: 0,
       );
 
@@ -97,7 +97,7 @@ class AppTypography {
         fontSize: 16,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.4,
+        height: 1.5, // Increased from 1.4
         letterSpacing: 0,
       );
 
@@ -106,7 +106,7 @@ class AppTypography {
         fontSize: 16,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.4,
+        height: 1.5, // Increased from 1.4
         letterSpacing: 0,
       );
 
@@ -115,7 +115,7 @@ class AppTypography {
         fontSize: 14,
         fontWeight: regular,
         color: AppColors.textSecondary,
-        height: 1.4,
+        height: 1.5,
       );
 
   static TextStyle get buttonLarge => const TextStyle(
@@ -123,7 +123,7 @@ class AppTypography {
         fontSize: 17,
         fontWeight: semiBold,
         color: AppColors.white,
-        height: 1.29,
+        height: 1.3,
         letterSpacing: -0.02,
       );
 
@@ -132,7 +132,7 @@ class AppTypography {
         fontSize: 15,
         fontWeight: semiBold,
         color: AppColors.white,
-        height: 1.33,
+        height: 1.35,
         letterSpacing: -0.01,
       );
 
@@ -141,7 +141,7 @@ class AppTypography {
         fontSize: 16,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.31,
+        height: 1.4,
         letterSpacing: -0.02,
       );
 
@@ -150,7 +150,7 @@ class AppTypography {
         fontSize: 15,
         fontWeight: regular,
         color: AppColors.textPrimary,
-        height: 1.33,
+        height: 1.4,
         letterSpacing: -0.01,
       );
 
@@ -158,42 +158,42 @@ class AppTypography {
         fontFamily: fontFamily,
         fontSize: 13,
         fontWeight: regular,
-        color: AppColors.grey600,
-        height: 1.38,
+        color: AppColors.textTertiary,
+        height: 1.4,
       );
 
   static TextStyle get caption1 => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 12,
         fontWeight: regular,
-        color: AppColors.grey600,
-        height: 1.33,
+        color: AppColors.textTertiary,
+        height: 1.4,
       );
 
   static TextStyle get caption => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 12,
         fontWeight: regular,
-        color: AppColors.grey500,
-        height: 1.33,
+        color: AppColors.textTertiary,
+        height: 1.4,
       );
 
   static TextStyle get overline => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 10,
         fontWeight: medium,
-        color: AppColors.grey500,
+        color: AppColors.textTertiary,
         height: 1.2,
         letterSpacing: 1.5,
       );
 
-  // Chat Specific Styles - Lo-Fi Minimal
+  // Chat Specific Styles - Optimized for reading bubbles
   static TextStyle get chatBubbleUser => const TextStyle(
         fontFamily: fontFamily,
         fontSize: 16,
         fontWeight: regular,
         color: AppColors.userBubbleText,
-        height: 1.4,
+        height: 1.5,
         letterSpacing: 0,
       );
 
@@ -202,7 +202,7 @@ class AppTypography {
         fontSize: 16,
         fontWeight: regular,
         color: AppColors.botBubbleText,
-        height: 1.4,
+        height: 1.5,
         letterSpacing: 0,
       );
 
@@ -211,7 +211,7 @@ class AppTypography {
         fontSize: 12,
         fontWeight: regular,
         color: AppColors.textTertiary,
-        height: 1.25,
+        height: 1.3,
       );
 
   static TextStyle get composerPlaceholder => const TextStyle(
@@ -219,19 +219,19 @@ class AppTypography {
         fontSize: 16,
         fontWeight: regular,
         color: AppColors.textTertiary,
-        height: 1.4,
+        height: 1.5,
       );
 
   // Legacy alias
   static TextStyle get chatBubbleAI => chatBubbleBot;
 
-  // Dark Theme Variants
-  static TextStyle get h1Dark => h1.copyWith(color: AppColors.darkTextPrimary);
-  static TextStyle get h2Dark => h2.copyWith(color: AppColors.darkTextPrimary);
-  static TextStyle get h3Dark => h3.copyWith(color: AppColors.darkTextPrimary);
-  static TextStyle get h4Dark => h4.copyWith(color: AppColors.darkTextPrimary);
-  static TextStyle get bodyLargeDark => bodyLarge.copyWith(color: AppColors.darkTextPrimary);
-  static TextStyle get bodyMediumDark => bodyMedium.copyWith(color: AppColors.darkTextPrimary);
-  static TextStyle get bodySmallDark => bodySmall.copyWith(color: AppColors.darkTextSecondary);
-  static TextStyle get captionDark => caption.copyWith(color: AppColors.darkTextSecondary);
+  // Dark Theme Variants (Now default, but keeping for compatibility if needed)
+  static TextStyle get h1Dark => h1;
+  static TextStyle get h2Dark => h2;
+  static TextStyle get h3Dark => h3;
+  static TextStyle get h4Dark => h4;
+  static TextStyle get bodyLargeDark => bodyLarge;
+  static TextStyle get bodyMediumDark => bodyMedium;
+  static TextStyle get bodySmallDark => bodySmall;
+  static TextStyle get captionDark => caption;
 }

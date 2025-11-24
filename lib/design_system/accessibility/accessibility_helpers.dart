@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Enum for ARIA live region politeness
+enum AssertionsAriaLive {
+  polite,
+  assertive,
+}
+
 /// **Lo-Fi Accessibility Helpers**
 /// 
 /// **Functional Description:**

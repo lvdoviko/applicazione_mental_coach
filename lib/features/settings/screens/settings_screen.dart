@@ -25,8 +25,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Settings'),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        title: Text(
+          'Settings',
+          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         actions: [
           IconButton(
             onPressed: _showAboutDialog,
@@ -206,14 +213,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark 
-                  ? AppColors.darkSurface 
-                  : AppColors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? AppColors.grey700 
-                    : AppColors.grey200,
+                color: AppColors.border,
               ),
             ),
             child: Column(children: children),

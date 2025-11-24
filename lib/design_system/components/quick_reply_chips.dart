@@ -52,7 +52,10 @@ class QuickReplyChips extends StatelessWidget {
   }
 
   Widget _buildChip(String reply, int index, BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // Performance Dark Mode styling
+    final backgroundColor = AppColors.surfaceVariant;
+    final borderColor = AppColors.primary.withOpacity(0.3);
+    final textColor = AppColors.textPrimary;
 
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 200 + (index * 100)),
@@ -69,13 +72,14 @@ class QuickReplyChips extends StatelessWidget {
       child: ActionChip(
         label: Text(
           reply,
-          style: AppTypography.bodyMedium.copyWith(
-            color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
+          style: AppTypography.caption.copyWith(
+            color: textColor,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: isDarkMode ? AppColors.grey700 : AppColors.grey100,
+        backgroundColor: backgroundColor,
         side: BorderSide(
-          color: isDarkMode ? AppColors.grey600 : AppColors.grey200,
+          color: borderColor,
           width: 1,
         ),
         shape: RoundedRectangleBorder(
@@ -86,8 +90,9 @@ class QuickReplyChips extends StatelessWidget {
           vertical: AppSpacing.sm,
         ),
         onPressed: () => onReplySelected(reply),
-        pressElevation: 0,
-        elevation: 0,
+        pressElevation: 4,
+        elevation: 2,
+        shadowColor: AppColors.primary.withOpacity(0.2),
       ),
     );
   }

@@ -48,7 +48,7 @@ class AppTheme {
       bottomNavigationBarTheme: _darkBottomNavTheme,
       dividerTheme: _darkDividerTheme,
       switchTheme: _darkSwitchTheme,
-      scaffoldBackgroundColor: AppColors.darkBackground,
+      scaffoldBackgroundColor: AppColors.background,
     );
   }
 
@@ -76,16 +76,16 @@ class AppTheme {
     primary: AppColors.primary,
     onPrimary: AppColors.white,
     secondary: AppColors.secondary,
-    onSecondary: AppColors.darkTextPrimary,
+    onSecondary: AppColors.textPrimary,
     tertiary: AppColors.accent,
-    onTertiary: AppColors.darkTextPrimary,
+    onTertiary: AppColors.textPrimary,
     error: AppColors.error,
     onError: AppColors.white,
-    surface: AppColors.darkSurface,
-    onSurface: AppColors.darkTextPrimary,
-    surfaceContainerHighest: AppColors.darkSurfaceVariant,
-    onSurfaceVariant: AppColors.darkTextSecondary,
-    outline: AppColors.darkBorder,
+    surface: AppColors.surface,
+    onSurface: AppColors.textPrimary,
+    surfaceContainerHighest: AppColors.surfaceVariant,
+    onSurfaceVariant: AppColors.textSecondary,
+    outline: AppColors.border,
     outlineVariant: AppColors.grey700,
   );
 
@@ -130,8 +130,8 @@ class AppTheme {
       );
 
   static AppBarTheme get _darkAppBarTheme => AppBarTheme(
-        backgroundColor: AppColors.darkSurface,
-        foregroundColor: AppColors.darkTextPrimary,
+        backgroundColor: AppColors.surface,
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
         titleTextStyle: AppTypography.h3Dark,
@@ -268,7 +268,7 @@ class AppTheme {
   static InputDecorationTheme get _darkInputDecorationTheme =>
       InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.darkSurfaceVariant,
+        fillColor: AppColors.surfaceVariant,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppBorderRadius.composer),
           borderSide: BorderSide.none,
@@ -290,7 +290,7 @@ class AppTheme {
           vertical: AppSpacing.composerPadding,
         ),
         hintStyle: AppTypography.composerPlaceholder.copyWith(
-          color: AppColors.darkTextSecondary,
+          color: AppColors.textSecondary,
         ),
       );
 
@@ -308,9 +308,9 @@ class AppTheme {
       );
 
   static CardThemeData get _darkCardTheme => CardThemeData(
-        color: AppColors.darkSurface,
+        color: AppColors.surface,
         elevation: 0,
-        shadowColor: AppColors.darkTextPrimary.withOpacity(0.1),
+        shadowColor: AppColors.textPrimary.withOpacity(0.1),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppBorderRadius.card),
         ),
@@ -336,9 +336,9 @@ class AppTheme {
       );
 
   static ChipThemeData get _darkChipTheme => ChipThemeData(
-        backgroundColor: AppColors.darkSurfaceVariant,
+        backgroundColor: AppColors.surfaceVariant,
         selectedColor: AppColors.primary,
-        labelStyle: AppTypography.bodySmall.copyWith(color: AppColors.darkTextPrimary),
+        labelStyle: AppTypography.bodySmall.copyWith(color: AppColors.textPrimary),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppBorderRadius.chip),
         ),
@@ -377,9 +377,9 @@ class AppTheme {
 
   static BottomNavigationBarThemeData get _darkBottomNavTheme =>
       BottomNavigationBarThemeData(
-        backgroundColor: AppColors.darkSurface,
+        backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.darkTextSecondary,
+        unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: AppTypography.captionDark,
         unselectedLabelStyle: AppTypography.captionDark,
@@ -393,7 +393,7 @@ class AppTheme {
       );
 
   static DividerThemeData get _darkDividerTheme => const DividerThemeData(
-        color: AppColors.darkBorder,
+        color: AppColors.border,
         thickness: 1,
         space: 1,
       );

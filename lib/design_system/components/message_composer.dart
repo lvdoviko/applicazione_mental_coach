@@ -159,8 +159,8 @@ class _MessageComposerState extends State<MessageComposer>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    // Force dark mode for consistency
+    const isDarkMode = true;
 
     return Semantics(
       label: 'Message composer',
@@ -168,8 +168,8 @@ class _MessageComposerState extends State<MessageComposer>
         position: _slideAnimation,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: isDarkMode ? AppColors.darkSurface : AppColors.white,
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
           ),
           child: SafeArea(
             child: Row(
@@ -187,42 +187,35 @@ class _MessageComposerState extends State<MessageComposer>
                       enabled: widget.enabled,
                       maxLines: null,
                       textInputAction: TextInputAction.newline,
-                      style: AppTypography.bodyLarge,
+                      style: AppTypography.bodyLarge.copyWith(color: AppColors.textPrimary),
                       decoration: InputDecoration(
                         hintText: widget.hintText,
+                        hintStyle: AppTypography.composerPlaceholder,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.lg,
                           vertical: AppSpacing.md,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(
-                            color: isDarkMode 
-                                ? AppColors.grey600 
-                                : AppColors.grey300,
+                          borderSide: const BorderSide(
+                            color: AppColors.grey600,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(
-                            color: isDarkMode 
-                                ? AppColors.grey600 
-                                : AppColors.grey300,
+                          borderSide: const BorderSide(
+                            color: AppColors.grey600,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(
-                            color: isDarkMode 
-                                ? AppColors.warmGold 
-                                : AppColors.warmTerracotta,
+                          borderSide: const BorderSide(
+                            color: AppColors.warmGold,
                             width: 2,
                           ),
                         ),
                         filled: true,
-                        fillColor: isDarkMode 
-                            ? AppColors.grey800 
-                            : AppColors.grey50,
+                        fillColor: AppColors.grey800,
                       ),
                       onSubmitted: (_) => _sendMessage(),
                     ),
@@ -251,7 +244,7 @@ class _MessageComposerState extends State<MessageComposer>
             height: 48,
             width: 48,
             decoration: BoxDecoration(
-              color: _isListening ? AppColors.error : AppColors.grey100,
+              color: _isListening ? AppColors.error : AppColors.grey700,
               shape: BoxShape.circle,
               border: _isListening
                   ? Border.all(color: AppColors.error.withOpacity(0.3), width: 2)
@@ -264,7 +257,7 @@ class _MessageComposerState extends State<MessageComposer>
                 onTap: _toggleListening,
                 child: Icon(
                   _isListening ? Icons.mic : Icons.mic_none,
-                  color: _isListening ? AppColors.white : AppColors.grey600,
+                  color: _isListening ? AppColors.white : AppColors.grey400,
                   size: 20,
                   semanticLabel: _isListening ? 'Stop recording' : 'Start voice recording',
                 ),
@@ -278,7 +271,8 @@ class _MessageComposerState extends State<MessageComposer>
 
   Widget _buildSendButton() {
     final canSend = _hasText && widget.enabled;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // Force dark mode colors
+    const isDarkMode = true;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -286,8 +280,8 @@ class _MessageComposerState extends State<MessageComposer>
       width: 48,
       decoration: BoxDecoration(
         color: canSend 
-            ? (isDarkMode ? AppColors.warmGold : AppColors.warmTerracotta)
-            : AppColors.grey300,
+            ? AppColors.warmGold
+            : AppColors.grey700,
         shape: BoxShape.circle,
       ),
       child: Material(
