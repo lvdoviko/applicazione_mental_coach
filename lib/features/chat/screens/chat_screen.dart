@@ -66,7 +66,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             Expanded(
               child: _buildMessagesList(),
             ),
-            _buildQuickSuggestions(),
             _buildInputComposer(),
           ],
         ),
@@ -261,23 +260,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
-  Widget _buildQuickSuggestions() {
-    final suggestions = _getContextualSuggestions();
 
-    return LoFiQuickSuggestions(
-      suggestions: suggestions,
-      onSuggestionTap: _sendMessage,
-      isVisible: suggestions.isNotEmpty && !_isTyping,
-    );
-  }
-
-  List<String> _getContextualSuggestions() {
-    if (_isCrisisMode) return ['Parla con un umano', 'Esercizio di respirazione'];
-    if (_messages.isEmpty) return ['Mi sento stanco', 'Ho ansia pre-gara', 'Voglio migliorare il focus'];
-
-    // Simple logic for demo
-    return ['Dimmi di più', 'Come funziona?', 'Sono pronto'];
-  }
 
   Widget _buildInputComposer() {
     return LoFiInputComposer(

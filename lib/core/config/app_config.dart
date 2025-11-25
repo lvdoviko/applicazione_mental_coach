@@ -90,4 +90,5 @@ class AppConfig {
   static const bool showDebugInfo = isDevelopment;
   static const bool enableNetworkLogs = isDevelopment;
   static const bool skipOnboarding = false; // For development
+  static const bool debugSimulateTokenExpiry = false; // For testing token expiry logic
 }

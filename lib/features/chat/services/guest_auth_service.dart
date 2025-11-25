@@ -3,13 +3,12 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/config/app_config.dart';
-import '../../../core/security/token_storage_service.dart';
+
 
 /// Service for guest (anonymous) authentication
 /// Allows users to access chat without account creation
 class GuestAuthService {
   final Dio _dio;
-  final TokenStorageService _tokenStorage;
   final Uuid _uuid = const Uuid();
 
   static const String _guestBoxName = 'guest_auth';
@@ -20,10 +19,8 @@ class GuestAuthService {
   Box<String>? _guestBox;
 
   GuestAuthService({
-    required TokenStorageService tokenStorage,
     Dio? dio,
-  })  : _tokenStorage = tokenStorage,
-        _dio = dio ?? Dio();
+  })  : _dio = dio ?? Dio();
 
   /// Initialize guest box
   Future<void> _ensureInitialized() async {
@@ -35,79 +32,94 @@ class GuestAuthService {
   /// Initialize guest authentication
   /// Creates or retrieves existing guest session
   Future<GuestAuthResult> authenticateAsGuest() async {
-    debugPrint('🔐 Starting guest authentication...');
+    debugPrint('🔐 Starting v1-lite authentication...');
 
     // Check if we have an existing valid guest session
     final existingToken = await _getStoredGuestToken();
-    if (existingToken != null && !await _isGuestTokenExpired()) {
+    if (existingToken != null && !await isTokenExpired()) {
       final guestId = await _getOrCreateGuestId();
-      debugPrint('✅ Using cached guest token for: $guestId');
+      debugPrint('✅ Using cached websocket token');
       return GuestAuthResult(
-        guestId: guestId,
+        guestId: guestId, // Kept for local reference, though backend uses session_id
         sessionToken: existingToken,
         isNewGuest: false,
       );
     }
 
-    // Create new guest session
-    final guestId = await _getOrCreateGuestId();
-    debugPrint('🆔 Guest ID: $guestId');
+    // Generate Request ID for tracing
+    final requestId = _uuid.v4();
+    debugPrint('🆔 Request ID: $requestId');
 
     try {
       _dio.options.baseUrl = AppConfig.baseUrl;
 
-      debugPrint('📡 Calling: ${AppConfig.baseUrl}/v1/auth/guest');
+      debugPrint('📡 Calling: ${AppConfig.baseUrl}/v1/auth/session');
       debugPrint('🏢 Tenant: ${AppConfig.tenantId}');
-      debugPrint('🔑 API Key: ${AppConfig.apiKey.substring(0, 20)}...');
-
+      
       final response = await _dio.post(
-        '/v1/auth/guest',
+        '/v1/auth/session',
         options: Options(
           headers: {
             'X-Tenant-Id': AppConfig.tenantId,
-            'X-Api-Key': AppConfig.apiKey,
             'Content-Type': 'application/json',
+            'X-Request-ID': requestId,
           },
         ),
         data: {
-          'guest_id': guestId,
-          'device_info': await _getDeviceInfo(),
+          'tenant_id': AppConfig.tenantId,
+          'api_key': AppConfig.apiKey,
         },
       );
 
       debugPrint('📥 Response status: ${response.statusCode}');
-      debugPrint('📥 Response data: ${response.data}');
+      
+      final data = response.data;
+      final websocketToken = data['websocket_token'] as String?;
+      final sessionId = data['session_id'] as String?;
+      final expiresAt = data['expires_at'] as String?;
 
-      final sessionToken = response.data['session_token'] as String?;
-      final expiresIn = response.data['expires_in'] as int? ?? 86400; // Default 24h
-
-      if (sessionToken == null) {
-        throw GuestAuthException('Invalid response: missing session_token');
+      if (websocketToken == null || sessionId == null) {
+        throw GuestAuthException('Invalid response: missing websocket_token or session_id');
       }
 
-      debugPrint('🎫 Got session token (${sessionToken.length} chars)');
-      debugPrint('⏰ Expires in: ${expiresIn}s');
+      debugPrint('🎫 Got websocket token');
+      debugPrint('🆔 Session ID: $sessionId');
 
-      // Store the guest session token
+      // Calculate expiry duration
+      Duration expiresIn = const Duration(hours: 1); // Default fallback
+      if (expiresAt != null) {
+        try {
+          final expiryDate = DateTime.parse(expiresAt);
+          final now = DateTime.now();
+          if (expiryDate.isAfter(now)) {
+            expiresIn = expiryDate.difference(now);
+          }
+        } catch (e) {
+          debugPrint('⚠️ Failed to parse expires_at: $e');
+        }
+      }
+
+      // Store the session token (websocket_token)
       await _storeGuestToken(
-        sessionToken,
-        Duration(seconds: expiresIn),
+        websocketToken,
+        expiresIn,
       );
+      
+      // Store session ID as guest ID for consistency
+      await _guestBox!.put(_guestIdKey, sessionId);
 
       return GuestAuthResult(
-        guestId: guestId,
-        sessionToken: sessionToken,
+        guestId: sessionId,
+        sessionToken: websocketToken,
         isNewGuest: true,
       );
     } catch (e) {
-      debugPrint('❌ Guest authentication error: $e');
+      debugPrint('❌ Authentication error: $e');
       if (e is DioException) {
         debugPrint('❌ DioException type: ${e.type}');
         debugPrint('❌ Response: ${e.response?.data}');
-        debugPrint('❌ Status: ${e.response?.statusCode}');
-        debugPrint('❌ Message: ${e.message}');
       }
-      throw GuestAuthException('Guest authentication failed: $e');
+      throw GuestAuthException('Authentication failed: $e');
     }
   }
 
@@ -143,8 +155,14 @@ class GuestAuthService {
   }
 
   /// Check if guest token is expired
-  Future<bool> _isGuestTokenExpired() async {
+  Future<bool> isTokenExpired() async {
     await _ensureInitialized();
+
+    // Debug: Simulate token expiry for testing
+    if (AppConfig.debugSimulateTokenExpiry) {
+      debugPrint('🐛 DEBUG: Simulating token expiry');
+      return true;
+    }
 
     final expiryString = _guestBox!.get(_guestTokenExpiryKey);
     if (expiryString == null) return true;
@@ -169,7 +187,7 @@ class GuestAuthService {
   /// Get current guest session token if valid
   Future<String?> getValidGuestToken() async {
     final token = await _getStoredGuestToken();
-    if (token != null && !await _isGuestTokenExpired()) {
+    if (token != null && !await isTokenExpired()) {
       return token;
     }
     return null;
@@ -189,16 +207,8 @@ class GuestAuthService {
     await _guestBox!.delete(_guestTokenExpiryKey);
     // Keep guest_id for potential re-authentication
   }
-
-  /// Get device information for guest authentication
-  Future<Map<String, dynamic>> _getDeviceInfo() async {
-    // Return basic device info (privacy-preserving)
-    return {
-      'platform': 'flutter',
-      'timestamp': DateTime.now().toIso8601String(),
-    };
-  }
 }
+
 
 /// Result of guest authentication
 class GuestAuthResult {

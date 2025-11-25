@@ -222,9 +222,6 @@ class _MessageComposerState extends State<MessageComposer>
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                if (widget.supportsSpeech && _speechEnabled)
-                  _buildVoiceButton(),
-                const SizedBox(width: AppSpacing.sm),
                 _buildSendButton(),
               ],
             ),
@@ -234,40 +231,7 @@ class _MessageComposerState extends State<MessageComposer>
     );
   }
 
-  Widget _buildVoiceButton() {
-    return AnimatedBuilder(
-      animation: _pulseAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _isListening ? _pulseAnimation.value : 1.0,
-          child: Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: _isListening ? AppColors.error : AppColors.grey700,
-              shape: BoxShape.circle,
-              border: _isListening
-                  ? Border.all(color: AppColors.error.withOpacity(0.3), width: 2)
-                  : null,
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(24),
-                onTap: _toggleListening,
-                child: Icon(
-                  _isListening ? Icons.mic : Icons.mic_none,
-                  color: _isListening ? AppColors.white : AppColors.grey400,
-                  size: 20,
-                  semanticLabel: _isListening ? 'Stop recording' : 'Start voice recording',
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // _buildVoiceButton removed
 
   Widget _buildSendButton() {
     final canSend = _hasText && widget.enabled;

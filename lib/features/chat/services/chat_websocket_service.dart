@@ -5,7 +5,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:uuid/uuid.dart';
 import '../../../core/config/app_config.dart';
-import '../../../core/api/secure_api_client.dart';
+
 import '../models/chat_message.dart';
 import 'guest_auth_service.dart';
 
@@ -18,7 +18,6 @@ import 'guest_auth_service.dart';
 /// - Message deduplication
 /// - Delivery receipts
 class ChatWebSocketService {
-  final SecureApiClient _apiClient;
   final GuestAuthService _guestAuthService;
   final Uuid _uuid = const Uuid();
 
@@ -27,6 +26,7 @@ class ChatWebSocketService {
   Timer? _reconnectTimer;
   String? _currentSessionId;
   String? _currentGuestId;
+  String? _currentChatId; // Store the active chat ID
   String? _currentToken;
 
   // Connection state
@@ -46,10 +46,8 @@ class ChatWebSocketService {
   late final StreamController<ChatError> _errorController;
 
   ChatWebSocketService({
-    required SecureApiClient apiClient,
     required GuestAuthService guestAuthService,
-  })  : _apiClient = apiClient,
-        _guestAuthService = guestAuthService {
+  })  : _guestAuthService = guestAuthService {
     _messageController = StreamController<ChatMessage>.broadcast();
     _chunkController = StreamController<String>.broadcast();
     _connectionController = StreamController<ChatConnectionStatus>.broadcast();
@@ -109,35 +107,43 @@ class ChatWebSocketService {
   }
 
   /// Send chat message with enterprise protocol
-  Future<String> sendMessage(String text, {Map<String, dynamic>? metadata}) async {
+  Future<String> sendMessage(String text, {Map<String, dynamic>? metadata, String? clientMessageId}) async {
     if (!_isConnected || _channel == null) {
       throw const ChatException('Not connected to chat service');
     }
 
-    final clientMessageId = _uuid.v4();
+    final messageId = clientMessageId ?? _uuid.v4();
+
+    if (_currentChatId == null) {
+      debugPrint('❌ Cannot send message without active chat_id');
+      // Optionally queue message or throw error
+      throw const ChatException('Cannot send message: No active chat session');
+    }
 
     final message = {
-      'type': 'chat:message:send',
-      'payload': {
-        'text': text,
-        'clientMessageId': clientMessageId,
+      'type': 'chat_message', // Updated to match backend spec
+      'data': {
+        'message': text, // Updated from 'content'/'text'
+        'chat_id': _currentChatId,
+        'stream': true, // Required for streaming
       },
     };
 
     try {
       // Store pending message for deduplication
-      _pendingMessages[clientMessageId] = ChatMessage.user(
+      _pendingMessages[messageId] = ChatMessage.user(
         text,
+        id: messageId, // Use the same ID
         status: ChatMessageStatus.sending,
-        metadata: {'clientMessageId': clientMessageId, ...?metadata},
+        metadata: {'clientMessageId': messageId, ...?metadata},
       );
 
       _channel!.sink.add(json.encode(message));
 
       // Emit user message to UI immediately
-      _messageController.add(_pendingMessages[clientMessageId]!);
+      _messageController.add(_pendingMessages[messageId]!);
 
-      return clientMessageId;
+      return messageId;
     } catch (e) {
       _errorController.add(ChatError.sendFailed(e.toString()));
       rethrow;
@@ -207,21 +213,39 @@ class ChatWebSocketService {
 
   /// Connect to WebSocket with enterprise protocol
   Future<void> _connectWebSocket() async {
+    // Check if token is valid or needs refresh
+    if (_currentToken == null || await _guestAuthService.isTokenExpired()) {
+      debugPrint('🔄 Token expired or missing, refreshing...');
+      try {
+        final result = await _guestAuthService.authenticateAsGuest();
+        _currentToken = result.sessionToken;
+        _currentSessionId = result.guestId; // Ensure session ID consistency
+      } catch (e) {
+        throw ChatException('Failed to refresh token: $e');
+      }
+    }
+
     if (_currentToken == null) {
       throw const ChatException('No authentication token available');
     }
 
-    // Build URL with query parameters: token, tenant, key
-    final uri = Uri.parse(AppConfig.wsUrl).replace(queryParameters: {
-      'token': _currentToken!,
-      'tenant': AppConfig.tenantId,
-      'key': AppConfig.apiKey,
-    });
+    // Use canonical URL without query parameters
+    final uri = Uri.parse(AppConfig.wsUrl);
 
-    debugPrint('Connecting to WebSocket: ${uri.toString().replaceAll(RegExp(r'token=[^&]+'), 'token=***')}');
+    // Use Bearer subprotocol for authentication
+    // Format: Sec-WebSocket-Protocol: bearer, <token>
+    // We pass them as separate items so Dart treats them as a list of protocols.
+    // The server will select 'bearer' and use the second item for auth.
+    final protocols = ['bearer', _currentToken!];
+
+    debugPrint('Connecting to WebSocket: $uri');
+    debugPrint('Protocol: bearer,***');
 
     try {
-      _channel = WebSocketChannel.connect(uri);
+      _channel = WebSocketChannel.connect(
+        uri,
+        protocols: protocols,
+      );
 
       // Setup message listener
       _channel!.stream.listen(
@@ -241,39 +265,79 @@ class ChatWebSocketService {
 
   /// Handle incoming WebSocket messages (enterprise protocol)
   void _handleWebSocketMessage(dynamic data) {
+    debugPrint('📥 Raw WebSocket Message: $data'); // Debug log
     try {
       final Map<String, dynamic> messageData = json.decode(data);
       final messageType = messageData['type'] as String?;
-      final payload = messageData['payload'] as Map<String, dynamic>?;
+      // Server uses 'data' field, but we check 'payload' for backward compatibility
+      final payload = (messageData['data'] ?? messageData['payload']) as Map<String, dynamic>?;
 
-      if (payload == null) {
+      // Allow specific messages without payload
+      if (payload == null && 
+          messageType != 'connection_ready' && 
+          messageType != 'connection_established' && 
+          messageType != 'initialization_progress') {
         debugPrint('Message without payload: $messageType');
         return;
       }
 
       switch (messageType) {
+        case 'connection_ready':
+          debugPrint('✅ Connection ready, sending join_chat');
+          _sendJoinChat();
+          break;
+
+        case 'chat_joined': // Handle successful join
+          final chatId = payload?['chat_id'] as String?;
+          if (chatId != null) {
+            _currentChatId = chatId;
+            debugPrint('✅ Joined chat: $_currentChatId');
+          }
+          break;
+
+        case 'connection_established':
+        case 'initialization_progress':
+          debugPrint('ℹ️ Status: $messageType');
+          break;
+
         case 'heartbeat:ping':
-          _handleHeartbeatPing(payload);
+          if (payload != null) _handleHeartbeatPing(payload);
+          break;
+
+        case 'message_received':
+          if (payload != null) _handleMessageAck(payload);
+          break;
+
+        case 'response_start':
+          if (payload != null) _handleMessageStart(payload);
+          break;
+
+        case 'response_chunk':
+          if (payload != null) _handleMessageChunk(payload);
+          break;
+
+        case 'response_complete':
+          if (payload != null) _handleMessageComplete(payload);
           break;
 
         case 'chat:message:ack':
-          _handleMessageAck(payload);
+          if (payload != null) _handleMessageAck(payload);
           break;
 
         case 'chat:message:start':
-          _handleMessageStart(payload);
+          if (payload != null) _handleMessageStart(payload);
           break;
 
         case 'chat:message:chunk':
-          _handleMessageChunk(payload);
+          if (payload != null) _handleMessageChunk(payload);
           break;
 
         case 'chat:message:complete':
-          _handleMessageComplete(payload);
+          if (payload != null) _handleMessageComplete(payload);
           break;
 
         case 'system:error':
-          _handleSystemError(payload);
+          if (payload != null) _handleSystemError(payload);
           break;
 
         default:
@@ -283,6 +347,45 @@ class ChatWebSocketService {
       _errorController.add(ChatError.messageParsingFailed(e.toString()));
     }
   }
+
+  /// Send join chat message to complete handshake
+  void _sendJoinChat() {
+    // If we don't have a chat ID, we request to create one
+    final bool shouldCreate = _currentChatId == null || _currentChatId!.isEmpty;
+
+    final message = {
+      'type': 'join_chat',
+      'data': {
+        if (!shouldCreate) 'chat_id': _currentChatId,
+        if (shouldCreate) 'create': true,
+      },
+    };
+
+    try {
+      _channel?.sink.add(json.encode(message));
+      debugPrint('👋 Sent join_chat');
+    } catch (e) {
+      debugPrint('Failed to send join_chat: $e');
+    }
+  }
+
+  /// Send heartbeat ping to server
+  void _sendHeartbeatPing() {
+    final pingMessage = {
+      'type': 'heartbeat:ping',
+      'payload': {
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      },
+    };
+
+    try {
+      _channel?.sink.add(json.encode(pingMessage));
+      debugPrint('💓 Sent heartbeat ping');
+    } catch (e) {
+      debugPrint('Failed to send heartbeat ping: $e');
+    }
+  }
+
 
   /// Handle heartbeat ping from server
   void _handleHeartbeatPing(Map<String, dynamic> payload) {
@@ -305,8 +408,8 @@ class ChatWebSocketService {
 
   /// Handle message acknowledgment from server
   void _handleMessageAck(Map<String, dynamic> payload) {
-    final clientMessageId = payload['clientMessageId'] as String?;
-    final serverMessageId = payload['serverMessageId'] as String?;
+    final clientMessageId = (payload['client_message_id'] ?? payload['clientMessageId'] ?? payload['message_id']) as String?;
+    final serverMessageId = (payload['server_message_id'] ?? payload['serverMessageId'] ?? payload['message_id']) as String?;
 
     if (clientMessageId != null && _pendingMessages.containsKey(clientMessageId)) {
       // Update message status to sent
@@ -326,14 +429,20 @@ class ChatWebSocketService {
 
   /// Handle AI message generation start
   void _handleMessageStart(Map<String, dynamic> payload) {
-    final serverMessageId = payload['serverMessageId'] as String?;
+    final serverMessageId = (payload['server_message_id'] ?? payload['serverMessageId'] ?? payload['message_id']) as String?;
 
     if (serverMessageId != null) {
       // Initialize streaming buffer
       _streamingMessages[serverMessageId] = StringBuffer();
 
-      // Emit typing indicator
-      _messageController.add(ChatMessage.typing());
+      // Emit initial empty AI message
+      final initialMessage = ChatMessage.ai(
+        '',
+        sessionId: _currentSessionId,
+        metadata: {'serverMessageId': serverMessageId},
+      ).copyWith(id: serverMessageId); // Use server ID for consistency
+
+      _messageController.add(initialMessage);
 
       debugPrint('AI message generation started: $serverMessageId');
     }
@@ -341,15 +450,22 @@ class ChatWebSocketService {
 
   /// Handle AI message chunk (streaming)
   void _handleMessageChunk(Map<String, dynamic> payload) {
-    final serverMessageId = payload['serverMessageId'] as String?;
-    final chunk = payload['chunk'] as String?;
+    final serverMessageId = (payload['server_message_id'] ?? payload['serverMessageId'] ?? payload['message_id']) as String?;
+    final chunk = (payload['chunk'] ?? payload['content']) as String?;
 
     if (serverMessageId != null && chunk != null) {
       // Append to buffer
       _streamingMessages[serverMessageId]?.write(chunk);
+      final currentText = _streamingMessages[serverMessageId]?.toString() ?? '';
 
-      // Emit chunk to UI for real-time rendering
-      _chunkController.add(chunk);
+      // Emit updated message to UI
+      final updatedMessage = ChatMessage.ai(
+        currentText,
+        sessionId: _currentSessionId,
+        metadata: {'serverMessageId': serverMessageId},
+      ).copyWith(id: serverMessageId); // Use same ID to update existing message
+
+      _messageController.add(updatedMessage);
 
       debugPrint('Chunk received: ${chunk.length} chars');
     }
@@ -357,8 +473,8 @@ class ChatWebSocketService {
 
   /// Handle AI message complete
   void _handleMessageComplete(Map<String, dynamic> payload) {
-    final serverMessageId = payload['serverMessageId'] as String?;
-    final fullText = payload['fullText'] as String?;
+    final serverMessageId = (payload['server_message_id'] ?? payload['serverMessageId']) as String?;
+    final fullText = (payload['full_text'] ?? payload['fullText']) as String?;
     final context = payload['context'] as Map<String, dynamic>?;
 
     if (serverMessageId != null) {
@@ -409,6 +525,10 @@ class ChatWebSocketService {
   /// Handle WebSocket connection closed
   void _handleWebSocketDone() {
     debugPrint('WebSocket connection closed');
+    if (_channel != null) {
+      debugPrint('Close Code: ${_channel!.closeCode}');
+      debugPrint('Close Reason: ${_channel!.closeReason}');
+    }
     _isConnected = false;
     _heartbeatTimer?.cancel();
     _connectionController.add(ChatConnectionStatus.disconnected);

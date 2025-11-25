@@ -67,12 +67,13 @@ class ChatMessage extends Equatable {
   /// Create user message
   factory ChatMessage.user(
     String text, {
+    String? id,
     String? sessionId,
     Map<String, dynamic>? metadata,
     ChatMessageStatus status = ChatMessageStatus.sending,
   }) {
     return ChatMessage(
-      id: _generateId(),
+      id: id ?? _generateId(),
       text: text,
       type: ChatMessageType.user,
       timestamp: DateTime.now(),

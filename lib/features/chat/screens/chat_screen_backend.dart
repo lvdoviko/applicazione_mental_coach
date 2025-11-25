@@ -93,14 +93,13 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   Future<void> _initializeServices() async {
     _tokenStorage = TokenStorageService();
     _apiClient = SecureApiClient(tokenStorage: _tokenStorage);
-    _guestAuthService = GuestAuthService(tokenStorage: _tokenStorage);
+    _guestAuthService = GuestAuthService();
     // Initialize connectivity service (MUST be awaited)
     _connectivityService = ConnectivityService();
     await _connectivityService!.initialize();
 
     _offlineEngine = OfflineFallbackEngine(connectivityService: _connectivityService!);
     _chatService = ChatWebSocketService(
-      apiClient: _apiClient,
       guestAuthService: _guestAuthService,
     );
 
@@ -183,7 +182,14 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       }
 
       _isTyping = false;
-      _messages.add(message);
+      
+      // Update existing message or add new one
+      final index = _messages.indexWhere((m) => m.id == message.id);
+      if (index != -1) {
+        _messages[index] = message;
+      } else {
+        _messages.add(message);
+      }
       
       // Check for crisis escalation
       if (message.escalationNeeded) {
@@ -200,7 +206,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     // Show connection status messages
     switch (status) {
       case ChatConnectionStatus.connected:
-        _showStatusMessage('Connected to AI coach', isError: false);
+        // _showStatusMessage('Connected to AI coach', isError: false);
         break;
       case ChatConnectionStatus.reconnecting:
         _showStatusMessage('Reconnecting...', isError: false);
@@ -287,13 +293,15 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       _messages.add(userMessage);
       _messageController.clear();
     });
-
     _scrollToBottom();
 
     try {
       if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
-        // Send via WebSocket
-        await _chatService?.sendMessage(text.trim());
+        // Send via WebSocket with the same ID
+        await _chatService!.sendMessage(
+          text.trim(), 
+          clientMessageId: userMessage.id, // Pass the ID to ensure consistency
+        );
         
         // Update message status to sent
         setState(() {
@@ -404,7 +412,6 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
             ),
             if (_isTyping)
               _buildTypingIndicator(),
-            _buildQuickReplies(),
             _buildMessageComposer(),
           ],
         ),
@@ -650,91 +657,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     );
   }
 
-  Widget _buildQuickReplies() {
-    // Only show quick replies when connected and not typing
-    if (_connectionStatus != ChatConnectionStatus.connected || _isTyping) {
-      return const SizedBox.shrink();
-    }
 
-    final quickReplies = _getIntelligentQuickReplies();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: QuickReplyChips(
-        replies: quickReplies,
-        onReplySelected: (reply) => _sendMessage(reply),
-      ),
-    );
-  }
-
-  List<String> _getIntelligentQuickReplies() {
-    if (_isCrisisMode) return ['Parla con un umano', 'Esercizio di respirazione'];
-    if (_messages.isEmpty) {
-      return [
-        "Sto attraversando un periodo difficile",
-        "Ho bisogno di supporto emotivo",
-        "Mi sento sopraffatto",
-        "Vorrei parlare di ansia",
-      ];
-    }
-    
-    final lastMessage = _messages.last;
-    
-    // Don't show suggestions after user messages
-    if (lastMessage.type == ChatMessageType.user) return [];
-    
-    // Contextual analysis based on AI's response
-    final content = lastMessage.text.toLowerCase();
-    
-    // Emotional support
-    if (content.contains('difficult') || content.contains('struggling')) {
-      return [
-        "Grazie, mi aiuta molto",
-        "Voglio provare questo approccio", 
-        "Hai altri consigli?",
-        "Come posso iniziare?",
-      ];
-    }
-    
-    // Questions about feelings
-    if (content.contains('feeling') || content.contains('how are you')) {
-      return [
-        "Mi sento triste oggi",
-        "Sono stressato dal lavoro",
-        "Ho problemi di autostima", 
-        "Non riesco a dormire bene",
-      ];
-    }
-    
-    // Goal and progress topics
-    if (content.contains('goal') || content.contains('progress')) {
-      return [
-        "Voglio fissare un obiettivo",
-        "Come posso migliorare?",
-        "Ho raggiunto un traguardo",
-        "Sto facendo progressi",
-      ];
-    }
-    
-    // Immediate help requests
-    if (content.contains('help') || content.contains('support')) {
-      return [
-        "Ho bisogno di aiuto ora",
-        "Cosa posso fare oggi?", 
-        "Come gestisco questa situazione?",
-        "Parliamo di strategie pratiche",
-      ];
-    }
-    
-    // Default mental health starters
-    return [
-      "Sì, esattamente così",
-      "È proprio quello che provo",
-      "Mi capisci davvero", 
-      "Dimmi di più su questo",
-    ];
-  }
 
   Widget _buildMessageComposer() {
     return Container(

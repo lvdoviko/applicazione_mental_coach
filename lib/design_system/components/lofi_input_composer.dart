@@ -161,8 +161,10 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
               Expanded(
                 child: _buildTextInput(),
               ),
-              const SizedBox(width: AppSpacing.sm),
-              _hasText ? _buildSendButton() : _buildVoiceButton(),
+              if (_hasText) ...[
+                const SizedBox(width: AppSpacing.sm),
+                _buildSendButton(),
+              ],
             ],
           ),
         ),
@@ -239,45 +241,7 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
     );
   }
 
-  Widget _buildVoiceButton() {
-    return Semantics(
-      label: widget.isRecording ? 'Stop recording' : 'Start voice recording',
-      hint: widget.isRecording 
-          ? 'Tap to stop voice recording and send message'
-          : 'Tap to start recording a voice message',
-      button: true,
-      enabled: widget.isEnabled,
-      liveRegion: widget.isRecording,
-      child: AnimatedBuilder(
-        animation: _pulseAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: widget.isRecording ? _pulseAnimation.value : 1.0,
-            child: GestureDetector(
-              onTap: _toggleVoiceRecording,
-              child: Container(
-                width: AppSpacing.composerMinHeight,
-                height: AppSpacing.composerMinHeight,
-                decoration: BoxDecoration(
-                  color: widget.isRecording
-                      ? AppColors.error
-                      : AppColors.surfaceVariant,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  widget.isRecording ? Icons.stop : Icons.mic,
-                  color: widget.isRecording
-                      ? AppColors.surface
-                      : AppColors.textSecondary,
-                  size: 20,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
+
 
   Widget _buildAttachmentButton() {
     return Semantics(
