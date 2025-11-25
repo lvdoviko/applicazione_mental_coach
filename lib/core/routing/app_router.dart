@@ -7,7 +7,7 @@ import 'package:applicazione_mental_coach/features/chat/screens/chat_screen_back
 import 'package:applicazione_mental_coach/features/dashboard/screens/dashboard_screen.dart';
 import 'package:applicazione_mental_coach/features/avatar/screens/avatar_screen.dart';
 import 'package:applicazione_mental_coach/features/settings/screens/settings_screen.dart';
-import 'package:applicazione_mental_coach/shared/widgets/main_navigation.dart';
+import 'package:applicazione_mental_coach/features/settings/screens/settings_screen.dart';
 
 enum AppRoute {
   onboarding('/onboarding'),
@@ -33,38 +33,32 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const OnboardingScreen(),
       ),
       
-      // Main App Shell with Bottom Navigation
-      ShellRoute(
-        builder: (context, state, child) => MainNavigation(child: child),
-        routes: [
-          // Chat Screen (Primary) - Using WebSocket Backend
-          GoRoute(
-            path: AppRoute.chat.path,
-            name: 'chat',
-            builder: (context, state) => const ChatScreenBackend(),
-          ),
-          
-          // Dashboard
-          GoRoute(
-            path: AppRoute.dashboard.path,
-            name: 'dashboard',
-            builder: (context, state) => const DashboardScreen(),
-          ),
-          
-          // Avatar Customization
-          GoRoute(
-            path: AppRoute.avatar.path,
-            name: 'avatar',
-            builder: (context, state) => const AvatarScreen(),
-          ),
-          
-          // Settings
-          GoRoute(
-            path: AppRoute.settings.path,
-            name: 'settings',
-            builder: (context, state) => const SettingsScreen(),
-          ),
-        ],
+      // Chat Screen (Primary & Root)
+      GoRoute(
+        path: AppRoute.chat.path,
+        name: 'chat',
+        builder: (context, state) => const ChatScreenBackend(),
+      ),
+      
+      // Dashboard
+      GoRoute(
+        path: AppRoute.dashboard.path,
+        name: 'dashboard',
+        builder: (context, state) => const DashboardScreen(),
+      ),
+      
+      // Avatar Customization
+      GoRoute(
+        path: AppRoute.avatar.path,
+        name: 'avatar',
+        builder: (context, state) => const AvatarScreen(),
+      ),
+      
+      // Settings
+      GoRoute(
+        path: AppRoute.settings.path,
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
       ),
       
       // Root redirect

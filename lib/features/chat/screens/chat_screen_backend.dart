@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/routing/app_router.dart';
 import '../../../design_system/tokens/app_colors.dart';
 import '../../../design_system/tokens/app_typography.dart';
 import '../../../design_system/tokens/app_spacing.dart';
@@ -192,11 +194,41 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
         ],
       ),
       actions: [
-        IconButton(
-          onPressed: () {
-            // Show chat settings or options
-          },
+        PopupMenuButton<AppRoute>(
           icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+          onSelected: (route) => context.push(route.path),
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: AppRoute.dashboard,
+              child: Row(
+                children: [
+                  Icon(Icons.dashboard_outlined, color: AppColors.textSecondary),
+                  SizedBox(width: 8),
+                  Text('Dashboard'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: AppRoute.avatar,
+              child: Row(
+                children: [
+                  Icon(Icons.face_outlined, color: AppColors.textSecondary),
+                  SizedBox(width: 8),
+                  Text('Avatar'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: AppRoute.settings,
+              child: Row(
+                children: [
+                  Icon(Icons.settings_outlined, color: AppColors.textSecondary),
+                  SizedBox(width: 8),
+                  Text('Settings'),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );

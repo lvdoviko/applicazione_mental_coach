@@ -168,9 +168,7 @@ class _MessageComposerState extends State<MessageComposer>
         position: _slideAnimation,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-          ),
+          // Background decoration removed to make it transparent
           child: SafeArea(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
