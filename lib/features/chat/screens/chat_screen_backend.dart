@@ -13,6 +13,9 @@ import '../../../core/services/connectivity_service.dart';
 import '../services/chat_websocket_service.dart';
 import '../models/chat_message.dart';
 import '../providers/chat_provider.dart';
+import '../../avatar/widgets/avatar_viewer_3d.dart';
+import '../../avatar/providers/avatar_provider.dart';
+import '../../avatar/domain/models/avatar_config.dart';
 
 /// Chat screen with full backend integration following KAIX platform flow
 class ChatScreenBackend extends ConsumerStatefulWidget {
@@ -108,6 +111,31 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
             if (_isCrisisMode) _buildSafetyNetBanner(),
             if (chatState.connectionStatus != ChatConnectionStatus.connected)
               _buildConnectionStatusBanner(chatState.connectionStatus),
+            
+            // 3D Avatar Integration
+            Consumer(
+              builder: (context, ref, child) {
+                final avatarState = ref.watch(avatarProvider);
+                
+                if (avatarState is AvatarStateLoaded) {
+                  return Container(
+                    height: 250,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    child: AvatarViewer3D(
+                      config: avatarState.config,
+                      height: 250,
+                      width: 250,
+                      enableCameraControls: true,
+                      autoRotate: false,
+                    ),
+                  );
+                }
+                // Show nothing if avatar is not loaded or error (fallback to just chat)
+                return const SizedBox.shrink();
+              },
+            ),
+
             Expanded(
               child: _buildMessagesList(chatState.messages, chatState.isLoading),
             ),
