@@ -4,17 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../design_system/tokens/app_colors.dart';
 import '../../../design_system/tokens/app_typography.dart';
 import '../../../design_system/tokens/app_spacing.dart';
-import '../../../design_system/components/lofi_message_bubble.dart'; // Updated import
+import '../../../design_system/components/lofi_message_bubble.dart';
 import '../../../design_system/components/ios_button.dart';
 import '../../../design_system/components/message_composer.dart';
-import '../../../design_system/components/quick_reply_chips.dart';
 import '../../../core/services/connectivity_service.dart';
-import '../../../core/api/secure_api_client.dart';
-import '../../../core/security/token_storage_service.dart';
 import '../services/chat_websocket_service.dart';
-import '../services/guest_auth_service.dart';
-import '../services/offline_fallback_engine.dart';
 import '../models/chat_message.dart';
+import '../providers/chat_provider.dart';
 
 /// Chat screen with full backend integration following KAIX platform flow
 class ChatScreenBackend extends ConsumerStatefulWidget {
@@ -33,41 +29,30 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     with WidgetsBindingObserver {
   
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _messageController = TextEditingController();
-  final List<ChatMessage> _messages = [];
-  
-  // Services
-  ChatWebSocketService? _chatService;
-  late GuestAuthService _guestAuthService;
-  late OfflineFallbackEngine _offlineEngine;
-  ConnectivityService? _connectivityService;
-  late SecureApiClient _apiClient;
-  late TokenStorageService _tokenStorage;
   
   // State
-  bool _isLoading = false;
-  bool _isTyping = false;
   bool _isOnline = true;
   bool _isCrisisMode = false; // Safety Net State
-  ChatConnectionStatus _connectionStatus = ChatConnectionStatus.disconnected;
   
   // Subscriptions
-  StreamSubscription<ChatMessage>? _messageSubscription;
-  StreamSubscription<ChatConnectionStatus>? _connectionSubscription;
-  StreamSubscription<ChatError>? _errorSubscription;
   StreamSubscription<ConnectivityStatus>? _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initializeServices();
+    
+    // Connect when screen initializes (if not already connected)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatProvider.notifier).connect();
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _cleanup();
+    _scrollController.dispose();
+    _connectivitySubscription?.cancel();
     super.dispose();
   }
 
@@ -75,300 +60,16 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        if (_connectionStatus == ChatConnectionStatus.disconnected) {
-          _connectToChat();
-        }
+        // Reconnect logic handled by provider or service usually, 
+        // but we can trigger a check here if needed.
+        ref.read(chatProvider.notifier).connect();
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
-        break;
       case AppLifecycleState.detached:
-        _chatService?.disconnect();
-        break;
       case AppLifecycleState.hidden:
         break;
     }
-  }
-
-  Future<void> _initializeServices() async {
-    _tokenStorage = TokenStorageService();
-    _apiClient = SecureApiClient(tokenStorage: _tokenStorage);
-    _guestAuthService = GuestAuthService();
-    // Initialize connectivity service (MUST be awaited)
-    _connectivityService = ConnectivityService();
-    await _connectivityService!.initialize();
-
-    _offlineEngine = OfflineFallbackEngine(connectivityService: _connectivityService!);
-    _chatService = ChatWebSocketService(
-      guestAuthService: _guestAuthService,
-    );
-
-    // Now that everything is initialized, set up listeners and connect
-    _setupListeners();
-    _connectToChat();
-  }
-
-  void _setupListeners() {
-    if (_chatService == null || _connectivityService == null) return;
-
-    // Listen to chat messages
-    _messageSubscription = _chatService!.messageStream.listen(
-      _handleIncomingMessage,
-      onError: _handleChatError,
-    );
-
-    // Listen to connection status
-    _connectionSubscription = _chatService!.connectionStream.listen(
-      _handleConnectionStatusChange,
-    );
-
-    // Listen to chat errors
-    _errorSubscription = _chatService!.errorStream.listen(
-      _handleChatError,
-    );
-
-    // Listen to connectivity changes
-    _connectivitySubscription = _connectivityService!.statusStream.listen(
-      _handleConnectivityChange,
-    );
-  }
-
-  Future<void> _connectToChat() async {
-    if (_isLoading) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      // Initialize connectivity service
-      if (_connectivityService == null) {
-        _connectivityService = ConnectivityService();
-        await _connectivityService!.initialize();
-      }
-      
-      // Check if we're online
-      final isOnline = _connectivityService!.isConnected;
-      setState(() => _isOnline = isOnline);
-
-      if (isOnline) {
-        // Connect to WebSocket chat service
-        await _chatService?.connect(sessionId: widget.initialSessionId);
-        
-        // Add welcome message if this is a new session
-        if (_messages.isEmpty) {
-          _addWelcomeMessage();
-        }
-      } else {
-        // Show offline mode explanation
-        _addOfflineModeMessage();
-      }
-
-    } catch (e) {
-      _handleChatError(ChatError.connectionError(e.toString()));
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  void _handleIncomingMessage(ChatMessage message) {
-    setState(() {
-      // Handle typing indicator
-      if (message.isTyping) {
-        _isTyping = true;
-        // Remove typing indicator after 3 seconds if no new message
-        Timer(const Duration(seconds: 3), () {
-          if (mounted) setState(() => _isTyping = false);
-        });
-        return;
-      }
-
-      _isTyping = false;
-      
-      // Update existing message or add new one
-      final index = _messages.indexWhere((m) => m.id == message.id);
-      if (index != -1) {
-        _messages[index] = message;
-      } else {
-        _messages.add(message);
-      }
-      
-      // Check for crisis escalation
-      if (message.escalationNeeded) {
-        _isCrisisMode = true;
-      }
-    });
-
-    _scrollToBottom();
-  }
-
-  void _handleConnectionStatusChange(ChatConnectionStatus status) {
-    setState(() => _connectionStatus = status);
-
-    // Show connection status messages
-    switch (status) {
-      case ChatConnectionStatus.connected:
-        // _showStatusMessage('Connected to AI coach', isError: false);
-        break;
-      case ChatConnectionStatus.reconnecting:
-        _showStatusMessage('Reconnecting...', isError: false);
-        break;
-      case ChatConnectionStatus.failed:
-        _showStatusMessage('Connection failed. Trying offline mode...', isError: true);
-        _addOfflineModeMessage();
-        break;
-      default:
-        break;
-    }
-  }
-
-  void _handleConnectivityChange(ConnectivityStatus status) {
-    final wasOnline = _isOnline;
-    final isOnline = status == ConnectivityStatus.connected;
-    
-    setState(() => _isOnline = isOnline);
-
-    if (!wasOnline && isOnline) {
-      // Back online - attempt to reconnect
-      _showStatusMessage('Connection restored. Reconnecting...', isError: false);
-      _connectToChat();
-    } else if (wasOnline && !isOnline) {
-      // Went offline
-      _showStatusMessage('Connection lost. Switching to offline mode...', isError: true);
-      _addOfflineModeMessage();
-    }
-  }
-
-  void _handleChatError(dynamic error) {
-    String errorMessage = 'An error occurred';
-    
-    if (error is ChatError) {
-      switch (error.type) {
-        case ChatErrorType.connection:
-          errorMessage = 'Connection error. Switching to offline mode...';
-          _addOfflineModeMessage();
-          break;
-        case ChatErrorType.sendFailed:
-          errorMessage = 'Failed to send message. Please try again.';
-          break;
-        case ChatErrorType.serverError:
-          errorMessage = 'Server error: ${error.message}';
-          break;
-        default:
-          errorMessage = error.message;
-      }
-    }
-
-    _showStatusMessage(errorMessage, isError: true);
-  }
-
-  void _addWelcomeMessage() {
-    final welcomeMessage = ChatMessage.ai(
-      'Ciao! Sono il tuo Mental Performance Coach. Sono qui per ottimizzare il tuo mindset. Come ti senti oggi?',
-      sessionId: _chatService?.currentSessionId,
-      metadata: const {'welcome_message': true},
-    );
-
-    setState(() => _messages.add(welcomeMessage));
-    _scrollToBottom();
-  }
-
-  void _addOfflineModeMessage() {
-    final offlineMessage = _offlineEngine.generateOfflineModeExplanation(
-      sessionId: _chatService?.currentSessionId,
-    );
-
-    setState(() => _messages.add(offlineMessage));
-    _scrollToBottom();
-  }
-
-  Future<void> _sendMessage(String text) async {
-    if (text.trim().isEmpty) return;
-
-    // Create user message
-    final userMessage = ChatMessage.user(
-      text.trim(),
-      sessionId: _chatService?.currentSessionId,
-    );
-
-    setState(() {
-      _messages.add(userMessage);
-      _messageController.clear();
-    });
-    _scrollToBottom();
-
-    try {
-      if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
-        // Send via WebSocket with the same ID
-        await _chatService!.sendMessage(
-          text.trim(), 
-          clientMessageId: userMessage.id, // Pass the ID to ensure consistency
-        );
-        
-        // Update message status to sent
-        setState(() {
-          final index = _messages.indexWhere((m) => m.id == userMessage.id);
-          if (index != -1) {
-            _messages[index] = userMessage.copyWithStatus(ChatMessageStatus.sent);
-          }
-        });
-
-      } else {
-        // Use offline fallback
-        final offlineResponse = _offlineEngine.generateOfflineResponse(
-          text.trim(),
-          sessionId: _chatService?.currentSessionId,
-        );
-
-        setState(() {
-          _messages.add(offlineResponse);
-        });
-
-        _scrollToBottom();
-      }
-
-    } catch (e) {
-      // Update message status to error
-      setState(() {
-        final index = _messages.indexWhere((m) => m.id == userMessage.id);
-        if (index != -1) {
-          _messages[index] = userMessage.copyWithStatus(ChatMessageStatus.error);
-        }
-      });
-
-      _handleChatError(e);
-    }
-  }
-
-  void _sendTypingIndicator(bool isTyping) {
-    if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
-      if (isTyping) {
-        _chatService?.sendTypingStart();
-      } else {
-        _chatService?.sendTypingStop();
-      }
-    }
-  }
-
-  Future<void> _requestEscalation() async {
-    try {
-      if (_isOnline && _connectionStatus == ChatConnectionStatus.connected) {
-        // Note: Escalation removed from new protocol - show message
-        _showStatusMessage('Human support request noted. Our team will reach out soon.', isError: false);
-      } else {
-        _showStatusMessage('Request requires internet connection. Please try again when online.', isError: true);
-      }
-    } catch (e) {
-      _showStatusMessage('Failed to send escalation request. Please try again.', isError: true);
-    }
-  }
-
-  void _showStatusMessage(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        duration: const Duration(seconds: 3),
-      ),
-    );
   }
 
   void _scrollToBottom() {
@@ -383,36 +84,34 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     });
   }
 
-  void _cleanup() {
-    _scrollController.dispose();
-    _messageController.dispose();
-    _messageSubscription?.cancel();
-    _connectionSubscription?.cancel();
-    _errorSubscription?.cancel();
-    _connectivitySubscription?.cancel();
-    _chatService?.dispose();
-    _connectivityService?.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final chatState = ref.watch(chatProvider);
+    
+    // Auto-scroll on new messages
+    ref.listen(chatProvider, (previous, next) {
+      if (previous?.messages.length != next.messages.length) {
+        _scrollToBottom();
+      }
+    });
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
       color: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: _buildAppBar(),
+        appBar: _buildAppBar(chatState.connectionStatus),
         body: Column(
           children: [
             if (_isCrisisMode) _buildSafetyNetBanner(),
-            if (_connectionStatus != ChatConnectionStatus.connected)
-              _buildConnectionStatusBanner(),
+            if (chatState.connectionStatus != ChatConnectionStatus.connected)
+              _buildConnectionStatusBanner(chatState.connectionStatus),
             Expanded(
-              child: _buildMessagesList(),
+              child: _buildMessagesList(chatState.messages, chatState.isLoading),
             ),
-            if (_isTyping)
+            if (chatState.isTyping)
               _buildTypingIndicator(),
-            _buildMessageComposer(),
+            _buildMessageComposer(chatState.isLoading),
           ],
         ),
       ),
@@ -435,7 +134,11 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
             ),
           ),
           TextButton(
-            onPressed: _requestEscalation,
+            onPressed: () {
+               ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Human support request noted.')),
+              );
+            },
             child: const Text('CHIAMA', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
@@ -443,7 +146,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(ChatConnectionStatus status) {
     return AppBar(
       backgroundColor: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
       elevation: 0,
@@ -469,31 +172,26 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
             ),
           ),
           const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Kaix Coach',
-                  style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Kaix Coach',
+                style: AppTypography.h4.copyWith(
+                  color: AppColors.textPrimary,
                 ),
-                Text(
-                  _isCrisisMode ? 'Safety Mode' : _getConnectionStatusText(),
-                  style: AppTypography.caption.copyWith(
-                    color: _isCrisisMode ? AppColors.warmTerracotta : _getConnectionStatusColor(),
-                  ),
+              ),
+              Text(
+                _isCrisisMode ? 'Safety Mode' : _getConnectionStatusText(status),
+                style: AppTypography.caption.copyWith(
+                  color: _isCrisisMode ? AppColors.warmTerracotta : _getConnectionStatusColor(status),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
       actions: [
-        IconButton(
-          onPressed: _requestEscalation,
-          icon: const Icon(Icons.support_agent, color: AppColors.primary),
-          tooltip: 'Request human coach',
-        ),
         IconButton(
           onPressed: () {
             // Show chat settings or options
@@ -504,8 +202,8 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     );
   }
 
-  Widget _buildConnectionStatusBanner() {
-    if (_connectionStatus == ChatConnectionStatus.connected) {
+  Widget _buildConnectionStatusBanner(ChatConnectionStatus status) {
+    if (status == ChatConnectionStatus.connected) {
       return const SizedBox.shrink();
     }
 
@@ -514,7 +212,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     IconData icon;
     String text;
 
-    switch (_connectionStatus) {
+    switch (status) {
       case ChatConnectionStatus.connecting:
       case ChatConnectionStatus.reconnecting:
         backgroundColor = AppColors.warning.withValues(alpha: 0.1);
@@ -554,20 +252,20 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
             style: AppTypography.caption.copyWith(color: textColor),
           ),
           const Spacer(),
-          if (_connectionStatus == ChatConnectionStatus.failed)
+          if (status == ChatConnectionStatus.failed)
             IOSButton(
               text: 'Retry',
               style: IOSButtonStyle.tertiary,
               size: IOSButtonSize.small,
-              onPressed: _connectToChat,
+              onPressed: () => ref.read(chatProvider.notifier).connect(),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildMessagesList() {
-    if (_messages.isEmpty && _isLoading) {
+  Widget _buildMessagesList(List<ChatMessage> messages, bool isLoading) {
+    if (messages.isEmpty && isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.primary),
       );
@@ -576,16 +274,16 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(AppSpacing.md),
-      itemCount: _messages.length,
+      itemCount: messages.length,
       itemBuilder: (context, index) {
-        final message = _messages[index];
+        final message = messages[index];
         return LoFiMessageBubble(
           message: message.displayText,
           type: _mapMessageType(message.type),
           timestamp: message.timestamp,
           status: _mapMessageStatus(message.status),
           citation: message.citation,
-          onRetry: message.isError ? () => _sendMessage(message.text) : null,
+          onRetry: message.isError ? () => ref.read(chatProvider.notifier).sendMessage(message.text) : null,
         );
       },
     );
@@ -657,28 +355,24 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     );
   }
 
-
-
-  Widget _buildMessageComposer() {
+  Widget _buildMessageComposer(bool isLoading) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       child: MessageComposer(
-        onSendMessage: _sendMessage,
+        onSendMessage: (text) => ref.read(chatProvider.notifier).sendMessage(text),
         hintText: _isOnline 
             ? 'Scrivi o parla...'
             : 'Risposte limitate offline...',
-        enabled: !_isLoading,
-        supportsSpeech: _isOnline, // Voice input only when online
-        onVoiceStart: () => _sendTypingIndicator(true),
-        onVoiceStop: () => _sendTypingIndicator(false),
+        enabled: !isLoading,
+        supportsSpeech: false, // Removed mic button
       ),
     );
   }
 
-  String _getConnectionStatusText() {
+  String _getConnectionStatusText(ChatConnectionStatus status) {
     if (!_isOnline) return 'Offline';
     
-    switch (_connectionStatus) {
+    switch (status) {
       case ChatConnectionStatus.connected:
         return 'Online';
       case ChatConnectionStatus.connecting:
@@ -692,10 +386,10 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     }
   }
 
-  Color _getConnectionStatusColor() {
+  Color _getConnectionStatusColor(ChatConnectionStatus status) {
     if (!_isOnline) return AppColors.error;
     
-    switch (_connectionStatus) {
+    switch (status) {
       case ChatConnectionStatus.connected:
         return AppColors.success;
       case ChatConnectionStatus.connecting:
