@@ -71,6 +71,14 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(AvatarViewer3D oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.config != oldWidget.config) {
+      _loadAvatar();
+    }
+  }
+
   Future<void> _initWebView() async {
     debugPrint("🏗️ Avvio Caricamento IBRIDO (Avatar Online + Risorse Locali)...");
 
@@ -78,6 +86,40 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
       // 1. Avvia Server Locale (per lo sfondo)
       await _startLocalServer();
       if (_server == null) throw Exception("Server failed to start");
+      
+      // Initialize Controller
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(const Color(0x00000000))
+        ..setOnConsoleMessage((message) {
+           debugPrint('WebView Console: ${message.message}');
+        });
+
+      if (mounted) {
+        setState(() {
+          _controller = controller;
+        });
+      }
+
+      // 2. Carica Contenuto
+      await _loadAvatar();
+
+    } catch (e) {
+      debugPrint("❌ Errore Caricamento: $e");
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Failed to load avatar';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadAvatar() async {
+    if (_controller == null || _server == null) return;
+    
+    try {
       final port = _server!.port;
 
       // 2. URL AVATAR
@@ -139,7 +181,7 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
             muted
             
             /* 1. PUNTA AGLI OCCHI (Non al centro del corpo) */
-            camera-target="0m 1.68m 0m" 
+            camera-target="0m 1.62m 0m" 
             
             /* 2. ZOOM TELEOBIETTIVO (Taglia le gambe e riempie lo schermo) */
             field-of-view="20deg"
@@ -153,7 +195,12 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
             min-camera-orbit="auto 90deg auto" 
             max-camera-orbit="auto 90deg auto"
             
-            shadow-intensity="1" 
+            /* 5. ILLUMINAZIONE STUDIO (Ciliegina sulla torta) */
+            exposure="1.2" 
+            environment-image="neutral" 
+            shadow-intensity="1.5"
+            shadow-softness="1"
+            
             style="width: 100%; height: 100%;"
           >
           </model-viewer>
@@ -177,32 +224,17 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
         </html>
       ''';
 
-      // Initialize Controller
-      final controller = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setBackgroundColor(const Color(0x00000000))
-        ..setOnConsoleMessage((message) {
-           debugPrint('WebView Console: ${message.message}');
-        })
-        ..loadHtmlString(htmlString);
+      await _controller?.loadHtmlString(htmlString);
 
       if (mounted) {
         setState(() {
-          _controller = controller;
           _isLoading = false;
         });
       }
       debugPrint("🚀 HTML Ibrido (Online Avatar) Caricato");
 
     } catch (e) {
-      debugPrint("❌ Errore Caricamento: $e");
-      if (mounted) {
-        setState(() {
-          _hasError = true;
-          _errorMessage = 'Failed to load avatar';
-          _isLoading = false;
-        });
-      }
+      debugPrint("❌ Errore Caricamento Avatar: $e");
     }
   }
 

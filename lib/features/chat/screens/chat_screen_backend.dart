@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui'; // For ImageFilter
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart'; // For custom fonts
 import '../../../core/routing/app_router.dart';
 import '../../../design_system/tokens/app_colors.dart';
 import '../../../design_system/tokens/app_typography.dart';
@@ -105,7 +107,8 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       color: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: _buildAppBar(chatState.connectionStatus),
+        extendBodyBehindAppBar: true, // Allow body to extend behind the header
+        // appBar: Removed standard AppBar
         body: Stack(
           children: [
             // 1. Avatar (Full Screen Background)
@@ -189,6 +192,144 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
                 _buildMessageComposer(chatState.isLoading),
               ],
             ),
+
+            // 4. Floating Glass Header (New Premium Header)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: ClipRRect(
+                // Nessun bordo arrotondato in alto, sfuma con lo schermo
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Sfocatura vetro
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      // Gradiente dall'alto per leggere bene batteria/orario e titolo
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.8), // Più scuro in alto (status bar)
+                          Colors.black.withOpacity(0.0), // Svanisce verso il basso
+                        ],
+                      ),
+                    ),
+                    child: SafeArea(
+                      bottom: false, // Non aggiungere padding sotto
+                      child: Row(
+                        children: [
+                          // 1. BACK BUTTON (Stilizzato)
+                          GestureDetector(
+                            onTap: () {
+                              if (context.canPop()) {
+                                context.pop();
+                              } else {
+                                context.go(AppRoute.dashboard.path);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.1), // Bottone vetro
+                              ),
+                              child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                            ),
+                          ),
+                          
+                          const SizedBox(width: 16),
+                          
+                          // 2. INFO COACH (Senza avatar tondo, solo testo)
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // NOME
+                                Text(
+                                  "Kaix Coach",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    shadows: [const Shadow(color: Colors.black45, blurRadius: 4)],
+                                  ),
+                                ),
+                                // STATUS
+                                Row(
+                                  children: [
+                                    // Pallino verde
+                                    Container(
+                                      width: 8, height: 8,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF4ADE80), // Verde brillante
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(color: const Color(0xFF4ADE80).withOpacity(0.6), blurRadius: 6, spreadRadius: 1)
+                                        ]
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      "Mental Performance", // O "Online"
+                                      style: GoogleFonts.nunito(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          
+                          // 3. MENU / SETTINGS
+                          PopupMenuButton<AppRoute>(
+                            icon: const Icon(Icons.more_vert, color: Colors.white70),
+                            onSelected: (route) => context.push(route.path),
+                            color: const Color(0xFF1A1A1A), // Dark background for menu
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: AppRoute.dashboard,
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.dashboard_outlined, color: Colors.white70),
+                                    const SizedBox(width: 8),
+                                    Text('Dashboard', style: GoogleFonts.nunito(color: Colors.white)),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: AppRoute.avatar,
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.face_outlined, color: Colors.white70),
+                                    const SizedBox(width: 8),
+                                    Text('Avatar', style: GoogleFonts.nunito(color: Colors.white)),
+                                  ],
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: AppRoute.settings,
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.settings_outlined, color: Colors.white70),
+                                    const SizedBox(width: 8),
+                                    Text('Settings', style: GoogleFonts.nunito(color: Colors.white)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -220,92 +361,6 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
           ),
         ],
       ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(ChatConnectionStatus status) {
-    return AppBar(
-      backgroundColor: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
-      elevation: 0,
-      title: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.5),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.auto_awesome,
-              color: AppColors.white,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Kaix Coach',
-                style: AppTypography.h4.copyWith(
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Text(
-                _isCrisisMode ? 'Safety Mode' : _getConnectionStatusText(status),
-                style: AppTypography.caption.copyWith(
-                  color: _isCrisisMode ? AppColors.warmTerracotta : _getConnectionStatusColor(status),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        PopupMenuButton<AppRoute>(
-          icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
-          onSelected: (route) => context.push(route.path),
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: AppRoute.dashboard,
-              child: Row(
-                children: [
-                  Icon(Icons.dashboard_outlined, color: AppColors.textSecondary),
-                  SizedBox(width: 8),
-                  Text('Dashboard'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: AppRoute.avatar,
-              child: Row(
-                children: [
-                  Icon(Icons.face_outlined, color: AppColors.textSecondary),
-                  SizedBox(width: 8),
-                  Text('Avatar'),
-                ],
-              ),
-            ),
-            const PopupMenuItem(
-              value: AppRoute.settings,
-              child: Row(
-                children: [
-                  Icon(Icons.settings_outlined, color: AppColors.textSecondary),
-                  SizedBox(width: 8),
-                  Text('Settings'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 
