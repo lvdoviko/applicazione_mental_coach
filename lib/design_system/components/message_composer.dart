@@ -196,6 +196,7 @@ class _MessageComposerState extends State<MessageComposer>
                       enabled: widget.enabled,
                       maxLines: null,
                       textInputAction: TextInputAction.newline,
+                      textAlignVertical: TextAlignVertical.center, // Center text vertically
                       style: AppTypography.body.copyWith(color: AppColors.white), // Smaller font (16px)
                       decoration: InputDecoration(
                         hintText: widget.hintText,
@@ -236,8 +237,8 @@ class _MessageComposerState extends State<MessageComposer>
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      height: 48,
-      width: 48,
+      height: 40, // Reduced from 48 to match text field
+      width: 40,
       decoration: BoxDecoration(
         color: canSend 
             ? AppColors.warmGold

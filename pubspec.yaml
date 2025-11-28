@@ -104,6 +104,7 @@ flutter:
     - assets/animations/
     - assets/js/
     - assets/animations/idle.glb
+    - assets/avatars/default_avatar.glb
     - assets/avatars/
     
   # fonts:

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui'; // For ImageFilter
 import 'package:flutter/material.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
@@ -229,31 +230,84 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
   Widget _buildBubble() {
     final isUser = widget.type == MessageType.user;
     
-    // Bot: Glassmorphism (Deep Blue/Slate with opacity)
-    // User: Deep Indigo/Blue
-    final backgroundColor = isUser 
-        ? AppColors.userBubble.withOpacity(0.9) 
-        : const Color(0xFF1C2541).withOpacity(0.85); // Deep Focus Blue
-    
+    if (!isUser) {
+      // 💎 Glassmorphism Bubble for Coach
+      return ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+          bottomLeft: Radius.circular(4), // "Coda" del fumetto piccola
+        ),
+        child: BackdropFilter(
+          // 1. IL BLUR (La sfocatura che dà l'effetto vetro)
+          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.85, 
+            ),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              // 2. IL COLORE (Sfondo scuro ma trasparente)
+              color: const Color(0xFF1C2541).withOpacity(0.6), // Blu notte al 60%
+              
+              // 3. IL BORDO (Sottile riflesso di luce)
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1,
+              ),
+              // Gradiente sottile per dare volume
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF1C2541).withOpacity(0.7),
+                  const Color(0xFF1C2541).withOpacity(0.4),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.message,
+                  style: AppTypography.chatBubbleBot.copyWith( // Using AppTypography instead of GoogleFonts
+                    color: Colors.white.withOpacity(0.95),
+                    fontSize: 16,
+                    height: 1.4,
+                    fontWeight: FontWeight.w400,
+                    shadows: [],
+                  ),
+                ),
+                if (widget.citation != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  _buildCitationChip(),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // User Bubble (Existing Style)
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.85, 
       ),
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(20), // More rounded for all
-        // Only show border/shadow for User
-        border: isUser ? null : null, 
-        boxShadow: isUser ? [
+        color: AppColors.userBubble.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
-        ] : null,
+        ],
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg, // Padding for both now
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
         vertical: AppSpacing.md,
       ),
       child: Column(
@@ -261,22 +315,11 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
         children: [
           Text(
             widget.message,
-            style: (isUser
-                ? AppTypography.chatBubbleUser
-                : AppTypography.chatBubbleBot.copyWith(
-                    color: const Color(0xFFEBEBEB), // Soft White
-                    height: 1.6, // Increased line height
-                    fontSize: 16,
-                    shadows: [], // Remove heavy shadows for cleaner look
-                  )),
+            style: AppTypography.chatBubbleUser,
           ),
-          if (widget.citation != null) ...[
-            const SizedBox(height: AppSpacing.sm),
-            _buildCitationChip(),
-          ],
           if (_shouldShowTimestamp()) ...[
             const SizedBox(height: AppSpacing.xs),
-            _buildTimestamp(isUser ? AppColors.textPrimary : AppColors.white),
+            _buildTimestamp(AppColors.textPrimary),
           ],
         ],
       ),

@@ -53,5 +53,12 @@
 	<string>This app uses speech recognition to help you interact with your AI coach through voice commands.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs microphone access to enable voice interaction with your AI wellness coach.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

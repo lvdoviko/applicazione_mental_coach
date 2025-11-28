@@ -46,6 +46,7 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
   bool _hasError = false;
   String? _errorMessage;
   WebViewController? _controller;
+  bool _useFallback = false;
 
   @override
   void initState() {
@@ -54,30 +55,10 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
   }
 
   /// Verify avatar file exists before loading
+  /// Verify avatar file exists before loading
   Future<void> _verifyAvatarFile() async {
-    if (widget.config is! AvatarConfigLoaded) {
-      setState(() {
-        _hasError = true;
-        _errorMessage = 'No avatar configured';
-        _isLoading = false;
-      });
-      return;
-    }
-
-    final config = widget.config as AvatarConfigLoaded;
-    final file = File(config.localPath);
-
-    if (!await file.exists()) {
-      setState(() {
-        _hasError = true;
-        _errorMessage = 'Avatar file not found';
-        _isLoading = false;
-      });
-      return;
-    }
-
+    // HYBRID MODE: Skip local checks, go straight to initialization
     if (mounted) {
-      // Initialize WebView with custom HTML
       _initWebView();
     }
   }
@@ -91,25 +72,30 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
   }
 
   Future<void> _initWebView() async {
-    debugPrint("🏗️ Avvio Localhost Server Strategy (Ultimate)...");
+    debugPrint("🏗️ Avvio Caricamento IBRIDO (Avatar Online + Risorse Locali)...");
 
     try {
-      final config = widget.config as AvatarConfigLoaded;
-      
-      // 1. Avvia Server Locale
-      await _startLocalServer(config.localPath);
-      
+      // 1. Avvia Server Locale (per lo sfondo)
+      await _startLocalServer();
       if (_server == null) throw Exception("Server failed to start");
-      
       final port = _server!.port;
+
+      // 2. URL AVATAR
+      String avatarUrl = "https://models.readyplayer.me/69286d45132e61458cee2d1f.glb?bodyType=fullbody&quality=high"; 
+      if (widget.config is AvatarConfigLoaded) {
+        avatarUrl = (widget.config as AvatarConfigLoaded).remoteUrl;
+      }
       
-      // FINAL CONFIGURATION: Localhost Server
-      final avatarUrl = 'http://127.0.0.1:$port/avatar.glb';
-      final animUrl = 'http://127.0.0.1:$port/idle.glb';
-      
+      // 3. CARICA ANIMAZIONE (Da Asset -> Base64)
+      final animBytes = await rootBundle.load('assets/animations/idle.glb')
+          .then((b) => b.buffer.asUint8List());
+      final animUri = 'data:model/gltf-binary;base64,${base64Encode(animBytes)}';
+
+      // 4. CARICA SFONDO (Dal Server Locale)
+      final bgImage = "http://127.0.0.1:$port/sfondo_chat.png";
+
+      debugPrint("🔗 Avatar URL: $avatarUrl");
       debugPrint("🔗 Local Server running on port $port");
-      debugPrint("👤 Avatar: $avatarUrl");
-      debugPrint("💃 Anim: $animUrl");
 
       final htmlString = '''
         <!DOCTYPE html>
@@ -117,59 +103,74 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
         <head>
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <style>
-            /* Sfondo Trasparente per integrazione nativa */
-            body, html { 
-              margin: 0; 
-              height: 100%; 
-              overflow: hidden; 
-              background: radial-gradient(circle at 50% 30%, #1C2541, #080a10); /* Deep Focus Gradient */
+            body, html { margin: 0; height: 100%; overflow: hidden; background-color: #0d1322; }
+
+            /* SFONDO */
+            .background-layer {
+              position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+              background-image: url('$bgImage'); 
+              background-size: cover; background-position: center bottom;
+              filter: blur(3px); /* Blur leggero */
+              transform: scale(1.05);
+              z-index: 0;
             }
-            model-viewer { width: 100%; height: 100%; --poster-color: transparent; }
+
+            /* OVERLAY SCURO */
+            .overlay-layer {
+              position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+              background: linear-gradient(to bottom, rgba(13, 19, 34, 0.60) 0%, rgba(8, 10, 16, 0.95) 100%);
+              z-index: 1;
+            }
+
+            model-viewer { width: 100%; height: 100%; --poster-color: transparent; z-index: 2; }
           </style>
-          <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+          <!-- Usa model-viewer locale se possibile, altrimenti CDN -->
+          <script type="module" src="http://127.0.0.1:$port/model-viewer.min.js"></script>
         </head>
         <body>
+          <div class="background-layer"></div>
+          <div class="overlay-layer"></div>
+
           <model-viewer 
             id="coach"
             src="$avatarUrl" 
-            animation-src="$animUrl"
-            crossorigin="anonymous"
+            animation-src="$animUri"
             autoplay 
             muted
-            camera-controls
-            disable-zoom
-            disable-pan
-            /* Chest-Up View (Safer Zoom) */
-            camera-target="0m 1.45m 0m" 
-            camera-orbit="0deg 90deg 0.9m"
-            field-of-view="30deg"
             
+            /* 1. PUNTA AGLI OCCHI (Non al centro del corpo) */
+            camera-target="0m 1.68m 0m" 
+            
+            /* 2. ZOOM TELEOBIETTIVO (Taglia le gambe e riempie lo schermo) */
+            field-of-view="20deg"
+            
+            /* 3. POSIZIONE FISICA (Distanza fissa) */
+            camera-orbit="0deg 90deg 2m"
+            
+            /* 4. BLOCCA MOVIMENTI UTENTE (Per non rovinare l'inquadratura) */
             disable-zoom 
             disable-pan
             min-camera-orbit="auto 90deg auto" 
             max-camera-orbit="auto 90deg auto"
             
-            interaction-prompt="none"
-            shadow-intensity="1"
-            environment-image="neutral"
-            exposure="1.2"
+            shadow-intensity="1" 
+            style="width: 100%; height: 100%;"
           >
           </model-viewer>
 
           <script>
+            console.log("🔍 JS STARTED");
             const viewer = document.querySelector("#coach");
-
+            
+            // SCRIPT "BLIND FORCE" PER ANIMAZIONE
             viewer.addEventListener('load', () => {
-              console.log("✅ MODELLO CARICATO.");
-              
-              // Tentativo semplice di avvio animazione se disponibile
-              if (viewer.availableAnimations.length > 0) {
-                  console.log("🎬 Playing: " + viewer.availableAnimations[0]);
-                  viewer.animationName = viewer.availableAnimations[0];
-                  viewer.play();
-              } else {
-                  console.log("ℹ️ Nessuna animazione rilevata (Static Mode)");
-              }
+              console.log("✅ Avatar Online Caricato.");
+            });
+
+            viewer.addEventListener('error', (e) => {
+              console.log("❌ MODEL ERROR: " + JSON.stringify(e.detail));
+              // Hide viewer on error to show background
+              viewer.style.display = 'none';
             });
           </script>
         </body>
@@ -183,7 +184,7 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
         ..setOnConsoleMessage((message) {
            debugPrint('WebView Console: ${message.message}');
         })
-        ..loadHtmlString(htmlString); // Non serve baseUrl speciale qui, usiamo http:// assoluti
+        ..loadHtmlString(htmlString);
 
       if (mounted) {
         setState(() {
@@ -191,7 +192,7 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
           _isLoading = false;
         });
       }
-      debugPrint("🚀 HTML Localhost Caricato");
+      debugPrint("🚀 HTML Ibrido (Online Avatar) Caricato");
 
     } catch (e) {
       debugPrint("❌ Errore Caricamento: $e");
@@ -205,7 +206,7 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
     }
   }
 
-  Future<void> _startLocalServer(String localAvatarPath) async {
+  Future<void> _startLocalServer() async {
     try {
       // Chiudi server precedente se esiste
       _server?.close(force: true);
@@ -215,32 +216,32 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
       
       _server!.listen((HttpRequest request) async {
         final path = request.uri.path;
+        debugPrint("📥 Server Request: $path"); // Debug log
         
         // CORS Headers (per sicurezza)
         request.response.headers.add('Access-Control-Allow-Origin', '*');
         request.response.headers.add('Access-Control-Allow-Methods', 'GET');
         
         try {
-          if (path == '/avatar.glb') {
-            final file = File(localAvatarPath);
-            if (await file.exists()) {
-              request.response.headers.contentType = ContentType('model', 'gltf-binary');
-              await file.openRead().pipe(request.response);
-            } else {
-              request.response.statusCode = HttpStatus.notFound;
-              request.response.close();
-            }
-          } else if (path == '/idle.glb') {
-            final data = await rootBundle.load('assets/animations/idle.glb');
-            request.response.headers.contentType = ContentType('model', 'gltf-binary');
+          if (path == '/sfondo_chat.png') {
+            debugPrint("🖼️ Serving background image");
+            final data = await rootBundle.load('assets/images/sfondo_chat.png');
+            request.response.headers.contentType = ContentType('image', 'png');
+            request.response.add(data.buffer.asUint8List());
+            await request.response.close();
+          } else if (path == '/model-viewer.min.js') {
+            debugPrint("📜 Serving model-viewer.min.js");
+            final data = await rootBundle.load('assets/js/model-viewer.min.js');
+            request.response.headers.contentType = ContentType('text', 'javascript');
             request.response.add(data.buffer.asUint8List());
             await request.response.close();
           } else {
+            debugPrint("❌ Not Found: $path");
             request.response.statusCode = HttpStatus.notFound;
             request.response.close();
           }
         } catch (e) {
-          debugPrint("Server Error: $e");
+          debugPrint("Server Error ($path): $e");
           request.response.statusCode = HttpStatus.internalServerError;
           request.response.close();
         }

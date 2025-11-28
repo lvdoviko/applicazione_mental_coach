@@ -114,14 +114,20 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
                 builder: (context, ref, child) {
                   final avatarState = ref.watch(avatarProvider);
                   
+                  // Always show AvatarViewer3D to ensure background is visible
+                  // It handles empty/error states internally now
+                  AvatarConfig config;
                   if (avatarState is AvatarStateLoaded) {
-                    return AvatarViewer3D(
-                      config: avatarState.config,
-                      enableCameraControls: true,
-                      autoRotate: false,
-                    );
+                    config = avatarState.config;
+                  } else {
+                    config = const AvatarConfigEmpty();
                   }
-                  return const SizedBox.shrink();
+
+                  return AvatarViewer3D(
+                    config: config,
+                    enableCameraControls: true,
+                    autoRotate: false,
+                  );
                 },
               ),
             ),
