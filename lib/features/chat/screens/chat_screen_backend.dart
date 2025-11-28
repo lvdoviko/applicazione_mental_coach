@@ -11,6 +11,7 @@ import '../../../design_system/tokens/app_spacing.dart';
 import '../../../design_system/components/lofi_message_bubble.dart';
 import '../../../design_system/components/ios_button.dart';
 import '../../../design_system/components/message_composer.dart';
+import '../../../design_system/components/glass_drawer.dart';
 import '../../../core/services/connectivity_service.dart';
 import '../services/chat_websocket_service.dart';
 import '../models/chat_message.dart';
@@ -115,8 +116,9 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: Colors.transparent,
+        drawerScrimColor: Colors.black.withOpacity(0.6), // Darken background when drawer is open
         extendBodyBehindAppBar: true,
-        drawer: _buildNavigationDrawer(context), // Add Drawer
+        drawer: const GlassDrawer(), // New Glassmorphism Drawer
         body: Stack(
           children: [
             Positioned.fill(
@@ -247,111 +249,6 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildNavigationDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: const Color(0xFF0D1322).withOpacity(0.95), // Dark Glass
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-        child: Column(
-          children: [
-            // Drawer Header
-            Container(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 20,
-                bottom: 20,
-                left: 20,
-                right: 20,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [Colors.blue.shade800, Colors.purple.shade800],
-                      ),
-                    ),
-                    child: const Icon(Icons.person, color: Colors.white),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'User Menu',
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 20),
-            
-            // Navigation Items
-            _buildDrawerItem(
-              context,
-              icon: Icons.dashboard_outlined,
-              label: 'Dashboard',
-              onTap: () => context.go(AppRoute.dashboard.path),
-            ),
-            _buildDrawerItem(
-              context,
-              icon: Icons.face_outlined,
-              label: 'Edit Avatar',
-              onTap: () => context.push(AppRoute.avatar.path),
-            ),
-            _buildDrawerItem(
-              context,
-              icon: Icons.settings_outlined,
-              label: 'Settings',
-              onTap: () => context.push(AppRoute.settings.path),
-            ),
-            
-            const Spacer(),
-            
-            // Footer (Version or Logout)
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Text(
-                'Kaix v1.0.0',
-                style: GoogleFonts.nunito(
-                  color: Colors.white.withOpacity(0.3),
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap}) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.white70),
-      title: Text(
-        label,
-        style: GoogleFonts.nunito(
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-      onTap: () {
-        Navigator.pop(context); // Close drawer
-        onTap();
-      },
-      hoverColor: Colors.white.withOpacity(0.05),
     );
   }
 
