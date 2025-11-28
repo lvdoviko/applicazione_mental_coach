@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui';
 
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
@@ -9,6 +11,7 @@ import 'package:applicazione_mental_coach/features/avatar/widgets/avatar_viewer_
 import 'package:applicazione_mental_coach/features/avatar/widgets/rpm_avatar_creator.dart';
 import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart';
 import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
+import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
 
 /// Avatar Screen - Manage 3D Coach Avatar
 /// 
@@ -24,16 +27,19 @@ class AvatarScreen extends ConsumerWidget {
     final avatarState = ref.watch(avatarProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      extendBodyBehindAppBar: true,
       drawer: const GlassDrawer(),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           'Your Coach Avatar',
-          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: const IconThemeData(color: Colors.white),
         // Leading icon is automatically handled by Scaffold when drawer is present
         actions: [
           if (avatarState is AvatarStateLoaded &&
@@ -45,7 +51,19 @@ class AvatarScreen extends ConsumerWidget {
             ),
         ],
       ),
-      body: _buildBody(context, ref, avatarState),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topCenter,
+            radius: 1.2,
+            colors: [
+              Color(0xFF1C2541), // Deep Blue
+              Color(0xFF000000), // Black
+            ],
+          ),
+        ),
+        child: _buildBody(context, ref, avatarState),
+      ),
     );
   }
 
@@ -73,51 +91,125 @@ class AvatarScreen extends ConsumerWidget {
 
     final loadedConfig = config as AvatarConfigLoaded;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // 3D Avatar Preview
-          Center(
-            child: Container(
-              width: 300,
-              height: 400,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: AvatarViewer3D(
-                config: loadedConfig,
-                width: 300,
-                height: 400,
-                enableCameraControls: true,
-                autoRotate: true,
-                animationName: 'idle',
-              ),
-            ),
+    return Stack(
+      children: [
+        // 1. Full Screen Avatar Viewer
+        Positioned.fill(
+          child: AvatarViewer3D(
+            config: loadedConfig,
+            enableCameraControls: true,
+            autoRotate: true,
+            animationName: 'idle',
           ),
-          const SizedBox(height: AppSpacing.xl),
+        ),
 
-          // Avatar Info
-          _buildInfoCard(loadedConfig),
-          const SizedBox(height: AppSpacing.lg),
+        // 2. Floating Info Badge (HUD Style)
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 60,
+          right: 20,
+          child: _buildInfoBadge(loadedConfig),
+        ),
 
-          // Edit Button
-          ElevatedButton.icon(
-            onPressed: () => _openAvatarCreator(context),
-            icon: const Icon(Icons.edit),
-            label: const Text('Edit Avatar'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            ),
+        // 3. Floating Action Button (Pill)
+        Positioned(
+          bottom: 40,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: _buildEditButton(context),
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoBadge(AvatarConfigLoaded config) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.history, color: Colors.white.withOpacity(0.7), size: 14),
+              const SizedBox(width: 6),
+              Text(
+                'Updated: ${_formatDate(config.lastUpdated)}',
+                style: GoogleFonts.nunito(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
+
+  Widget _buildEditButton(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2979FF).withOpacity(0.5),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: () => _openAvatarCreator(context),
+        icon: const Icon(Icons.checkroom, color: Colors.white),
+        label: Text(
+          'Customize Look',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ).copyWith(
+          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+          // Gradient background workaround for ElevatedButton
+          backgroundBuilder: (context, states, child) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF2979FF), Color(0xFF4FC3F7)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: child,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // Workaround since backgroundBuilder is not standard in all Flutter versions yet
+  // We'll wrap the button in a Container with gradient and make button transparent
+  // Actually, let's use the Container wrapping approach which is safer.
 
   Widget _buildEmptyState(BuildContext context) {
     return Center(
@@ -137,36 +229,73 @@ class AvatarScreen extends ConsumerWidget {
                     AppColors.secondary.withOpacity(0.2),
                   ],
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.2),
+                    blurRadius: 30,
+                    spreadRadius: 10,
+                  ),
+                ],
               ),
               child: const Icon(
                 Icons.psychology,
                 size: 60,
-                color: AppColors.textSecondary,
+                color: Colors.white70,
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
               'Create Your Coach',
-              style: AppTypography.h2.copyWith(color: AppColors.textPrimary),
+              style: GoogleFonts.poppins(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Design a personalized 3D avatar for your mental coach',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+              style: GoogleFonts.nunito(
+                fontSize: 16,
+                color: Colors.white70,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xl),
-            ElevatedButton.icon(
-              onPressed: () => _openAvatarCreator(context),
-              icon: const Icon(Icons.add),
-              label: const Text('Create Avatar'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                  vertical: AppSpacing.md,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF2979FF), Color(0xFF4FC3F7)],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF2979FF).withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: () => _openAvatarCreator(context),
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: Text(
+                  'Create Avatar',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
               ),
             ),
@@ -191,13 +320,13 @@ class AvatarScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Oops!',
-              style: AppTypography.h2.copyWith(color: AppColors.textPrimary),
+              style: AppTypography.h2.copyWith(color: Colors.white),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               message,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Colors.white70,
               ),
               textAlign: TextAlign.center,
             ),
@@ -226,65 +355,18 @@ class AvatarScreen extends ConsumerWidget {
             Text(
               'Downloading avatar...',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+                color: Colors.white70,
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
               '${(progress * 100).toInt()}%',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiary,
+                color: Colors.white30,
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(AvatarConfigLoaded config) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Avatar Details',
-            style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildInfoRow('Last Updated', _formatDate(config.lastUpdated)),
-          if (config.gender != null)
-            _buildInfoRow('Gender', config.gender!),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-          Text(
-            value,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -317,15 +399,15 @@ class AvatarScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: const Color(0xFF1C2541),
         title: Text(
           'Delete Avatar',
-          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+          style: GoogleFonts.poppins(color: Colors.white),
         ),
         content: Text(
           'Are you sure you want to delete your coach avatar? This action cannot be undone.',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondary,
+          style: GoogleFonts.nunito(
+            color: Colors.white70,
           ),
         ),
         actions: [

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/core/config/app_config.dart';
 import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
+import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -26,17 +28,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      extendBodyBehindAppBar: true,
       drawer: const GlassDrawer(),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           'Settings',
-          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        // Leading icon is automatically handled by Scaffold when drawer is present
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             onPressed: _showAboutDialog,
@@ -45,138 +49,160 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildSection(
-              'Privacy & Data',
-              Icons.security,
-              [
-                _buildSwitchTile(
-                  'Health Data Sync',
-                  'Sync data from wearables and health apps',
-                  _healthDataEnabled,
-                  (value) => setState(() => _healthDataEnabled = value),
-                  subtitle: 'Required for personalized insights',
-                ),
-                _buildSwitchTile(
-                  'Analytics',
-                  'Help improve the app with usage data',
-                  _analyticsEnabled,
-                  (value) => setState(() => _analyticsEnabled = value),
-                  subtitle: 'Anonymous usage statistics only',
-                ),
-                _buildTile(
-                  'Export Data',
-                  'Download all your data (GDPR)',
-                  Icons.download,
-                  onTap: _exportData,
-                ),
-                _buildTile(
-                  'Privacy Policy',
-                  'Review our privacy practices',
-                  Icons.policy,
-                  onTap: () => _launchUrl('https://aiwellbeingcoach.com/privacy'),
-                ),
-              ],
-            ),
-            _buildSection(
-              'Notifications',
-              Icons.notifications,
-              [
-                _buildSwitchTile(
-                  'Push Notifications',
-                  'Receive wellness reminders and updates',
-                  _notificationsEnabled,
-                  (value) => setState(() => _notificationsEnabled = value),
-                ),
-                _buildSwitchTile(
-                  'Private Notifications',
-                  'Hide message content in notifications',
-                  _obfuscateNotifications,
-                  (value) => setState(() => _obfuscateNotifications = value),
-                  subtitle: 'Shows generic "New message" instead of content',
-                ),
-                _buildTile(
-                  'Notification Schedule',
-                  'Set quiet hours and frequency',
-                  Icons.schedule,
-                  onTap: _configureNotifications,
-                ),
-              ],
-            ),
-            _buildSection(
-              'Appearance',
-              Icons.palette,
-              [
-                _buildSwitchTile(
-                  'Dark Mode',
-                  'Use dark theme',
-                  _darkModeEnabled,
-                  (value) => setState(() => _darkModeEnabled = value),
-                  subtitle: 'Follow system setting',
-                ),
-                _buildTile(
-                  'Language',
-                  _selectedLanguage,
-                  Icons.language,
-                  onTap: _showLanguageDialog,
-                  trailing: const Icon(Icons.chevron_right),
-                ),
-              ],
-            ),
-            _buildSection(
-              'Support',
-              Icons.help,
-              [
-                _buildTile(
-                  'Help Center',
-                  'FAQs and guides',
-                  Icons.help_outline,
-                  onTap: () => _launchUrl('https://aiwellbeingcoach.com/help'),
-                ),
-                _buildTile(
-                  'Contact Support',
-                  'Get help from our team',
-                  Icons.support_agent,
-                  onTap: _contactSupport,
-                ),
-                _buildTile(
-                  'Emergency Resources',
-                  'Crisis helplines and support',
-                  Icons.emergency,
-                  onTap: _showEmergencyResources,
-                ),
-              ],
-            ),
-            _buildSection(
-              'Account',
-              Icons.person,
-              [
-                _buildTile(
-                  'Account Info',
-                  'Manage your account details',
-                  Icons.account_circle,
-                  onTap: _showAccountInfo,
-                ),
-                _buildTile(
-                  'Backup & Sync',
-                  'Secure cloud backup',
-                  Icons.cloud_sync,
-                  onTap: _configureBackup,
-                ),
-                _buildDangerTile(
-                  'Delete Account',
-                  'Permanently delete your account and data',
-                  Icons.delete_forever,
-                  onTap: _deleteAccount,
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.massive),
-            _buildVersionInfo(),
-            const SizedBox(height: AppSpacing.xl),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topCenter,
+            radius: 1.2,
+            colors: [
+              Color(0xFF1C2541), // Deep Blue
+              Color(0xFF000000), // Black
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + 60,
+            bottom: 40,
+          ),
+          child: Column(
+            children: [
+              _buildSection(
+                'Privacy & Data',
+                Icons.security,
+                const Color(0xFF22D3EE), // Cyan Neon
+                [
+                  _buildSwitchTile(
+                    'Health Data Sync',
+                    'Sync data from wearables and health apps',
+                    _healthDataEnabled,
+                    (value) => setState(() => _healthDataEnabled = value),
+                    subtitle: 'Required for personalized insights',
+                  ),
+                  _buildSwitchTile(
+                    'Analytics',
+                    'Help improve the app with usage data',
+                    _analyticsEnabled,
+                    (value) => setState(() => _analyticsEnabled = value),
+                    subtitle: 'Anonymous usage statistics only',
+                  ),
+                  _buildTile(
+                    'Export Data',
+                    'Download all your data (GDPR)',
+                    Icons.download,
+                    onTap: _exportData,
+                  ),
+                  _buildTile(
+                    'Privacy Policy',
+                    'Review our privacy practices',
+                    Icons.policy,
+                    onTap: () => _launchUrl('https://aiwellbeingcoach.com/privacy'),
+                  ),
+                ],
+              ),
+              _buildSection(
+                'Notifications',
+                Icons.notifications,
+                const Color(0xFFE879F9), // Purple/Pink Neon
+                [
+                  _buildSwitchTile(
+                    'Push Notifications',
+                    'Receive wellness reminders and updates',
+                    _notificationsEnabled,
+                    (value) => setState(() => _notificationsEnabled = value),
+                  ),
+                  _buildSwitchTile(
+                    'Private Notifications',
+                    'Hide message content in notifications',
+                    _obfuscateNotifications,
+                    (value) => setState(() => _obfuscateNotifications = value),
+                    subtitle: 'Shows generic "New message" instead of content',
+                  ),
+                  _buildTile(
+                    'Notification Schedule',
+                    'Set quiet hours and frequency',
+                    Icons.schedule,
+                    onTap: _configureNotifications,
+                  ),
+                ],
+              ),
+              _buildSection(
+                'Appearance',
+                Icons.palette,
+                const Color(0xFFFACC15), // Yellow/Amber Neon
+                [
+                  _buildSwitchTile(
+                    'Dark Mode',
+                    'Use dark theme',
+                    _darkModeEnabled,
+                    (value) => setState(() => _darkModeEnabled = value),
+                    subtitle: 'Follow system setting',
+                  ),
+                  _buildTile(
+                    'Language',
+                    _selectedLanguage,
+                    Icons.language,
+                    onTap: _showLanguageDialog,
+                    trailing: const Icon(Icons.chevron_right, color: Colors.white54),
+                  ),
+                ],
+              ),
+              _buildSection(
+                'Support',
+                Icons.help,
+                const Color(0xFF4ADE80), // Green Neon
+                [
+                  _buildTile(
+                    'Help Center',
+                    'FAQs and guides',
+                    Icons.help_outline,
+                    onTap: () => _launchUrl('https://aiwellbeingcoach.com/help'),
+                  ),
+                  _buildTile(
+                    'Contact Support',
+                    'Get help from our team',
+                    Icons.support_agent,
+                    onTap: _contactSupport,
+                  ),
+                  _buildTile(
+                    'Emergency Resources',
+                    'Crisis helplines and support',
+                    Icons.emergency,
+                    onTap: _showEmergencyResources,
+                    iconColor: AppColors.error,
+                  ),
+                ],
+              ),
+              _buildSection(
+                'Account',
+                Icons.person,
+                const Color(0xFF60A5FA), // Blue Neon
+                [
+                  _buildTile(
+                    'Account Info',
+                    'Manage your account details',
+                    Icons.account_circle,
+                    onTap: _showAccountInfo,
+                  ),
+                  _buildTile(
+                    'Backup & Sync',
+                    'Secure cloud backup',
+                    Icons.cloud_sync,
+                    onTap: _configureBackup,
+                  ),
+                  _buildDangerTile(
+                    'Delete Account',
+                    'Permanently delete your account and data',
+                    Icons.delete_forever,
+                    onTap: _deleteAccount,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              _buildVersionInfo(),
+              const SizedBox(height: AppSpacing.xl),
+            ],
+          ),
         ),
       ),
     );
@@ -185,10 +211,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildSection(
     String title,
     IconData icon,
+    Color accentColor,
     List<Widget> children,
   ) {
-    return Container(
-      margin: const EdgeInsets.symmetric(
+    return Padding(
+      padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.md,
       ),
@@ -196,33 +223,54 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  color: AppColors.primary,
-                  size: 20,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: accentColor,
+                    size: 18,
+                  ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
+                const SizedBox(width: 12),
                 Text(
                   title,
-                  style: AppTypography.h4.copyWith(
-                    color: AppColors.primary,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.border,
-              ),
+          PremiumGlassCard(
+            padding: const EdgeInsets.all(0), // ListTiles have their own padding
+            child: Column(
+              children: children.map((child) {
+                // Add separator if not last item
+                if (child != children.last) {
+                  return Column(
+                    children: [
+                      child,
+                      Divider(
+                        height: 1,
+                        color: Colors.white.withOpacity(0.05),
+                        indent: 16,
+                        endIndent: 16,
+                      ),
+                    ],
+                  );
+                }
+                return child;
+              }).toList(),
             ),
-            child: Column(children: children),
           ),
         ],
       ),
@@ -235,20 +283,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     IconData icon, {
     VoidCallback? onTap,
     Widget? trailing,
+    Color? iconColor,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.grey600),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Icon(icon, color: iconColor ?? Colors.white54, size: 22),
       title: Text(
         title,
-        style: AppTypography.bodyMedium,
+        style: GoogleFonts.nunito(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
       ),
       subtitle: Text(
         subtitle,
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.grey600,
+        style: GoogleFonts.nunito(
+          color: Colors.white38,
+          fontSize: 13,
         ),
       ),
-      trailing: trailing ?? const Icon(Icons.chevron_right),
+      trailing: trailing ?? const Icon(Icons.chevron_right, color: Colors.white24, size: 20),
       onTap: onTap,
     );
   }
@@ -261,19 +316,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     String? subtitle,
   }) {
     return SwitchListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       title: Text(
         title,
-        style: AppTypography.bodyMedium,
+        style: GoogleFonts.nunito(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
       ),
       subtitle: Text(
         subtitle ?? description,
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.grey600,
+        style: GoogleFonts.nunito(
+          color: Colors.white38,
+          fontSize: 13,
         ),
       ),
       value: value,
       onChanged: onChanged,
-      activeThumbColor: AppColors.primary,
+      activeColor: Colors.white,
+      activeTrackColor: AppColors.primary,
+      inactiveThumbColor: Colors.white38,
+      inactiveTrackColor: Colors.white10,
     );
   }
 
@@ -284,20 +348,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     VoidCallback? onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: AppColors.error),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Icon(icon, color: AppColors.error.withOpacity(0.8), size: 22),
       title: Text(
         title,
-        style: AppTypography.bodyMedium.copyWith(
+        style: GoogleFonts.nunito(
           color: AppColors.error,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.grey600,
+        style: GoogleFonts.nunito(
+          color: AppColors.error.withOpacity(0.6),
+          fontSize: 13,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: AppColors.error),
+      trailing: Icon(Icons.chevron_right, color: AppColors.error.withOpacity(0.4), size: 20),
       onTap: onTap,
     );
   }
@@ -307,18 +375,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       children: [
         Text(
           AppConfig.appName,
-          style: AppTypography.h4,
+          style: GoogleFonts.poppins(
+            color: Colors.white54,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        const SizedBox(height: AppSpacing.xs),
+        const SizedBox(height: 4),
         Text(
           'Version ${AppConfig.appVersion}',
-          style: AppTypography.caption,
+          style: GoogleFonts.nunito(
+            color: Colors.white30,
+            fontSize: 12,
+          ),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: 8),
         Text(
           'Made with ❤️ for athletes',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.grey600,
+          style: GoogleFonts.nunito(
+            color: Colors.white24,
+            fontSize: 12,
           ),
         ),
       ],
@@ -329,9 +405,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Export Data'),
-        content: const Text(
+        backgroundColor: const Color(0xFF1C2541),
+        title: Text('Export Data', style: GoogleFonts.poppins(color: Colors.white)),
+        content: Text(
           'Your data export will be prepared and sent to your registered email within 24 hours. This includes all conversations, health data, and settings.',
+          style: GoogleFonts.nunito(color: Colors.white70),
         ),
         actions: [
           TextButton(
@@ -360,8 +438,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Notification Schedule'),
-        content: const Text('Notification preferences will be available in a future update.'),
+        backgroundColor: const Color(0xFF1C2541),
+        title: Text('Notification Schedule', style: GoogleFonts.poppins(color: Colors.white)),
+        content: Text(
+          'Notification preferences will be available in a future update.',
+          style: GoogleFonts.nunito(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -378,12 +460,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Select Language'),
+        backgroundColor: const Color(0xFF1C2541),
+        title: Text('Select Language', style: GoogleFonts.poppins(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: languages.map((language) {
             return RadioListTile<String>(
-              title: Text(language),
+              title: Text(language, style: GoogleFonts.nunito(color: Colors.white)),
               value: language,
               groupValue: _selectedLanguage,
               onChanged: (value) {
@@ -411,20 +494,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        backgroundColor: const Color(0xFF1C2541),
+        title: Row(
           children: [
-            Icon(Icons.emergency, color: AppColors.error),
-            SizedBox(width: AppSpacing.sm),
-            Text('Emergency Resources'),
+            const Icon(Icons.emergency, color: AppColors.error),
+            const SizedBox(width: AppSpacing.sm),
+            Text('Emergency Resources', style: GoogleFonts.poppins(color: Colors.white)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'If you\'re in immediate danger or having thoughts of self-harm, please contact:',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: GoogleFonts.nunito(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: AppSpacing.md),
             ...AppConfig.emergencyHotlines.map((number) => 
@@ -434,7 +518,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   onTap: () => _launchUrl('tel:$number'),
                   child: Text(
                     number,
-                    style: const TextStyle(
+                    style: GoogleFonts.nunito(
                       color: AppColors.primary,
                       decoration: TextDecoration.underline,
                     ),
@@ -458,8 +542,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Account Information'),
-        content: const Text('Account management will be available in a future update.'),
+        backgroundColor: const Color(0xFF1C2541),
+        title: Text('Account Information', style: GoogleFonts.poppins(color: Colors.white)),
+        content: Text(
+          'Account management will be available in a future update.',
+          style: GoogleFonts.nunito(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -474,8 +562,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Backup & Sync'),
-        content: const Text('Cloud backup will be available in a future update.'),
+        backgroundColor: const Color(0xFF1C2541),
+        title: Text('Backup & Sync', style: GoogleFonts.poppins(color: Colors.white)),
+        content: Text(
+          'Cloud backup will be available in a future update.',
+          style: GoogleFonts.nunito(color: Colors.white70),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -490,15 +582,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        backgroundColor: const Color(0xFF1C2541),
+        title: Row(
           children: [
-            Icon(Icons.warning, color: AppColors.error),
-            SizedBox(width: AppSpacing.sm),
-            Text('Delete Account'),
+            const Icon(Icons.warning, color: AppColors.error),
+            const SizedBox(width: AppSpacing.sm),
+            Text('Delete Account', style: GoogleFonts.poppins(color: Colors.white)),
           ],
         ),
-        content: const Text(
+        content: Text(
           'This action cannot be undone. All your data, conversations, and settings will be permanently deleted. Are you sure you want to proceed?',
+          style: GoogleFonts.nunito(color: Colors.white70),
         ),
         actions: [
           TextButton(
@@ -546,8 +640,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
       children: [
-        const Text(
+        Text(
           'Your personal AI wellness coach supporting mental health for athletes and sports teams.',
+          style: GoogleFonts.nunito(color: Colors.black87), // AboutDialog usually has light theme background by default in Flutter unless themed globally
         ),
         const SizedBox(height: AppSpacing.md),
         TextButton(
