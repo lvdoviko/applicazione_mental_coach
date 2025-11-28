@@ -6,6 +6,7 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/core/config/app_config.dart';
+import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -26,6 +27,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: const GlassDrawer(),
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
@@ -34,6 +36,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
         ),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        // Leading icon is automatically handled by Scaffold when drawer is present
         actions: [
           IconButton(
             onPressed: _showAboutDialog,

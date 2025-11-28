@@ -21,7 +21,7 @@ class ReadinessBattery extends StatelessWidget {
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondary,
+            color: Colors.white70, // Brighter text
             fontWeight: FontWeight.w600,
           ),
         ),

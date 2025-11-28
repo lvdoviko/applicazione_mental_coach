@@ -9,6 +9,9 @@ class GlassDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get current location to determine active state
+    final String location = GoRouterState.of(context).uri.toString();
+
     // Usiamo ClipRRect per arrotondare i bordi destri del pannello
     return ClipRRect(
       borderRadius: const BorderRadius.only(
@@ -118,23 +121,30 @@ class GlassDrawer extends StatelessWidget {
                 // 2. VOCI MENU ELEGANTI
                 _buildMenuItem(
                   context, 
+                  Icons.chat_bubble_outline, 
+                  "Chat", 
+                  location == AppRoute.chat.path,
+                  () => context.go(AppRoute.chat.path),
+                ),
+                _buildMenuItem(
+                  context, 
                   Icons.dashboard_outlined, 
                   "Dashboard", 
-                  true,
+                  location == AppRoute.dashboard.path,
                   () => context.go(AppRoute.dashboard.path),
                 ),
                 _buildMenuItem(
                   context, 
                   Icons.face, 
                   "Edit Avatar", 
-                  false,
+                  location == AppRoute.avatar.path,
                   () => context.push(AppRoute.avatar.path),
                 ),
                 _buildMenuItem(
                   context, 
                   Icons.settings_outlined, 
                   "Settings", 
-                  false,
+                  location == AppRoute.settings.path,
                   () => context.push(AppRoute.settings.path),
                 ),
                 

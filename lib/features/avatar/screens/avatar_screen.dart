@@ -8,6 +8,7 @@ import 'package:applicazione_mental_coach/features/avatar/providers/avatar_provi
 import 'package:applicazione_mental_coach/features/avatar/widgets/avatar_viewer_3d.dart';
 import 'package:applicazione_mental_coach/features/avatar/widgets/rpm_avatar_creator.dart';
 import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart';
+import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
 
 /// Avatar Screen - Manage 3D Coach Avatar
 /// 
@@ -24,6 +25,7 @@ class AvatarScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: const GlassDrawer(),
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
@@ -32,6 +34,7 @@ class AvatarScreen extends ConsumerWidget {
           style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
         ),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        // Leading icon is automatically handled by Scaffold when drawer is present
         actions: [
           if (avatarState is AvatarStateLoaded &&
               avatarState.config is AvatarConfigLoaded)

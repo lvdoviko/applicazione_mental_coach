@@ -7,6 +7,8 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart'
 import 'package:applicazione_mental_coach/features/dashboard/widgets/morning_briefing_card.dart';
 import 'package:applicazione_mental_coach/features/dashboard/widgets/readiness_battery.dart';
 import 'package:applicazione_mental_coach/features/dashboard/widgets/daily_pulse.dart';
+import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
+import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -16,20 +18,37 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
-      body: RefreshIndicator(
+      key: _scaffoldKey,
+      drawer: const GlassDrawer(),
+      extendBodyBehindAppBar: true, // Allow body to extend behind AppBar
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0.0, -0.5), // Center top
+            radius: 1.2,
+            colors: [
+              Color(0xFF1C2541), // Deep Blue
+              Color(0xFF080a10), // Almost Black
+            ],
+          ),
+        ),
+        child: RefreshIndicator(
         onRefresh: _refreshData,
         color: AppColors.primary,
         backgroundColor: AppColors.surface,
-        child: SingleChildScrollView(
+        child: SafeArea(
+          child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildAppBar(), // Custom AppBar inside body
+              const SizedBox(height: AppSpacing.md),
               // 1. Morning Briefing (Anticipatory UI)
               MorningBriefingCard(
                 greeting: 'Buongiorno, Alex',
@@ -47,13 +66,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 children: [
                   Expanded(
                     flex: 5,
-                    child: Container(
+                    child: PremiumGlassCard(
                       padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppColors.border),
-                      ),
                       child: const ReadinessBattery(
                         percentage: 0.85,
                         label: 'Energia Mentale',
@@ -83,33 +97,50 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
       ),
+    ),
+      ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.background,
-      elevation: 0,
-      title: Text(
-        'Kaix',
-        style: AppTypography.h3.copyWith(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.bold,
-        ),
+  Widget _buildAppBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                icon: const Icon(Icons.menu, color: Colors.white),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Kaix',
+                style: AppTypography.h3.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none, color: Colors.white70),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              const CircleAvatar(
+                radius: 16,
+                backgroundColor: AppColors.primary,
+                child: Text('A', style: TextStyle(color: Colors.white, fontSize: 12)),
+              ),
+            ],
+          ),
+        ],
       ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.notifications_none, color: AppColors.textSecondary),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        const CircleAvatar(
-          radius: 16,
-          backgroundColor: AppColors.primary,
-          child: Text('A', style: TextStyle(color: Colors.white, fontSize: 12)),
-        ),
-        const SizedBox(width: AppSpacing.md),
-      ],
     );
   }
 
@@ -119,23 +150,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       children: [
         Text(
           'Biometria',
-          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+          style: AppTypography.h4.copyWith(color: Colors.white, fontFamily: 'Poppins'),
         ),
         const SizedBox(height: AppSpacing.md),
-        Container(
+        PremiumGlassCard(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
-          ),
           child: Row(
             children: [
-              _buildBiometricItem(Icons.bedtime, 'Sonno', '7h 30m', AppColors.info),
+              _buildBiometricItem(Icons.bedtime, 'Sonno', '7h 30m', const Color(0xFF22D3EE)), // Cyan
               _buildDivider(),
-              _buildBiometricItem(Icons.favorite, 'HRV', '55ms', AppColors.success),
+              _buildBiometricItem(Icons.favorite, 'HRV', '55ms', const Color(0xFF4ADE80)), // Neon Green
               _buildDivider(),
-              _buildBiometricItem(Icons.monitor_heart, 'RHR', '48bpm', AppColors.primary),
+              _buildBiometricItem(Icons.monitor_heart, 'RHR', '48bpm', const Color(0xFFF472B6)), // Pink
             ],
           ),
         ),
@@ -146,17 +172,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _buildBiometricItem(IconData icon, String label, String value, Color color) {
     return Expanded(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // Ensure centering
         children: [
-          Icon(icon, color: color, size: 24),
+          Icon(icon, color: Colors.white.withOpacity(0.7), size: 20), // Reduced size
           const SizedBox(height: AppSpacing.xs),
           Text(
             value,
-            style: AppTypography.h4.copyWith(fontWeight: FontWeight.bold),
+            style: AppTypography.h4.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+              fontFamily: 'Nunito',
+              shadows: [
+                BoxShadow(
+                  color: color.withOpacity(0.5),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
           ),
           Text(
             label,
-            style: AppTypography.caption,
+            style: AppTypography.caption.copyWith(color: Colors.white70, fontFamily: 'Nunito'),
           ),
+          const SizedBox(height: 5), // Added breathing room
         ],
       ),
     );
@@ -166,7 +205,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Container(
       height: 40,
       width: 1,
-      color: AppColors.border,
+      color: Colors.white.withOpacity(0.1),
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
     );
   }
@@ -177,23 +216,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       children: [
         Text(
           'Trend',
-          style: AppTypography.h4.copyWith(color: AppColors.textPrimary),
+          style: AppTypography.h4.copyWith(color: Colors.white, fontFamily: 'Poppins'),
         ),
         const SizedBox(height: AppSpacing.md),
-        Container(
+        PremiumGlassCard(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primary.withOpacity(0.1),
-                AppColors.background,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
-          ),
           child: Row(
             children: [
               const Icon(Icons.trending_up, color: AppColors.primary),
@@ -204,11 +231,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   children: [
                     Text(
                       'Focus in aumento',
-                      style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontFamily: 'Nunito',
+                      ),
                     ),
                     Text(
                       'La tua coerenza è migliorata del 15% questa settimana.',
-                      style: AppTypography.bodySmall,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: Colors.white70,
+                        fontFamily: 'Nunito',
+                      ),
                     ),
                   ],
                 ),
