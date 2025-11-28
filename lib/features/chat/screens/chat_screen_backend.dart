@@ -463,7 +463,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
   Widget _buildMessageComposer(bool isLoading) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      // Padding removed to let MessageComposer handle its own floating margins
       child: MessageComposer(
         onSendMessage: (text) => ref.read(chatProvider.notifier).sendMessage(text),
         hintText: _isOnline 

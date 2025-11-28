@@ -164,23 +164,23 @@ class _MessageComposerState extends State<MessageComposer>
 
     return Semantics(
       label: 'Message composer',
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16), // Floating margins
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2C2C2C).withOpacity(0.95), // Floating Capsule Dark
-            borderRadius: BorderRadius.circular(32), // Pill shape
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: SafeArea(
+      child: SafeArea(
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16), // Floating margins
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2C2C2C).withOpacity(0.95), // Floating Capsule Dark
+              borderRadius: BorderRadius.circular(32), // Pill shape
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
