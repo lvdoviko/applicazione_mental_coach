@@ -1,4 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
@@ -159,67 +161,80 @@ class _MessageComposerState extends State<MessageComposer>
 
   @override
   Widget build(BuildContext context) {
-    // Force dark mode for consistency
-    const isDarkMode = true;
-
-    return Semantics(
-      label: 'Message composer',
-      child: SafeArea(
-        child: SlideTransition(
-          position: _slideAnimation,
+    return Padding(
+      // Margini laterali e dal fondo per farla "galleggiare"
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 30), 
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(35), // Forma a pillola
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15), // Sfocatura forte
           child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16), // Floating margins
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.fromLTRB(20, 5, 5, 5), // Padding interno
             decoration: BoxDecoration(
-              color: const Color(0xFF2C2C2C).withOpacity(0.95), // Floating Capsule Dark
-              borderRadius: BorderRadius.circular(32), // Pill shape
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              // Sfondo UNICO semitrasparente (uniforma i colori)
+              color: const Color(0xFF0D1322).withOpacity(0.80), 
+              // Bordo sottile bianco per l'effetto vetro
+              border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                // 1. CAMPO DI TESTO (Trasparente e Pulito)
                 Expanded(
-                  child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: 36, // Compact height
-                      maxHeight: 36.0 * widget.maxLines,
+                  child: TextField(
+                    controller: _textController,
+                    focusNode: _focusNode,
+                    enabled: widget.enabled,
+                    textAlignVertical: TextAlignVertical.center, // Allineamento verticale perfetto
+                    style: GoogleFonts.nunito(color: Colors.white, fontSize: 16),
+                    cursorColor: const Color(0xFF4A90E2), // Cursore blu elegante
+                    decoration: InputDecoration(
+                      hintText: "Scrivi un messaggio...",
+                      hintStyle: GoogleFonts.nunito(color: Colors.white38),
+                      
+                      // 1. TRASPARENZA TOTALE (Fix per i "3 colori")
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      
+                      // 2. RIMUOVIAMO TUTTI I BORDI
+                      border: const OutlineInputBorder(borderSide: BorderSide.none), 
+                      focusedBorder: const OutlineInputBorder(borderSide: BorderSide.none), 
+                      enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                      errorBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                      disabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                      
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
                     ),
-                    child: TextField(
-                      controller: _textController,
-                      focusNode: _focusNode,
-                      enabled: widget.enabled,
-                      maxLines: null,
-                      textInputAction: TextInputAction.newline,
-                      textAlignVertical: TextAlignVertical.center, // Center text vertically
-                      style: AppTypography.body.copyWith(color: AppColors.white), // Smaller font (16px)
-                      decoration: InputDecoration(
-                        hintText: widget.hintText,
-                        hintStyle: AppTypography.composerPlaceholder.copyWith(
-                          color: AppColors.grey500,
-                          fontSize: 16, // Match body size
-                        ),
-                        isDense: true, // Reduces default height
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: 8, // Tight vertical padding
-                        ),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        filled: false,
-                      ),
-                      onSubmitted: (_) => _sendMessage(),
-                    ),
+                    onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                _buildSendButton(),
+                
+                const SizedBox(width: 10),
+
+                // 2. BOTTONE INVIO (Integrato nella pillola)
+                Container(
+                  height: 45, width: 45,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A90E2), // Blu Elettrico del brand
+                    shape: BoxShape.circle,
+                    // Ombra interna per profondità
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4A90E2).withOpacity(0.4),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      )
+                    ]
+                  ),
+                  child: IconButton(
+                    // Icona INVIO leggermente spostata per centratura ottica
+                    icon: const Padding(
+                      padding: EdgeInsets.only(left: 2.0),
+                      child: Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                    ),
+                    onPressed: _sendMessage,
+                  ),
+                ),
               ],
             ),
           ),
@@ -228,36 +243,5 @@ class _MessageComposerState extends State<MessageComposer>
     );
   }
 
-  // _buildVoiceButton removed
-
-  Widget _buildSendButton() {
-    final canSend = _hasText && widget.enabled;
-    // Force dark mode colors
-    const isDarkMode = true;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      height: 40, // Reduced from 48 to match text field
-      width: 40,
-      decoration: BoxDecoration(
-        color: canSend 
-            ? AppColors.warmGold
-            : AppColors.grey700,
-        shape: BoxShape.circle,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(24),
-          onTap: canSend ? _sendMessage : null,
-          child: Icon(
-            Icons.send,
-            color: canSend ? AppColors.white : AppColors.grey500,
-            size: 20,
-            semanticLabel: 'Send message',
-          ),
-        ),
-      ),
-    );
-  }
+  // Helper methods removed as they are now inline or unused
 }
