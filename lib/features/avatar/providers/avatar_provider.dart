@@ -43,31 +43,35 @@ final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) async 
   return await SharedPreferences.getInstance();
 });
 
-/// Provider for AvatarRepository
-final avatarRepositoryProvider = Provider<AvatarRepository>((ref) {
+/// Provider for AvatarRepository (with async handling)
+final avatarRepositoryProvider = Provider<AvatarRepository?>((ref) {
   final dio = ref.watch(dioProvider);
-  final prefs = ref.watch(sharedPreferencesProvider).value;
+  final prefsAsync = ref.watch(sharedPreferencesProvider);
   
-  if (prefs == null) {
-    throw Exception('SharedPreferences not initialized');
-  }
-  
-  return AvatarRepository(dio: dio, prefs: prefs);
+  return prefsAsync.when(
+    data: (prefs) => AvatarRepository(dio: dio, prefs: prefs),
+    loading: () => null,
+    error: (_, __) => null,
+  );
 });
 
 /// Main avatar state provider
 class AvatarNotifier extends StateNotifier<AvatarState> {
-  final AvatarRepository _repository;
+  final AvatarRepository? _repository;
 
   AvatarNotifier(this._repository) : super(const AvatarStateLoading()) {
-    _loadAvatar();
+    if (_repository != null) {
+      _loadAvatar();
+    }
   }
 
   /// Load avatar from local storage
   Future<void> _loadAvatar() async {
+    if (_repository == null) return;
+    
     state = const AvatarStateLoading();
     
-    final (config, failure) = await _repository.getAvatar();
+    final (config, failure) = await _repository!.getAvatar();
     
     if (failure != null) {
       state = AvatarStateError(failure);
@@ -78,9 +82,11 @@ class AvatarNotifier extends StateNotifier<AvatarState> {
 
   /// Save new avatar by downloading from RPM URL
   Future<void> saveAvatar(String remoteUrl) async {
+    if (_repository == null) return;
+    
     state = const AvatarStateDownloading(0.0);
     
-    final (config, failure) = await _repository.saveAvatar(
+    final (config, failure) = await _repository!.saveAvatar(
       remoteUrl,
       onProgress: (received, total) {
         if (total > 0) {
@@ -99,9 +105,11 @@ class AvatarNotifier extends StateNotifier<AvatarState> {
 
   /// Delete current avatar
   Future<void> deleteAvatar() async {
+    if (_repository == null) return;
+    
     state = const AvatarStateLoading();
     
-    final (_, failure) = await _repository.deleteAvatar();
+    final (_, failure) = await _repository!.deleteAvatar();
     
     if (failure != null) {
       state = AvatarStateError(failure);
@@ -119,5 +127,11 @@ class AvatarNotifier extends StateNotifier<AvatarState> {
 /// Provider for avatar state
 final avatarProvider = StateNotifierProvider<AvatarNotifier, AvatarState>((ref) {
   final repository = ref.watch(avatarRepositoryProvider);
+  
+  // Return loading state if repository not ready yet
+  if (repository == null) {
+    return AvatarNotifier(null);
+  }
+  
   return AvatarNotifier(repository);
 });

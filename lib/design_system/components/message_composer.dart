@@ -167,8 +167,19 @@ class _MessageComposerState extends State<MessageComposer>
       child: SlideTransition(
         position: _slideAnimation,
         child: Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          // Background decoration removed to make it transparent
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16), // Floating margins
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2C2C2C).withOpacity(0.95), // Floating Capsule Dark
+            borderRadius: BorderRadius.circular(32), // Pill shape
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
           child: SafeArea(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -176,8 +187,8 @@ class _MessageComposerState extends State<MessageComposer>
                 Expanded(
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: 48,
-                      maxHeight: 48.0 * widget.maxLines,
+                      minHeight: 36, // Compact height
+                      maxHeight: 36.0 * widget.maxLines,
                     ),
                     child: TextField(
                       controller: _textController,
@@ -185,35 +196,22 @@ class _MessageComposerState extends State<MessageComposer>
                       enabled: widget.enabled,
                       maxLines: null,
                       textInputAction: TextInputAction.newline,
-                      style: AppTypography.bodyLarge.copyWith(color: AppColors.textPrimary),
+                      style: AppTypography.body.copyWith(color: AppColors.white), // Smaller font (16px)
                       decoration: InputDecoration(
                         hintText: widget.hintText,
-                        hintStyle: AppTypography.composerPlaceholder,
+                        hintStyle: AppTypography.composerPlaceholder.copyWith(
+                          color: AppColors.grey500,
+                          fontSize: 16, // Match body size
+                        ),
+                        isDense: true, // Reduces default height
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.md,
+                          vertical: 8, // Tight vertical padding
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(
-                            color: AppColors.grey600,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(
-                            color: AppColors.grey600,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(
-                            color: AppColors.warmGold,
-                            width: 2,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: AppColors.grey800,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        filled: false,
                       ),
                       onSubmitted: (_) => _sendMessage(),
                     ),

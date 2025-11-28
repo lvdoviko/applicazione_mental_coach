@@ -337,6 +337,7 @@ class ChatWebSocketService {
           break;
 
         case 'system:error':
+        case 'error': // Handle generic error type
           if (payload != null) _handleSystemError(payload);
           break;
 

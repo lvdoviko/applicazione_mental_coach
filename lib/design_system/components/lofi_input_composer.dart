@@ -139,18 +139,28 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(
-          top: BorderSide(
-            color: AppColors.border,
-            width: 1,
-          ),
+      margin: const EdgeInsets.all(AppSpacing.md), // Floating margin
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A).withOpacity(0.9), // Dark semi-transparent background
+        borderRadius: BorderRadius.circular(32), // Fully rounded pill shape
+        border: Border.all(
+          color: AppColors.border.withOpacity(0.2),
+          width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.composerPadding),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -183,8 +193,8 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
           maxHeight: 120,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.transparent, // Transparent inside the pill
+          borderRadius: BorderRadius.circular(20),
         ),
         child: TextField(
           controller: _textController,
@@ -193,14 +203,17 @@ class _LoFiInputComposerState extends State<LoFiInputComposer>
           maxLines: null,
           textInputAction: TextInputAction.newline,
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textPrimary,
+            color: AppColors.white, // White text
           ),
+          cursorColor: AppColors.primary,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            hintStyle: AppTypography.composerPlaceholder,
+            hintStyle: AppTypography.composerPlaceholder.copyWith(
+              color: AppColors.textSecondary.withOpacity(0.5),
+            ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
+              horizontal: AppSpacing.sm,
               vertical: AppSpacing.md,
             ),
           ),

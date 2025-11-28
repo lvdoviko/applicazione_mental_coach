@@ -81,7 +81,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          0.0, // For reverse list, 0.0 is the bottom
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -106,42 +106,83 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: _buildAppBar(chatState.connectionStatus),
-        body: Column(
+        body: Stack(
           children: [
-            if (_isCrisisMode) _buildSafetyNetBanner(),
-            if (chatState.connectionStatus != ChatConnectionStatus.connected)
-              _buildConnectionStatusBanner(chatState.connectionStatus),
-            
-            // 3D Avatar Integration
-            Consumer(
-              builder: (context, ref, child) {
-                final avatarState = ref.watch(avatarProvider);
-                
-                if (avatarState is AvatarStateLoaded) {
-                  return Container(
-                    height: 250,
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    child: AvatarViewer3D(
+            // 1. Avatar (Full Screen Background)
+            Positioned.fill(
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final avatarState = ref.watch(avatarProvider);
+                  
+                  if (avatarState is AvatarStateLoaded) {
+                    return AvatarViewer3D(
                       config: avatarState.config,
-                      height: 250,
-                      width: 250,
                       enableCameraControls: true,
                       autoRotate: false,
-                    ),
-                  );
-                }
-                // Show nothing if avatar is not loaded or error (fallback to just chat)
-                return const SizedBox.shrink();
-              },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
+            
+            // 2. Gradient Overlay (For Text Readability)
+            Positioned(
+              bottom: 0, 
+              left: 0, 
+              right: 0, 
+              height: 500,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter, 
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.9),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 1.0],
+                  ),
+                ),
+              ),
+            ),
+            
+            // 3. Chat UI (Foreground)
+            Column(
+              children: [
+                if (_isCrisisMode) _buildSafetyNetBanner(),
+                if (chatState.connectionStatus != ChatConnectionStatus.connected)
+                  _buildConnectionStatusBanner(chatState.connectionStatus),
+                
+                const Spacer(), // Push chat down (Dynamic Stage Rule 1)
 
-            Expanded(
-              child: _buildMessagesList(chatState.messages, chatState.isLoading),
+                // Dynamic Stage: Limit height & Fade out
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.55, // Max 55% height
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent, // Fade out at top
+                          Colors.transparent, 
+                          Colors.black,       // Visible
+                          Colors.black        // Visible at bottom
+                        ],
+                        stops: [0.0, 0.1, 0.3, 1.0], // Smooth fade
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: _buildMessagesList(chatState.messages, chatState.isLoading),
+                  ),
+                ),
+                
+                if (chatState.isTyping)
+                  _buildTypingIndicator(),
+                _buildMessageComposer(chatState.isLoading),
+              ],
             ),
-            if (chatState.isTyping)
-              _buildTypingIndicator(),
-            _buildMessageComposer(chatState.isLoading),
           ],
         ),
       ),
@@ -333,10 +374,15 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
 
     return ListView.builder(
       controller: _scrollController,
+      reverse: true, // Dynamic Stage Rule 3: Anchor to bottom
       padding: const EdgeInsets.all(AppSpacing.md),
       itemCount: messages.length,
       itemBuilder: (context, index) {
-        final message = messages[index];
+        // Since list is reversed (bottom-up), we need to access messages from end to start
+        // messages list is [oldest, ..., newest]
+        // index 0 (bottom) should be newest -> messages.length - 1
+        final message = messages[messages.length - 1 - index];
+        
         return LoFiMessageBubble(
           message: message.displayText,
           type: _mapMessageType(message.type),

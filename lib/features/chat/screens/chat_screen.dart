@@ -10,6 +10,10 @@ import 'package:applicazione_mental_coach/design_system/components/lofi_message_
 import 'package:applicazione_mental_coach/design_system/components/lofi_input_composer.dart';
 import 'package:applicazione_mental_coach/design_system/components/lofi_quick_suggestions.dart';
 import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
+import 'package:applicazione_mental_coach/features/avatar/widgets/avatar_viewer_3d.dart';
+
+import 'package:applicazione_mental_coach/features/avatar/providers/avatar_provider.dart';
+import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart';
 
 /// **Performance Chat Screen**
 ///
@@ -54,21 +58,77 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 500),
-      color: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
-      child: Scaffold(
-        backgroundColor: Colors.transparent, // Allow container color to show
-        appBar: _buildAppBar(),
-        body: Column(
-          children: [
-            if (_isCrisisMode) _buildSafetyNetBanner(),
-            Expanded(
-              child: _buildMessagesList(),
+    final avatarState = ref.watch(avatarProvider);
+    final avatarConfig = switch (avatarState) {
+      AvatarStateLoaded(config: final c) => c,
+      _ => const AvatarConfigEmpty(),
+    };
+
+    return Scaffold(
+      extendBodyBehindAppBar: true, // Estende il corpo dietro l'AppBar trasparente
+      appBar: _buildAppBar(),
+      body: Stack(
+        children: [
+          // 0. BACKGROUND: Immersive Gradient (Deep Blue)
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment(0.0, -0.3), // Center behind avatar chest
+                  radius: 1.2,
+                  colors: [
+                    Color(0xFF1A2A3A), // Deep Blue (Center)
+                    Color(0xFF000000), // Black (Edges)
+                  ],
+                  stops: [0.0, 1.0],
+                ),
+              ),
             ),
-            _buildInputComposer(),
-          ],
-        ),
+          ),
+
+          // 1. AVATAR LAYER: Transparent 3D Viewer
+          // 1. AVATAR LAYER: Transparent 3D Viewer (Aligned to Bottom)
+          // 1. AVATAR LAYER: Simple Bottom Positioning
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 400,
+            child: AvatarViewer3D(
+              config: avatarConfig,
+            ),
+          ),
+
+          // 2. OVERLAY: Gradient for text readability
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.0),
+                    Colors.black.withOpacity(0.6),
+                    Colors.black.withOpacity(0.9),
+                  ],
+                  stops: const [0.0, 0.5, 0.8, 1.0],
+                ),
+              ),
+            ),
+          ),
+
+          // 3. FOREGROUND: Chat Content
+          Column(
+            children: [
+              if (_isCrisisMode) _buildSafetyNetBanner(),
+              Expanded(
+                child: _buildMessagesList(),
+              ),
+              _buildInputComposer(),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -101,7 +161,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
+      backgroundColor: Colors.transparent, // Trasparente per mostrare l'avatar
       elevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       title: Row(
@@ -196,6 +256,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       child: Row(
         children: [
+          /*
           Container(
             width: 28,
             height: 28,
@@ -210,6 +271,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
+          */
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.messageBubblePadding,

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,14 +78,28 @@ class AvatarRepository {
       final directory = await _getAvatarDirectory();
       final localPath = '${directory.path}/$_avatarFileName';
 
+      // Append query parameters for optimization
+      // NUCLEAR OPTION: Force HIGH quality.
+      // Medium was still too small (1.1MB) and missing bones.
+      // FORZA BRUTA: Ignora i parametri in ingresso e usa quelli "NUCLEAR"
+      // Usiamo HIGH quality (2-3MB) per garantire le ossa. Base64 regge fino a 5MB.
+      final Uri originalUri = Uri.parse(remoteUrl);
+      final Uri newUri = originalUri.replace(queryParameters: {
+        'bodyType': 'fullbody', // Sempre fullbody per le ossa
+        'quality': 'high',      // High = Sicurezza scheletrica (~3MB)
+      });
+      
+      final String optimizedUrl = newUri.toString();
+      debugPrint("🔥 URL NUCLEAR (HIGH QUALITY): $optimizedUrl");
+
       // Download with retry logic
       await _downloadWithRetry(
-        remoteUrl,
+        optimizedUrl, // Use the optimized URL for download
         localPath,
         onProgress: onProgress,
       );
 
-      // Create config
+      // Create config (store the original remoteUrl, not the optimized one)
       final config = AvatarConfigLoaded(
         remoteUrl: remoteUrl,
         localPath: localPath,

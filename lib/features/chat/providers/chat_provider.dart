@@ -179,12 +179,42 @@ class ChatNotifier extends StateNotifier<ChatState> {
   }
 
   void _addWelcomeMessage(String? sessionId) {
-    final welcomeMessage = ChatMessage.ai(
-      'Ciao! Sono il tuo Mental Performance Coach. Sono qui per ottimizzare il tuo mindset. Come ti senti oggi?',
+    const fullText = 'Ciao! Sono il tuo Mental Performance Coach. Sono qui per ottimizzare il tuo mindset. Come ti senti oggi?';
+    
+    // Create initial empty message
+    final initialMessage = ChatMessage.ai(
+      '',
       sessionId: sessionId,
       metadata: const {'welcome_message': true},
     );
-    state = state.copyWith(messages: [welcomeMessage]);
+    
+    state = state.copyWith(messages: [initialMessage]);
+
+    // Simulate streaming
+    int currentIndex = 0;
+    const chunkSize = 2; // Characters per tick
+    
+    Timer.periodic(const Duration(milliseconds: 30), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      if (currentIndex < fullText.length) {
+        final endIndex = (currentIndex + chunkSize).clamp(0, fullText.length);
+        final currentChunk = fullText.substring(0, endIndex);
+        
+        // Update message
+        final updatedMessage = initialMessage.copyWith(
+          text: currentChunk,
+        );
+        
+        state = state.copyWith(messages: [updatedMessage]);
+        currentIndex += chunkSize;
+      } else {
+        timer.cancel();
+      }
+    });
   }
 
   @override

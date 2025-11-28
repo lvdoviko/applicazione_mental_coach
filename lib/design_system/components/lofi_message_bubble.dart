@@ -154,8 +154,8 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
       liveRegion: widget.type == MessageType.bot,
       child: Container(
         margin: EdgeInsets.only(
-          left: widget.type == MessageType.user ? AppSpacing.massive : 0,
-          right: widget.type == MessageType.bot ? AppSpacing.massive : 0,
+          left: widget.type == MessageType.user ? AppSpacing.massive : AppSpacing.xs, // Reduced left margin for bot
+          right: widget.type == MessageType.bot ? AppSpacing.massive : AppSpacing.xs, // Reduced right margin for user
           bottom: AppSpacing.messageBubbleMargin,
         ),
         child: Row(
@@ -164,15 +164,18 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
               : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Bot avatar removed as per user request
+            /*
             if (widget.type == MessageType.bot) ...[
               _buildBotAvatar(),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacing.xs),
             ],
+            */
             Flexible(
               child: _buildBubble(),
             ),
             if (widget.type == MessageType.user) ...[
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacing.xs), // Reduced spacing
               _buildUserAvatar(),
               const SizedBox(width: AppSpacing.sm),
               _buildStatusIndicator(),
@@ -225,19 +228,32 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
 
   Widget _buildBubble() {
     final isUser = widget.type == MessageType.user;
-    final backgroundColor = isUser ? AppColors.userBubble : AppColors.botBubble;
+    
+    // Bot: Glassmorphism (Deep Blue/Slate with opacity)
+    // User: Deep Indigo/Blue
+    final backgroundColor = isUser 
+        ? AppColors.userBubble.withOpacity(0.9) 
+        : const Color(0xFF1C2541).withOpacity(0.85); // Deep Focus Blue
     
     return Container(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.75,
+        maxWidth: MediaQuery.of(context).size.width * 0.85, 
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: _getBorderRadius(isUser),
-        border: isUser ? null : Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(20), // More rounded for all
+        // Only show border/shadow for User
+        border: isUser ? null : null, 
+        boxShadow: isUser ? [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ] : null,
       ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.messageBubblePadding,
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg, // Padding for both now
         vertical: AppSpacing.md,
       ),
       child: Column(
@@ -245,9 +261,14 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
         children: [
           Text(
             widget.message,
-            style: isUser
+            style: (isUser
                 ? AppTypography.chatBubbleUser
-                : AppTypography.chatBubbleBot,
+                : AppTypography.chatBubbleBot.copyWith(
+                    color: const Color(0xFFEBEBEB), // Soft White
+                    height: 1.6, // Increased line height
+                    fontSize: 16,
+                    shadows: [], // Remove heavy shadows for cleaner look
+                  )),
           ),
           if (widget.citation != null) ...[
             const SizedBox(height: AppSpacing.sm),
@@ -255,7 +276,7 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
           ],
           if (_shouldShowTimestamp()) ...[
             const SizedBox(height: AppSpacing.xs),
-            _buildTimestamp(isUser ? AppColors.textPrimary : AppColors.textSecondary),
+            _buildTimestamp(isUser ? AppColors.textPrimary : AppColors.white),
           ],
         ],
       ),
@@ -292,7 +313,7 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
   }
 
   BorderRadius _getBorderRadius(bool isUser) {
-    const radius = 16.0;
+    const radius = 24.0; // Rounder bubbles
     const tailRadius = 4.0;
     
     if (isUser) {

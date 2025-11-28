@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'package:applicazione_mental_coach/core/config/rpm_config.dart';
@@ -41,16 +43,56 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
   @override
   void initState() {
     super.initState();
+    _nukeAndLoad();
+  }
+
+  Future<void> _nukeAndLoad() async {
+    await _nukeAvatarCache();
+    await _nukeAvatarCache();
     _initializeWebView();
   }
 
-  void _initializeWebView() {
+  Future<void> _nukeAvatarCache() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      // Assuming the file is saved as 'avatar.glb' or similar based on previous context
+      // But wait, the config has the path. We don't have the config here easily unless we pass it.
+      // The user said: "File('${docsDir.path}/avatars/my_coach.glb')"
+      // I'll try to delete the standard path if I can guess it, or just rely on the editor clearing cache.
+      // Actually, the user provided code uses `getApplicationDocumentsDirectory`.
+      // Let's look at where the file is SAVED. It's in `_handleAvatarExport`.
+      // It uses `path_provider` and saves to `appDir.path/avatar.glb`.
+      
+      final appDir = await getApplicationDocumentsDirectory();
+      final avatarFile = File('${appDir.path}/avatar.glb');
+      
+      if (await avatarFile.exists()) {
+        debugPrint("💣 NUKE: Cancellazione avatar vecchio in corso...");
+        await avatarFile.delete();
+        debugPrint("✅ NUKE: Avatar cancellato.");
+      } else {
+        debugPrint("⚠️ NUKE: Nessun avatar trovato da cancellare.");
+      }
+    } catch (e) {
+      debugPrint("❌ NUKE ERROR: $e");
+    }
+  }
+
+  Future<void> _initializeWebView() async {
+    // FORZA BRUTA: Scrivilo direttamente nella stringa, non fidarti delle variabili
+    // Force fullbody, clear cache, and use HIGH quality to match repository
+    final String rpmUrl = "https://demo.readyplayer.me/avatar?frameApi&bodyType=fullbody&quality=high&clearCache=true";
+    
+    debugPrint('Loading RPM Editor: $rpmUrl');
+
+    // Initialize controller first
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(AppColors.background)
+      ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (url) {
+          onPageStarted: (String url) {
+            debugPrint('Page started loading: $url');
             if (mounted) {
               setState(() => _isLoading = true);
             }
@@ -63,6 +105,35 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
             // Inject JavaScript to monitor for avatar URL
             await _controller?.runJavaScript('''
               (function() {
+                // 1. Listen for standard RPM postMessage events
+                window.addEventListener('message', function(event) {
+                  var data = event.data;
+                  
+                  // Case A: Data is just the URL string (common in frameApi)
+                  if (typeof data === 'string' && data.startsWith('https://models.readyplayer.me/')) {
+                    window.${RpmConfig.jsChannelName}.postMessage(JSON.stringify({
+                      eventName: 'v1.avatar.exported',
+                      url: data
+                    }));
+                  }
+                  
+                  // Case B: Data is a JSON string
+                  if (typeof data === 'string') {
+                    try {
+                      var json = JSON.parse(data);
+                      if (json.eventName === 'v1.avatar.exported') {
+                        window.${RpmConfig.jsChannelName}.postMessage(data);
+                      }
+                    } catch(e) {}
+                  }
+                  
+                  // Case C: Data is an object
+                  if (typeof data === 'object' && data.eventName === 'v1.avatar.exported') {
+                    window.${RpmConfig.jsChannelName}.postMessage(JSON.stringify(data));
+                  }
+                });
+
+                // 2. Fallback: DOM Scraping (Keep existing logic)
                 var foundUrl = false;
                 
                 // Function to check for avatar URL
@@ -128,8 +199,19 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
       ..addJavaScriptChannel(
         RpmConfig.jsChannelName,
         onMessageReceived: _handleJavaScriptMessage,
-      )
-      ..loadRequest(Uri.parse(RpmConfig.editorUrl));
+      );
+
+    // Clear cookies
+    final cookieManager = WebViewCookieManager();
+    await cookieManager.clearCookies();
+
+    // Clear LocalStorage (native method clears for all domains)
+    await _controller?.clearLocalStorage();
+
+    // Load actual editor
+    if (mounted) {
+      _controller?.loadRequest(Uri.parse(rpmUrl));
+    }
   }
 
   /// Handle messages from Ready Player Me JavaScript
@@ -152,78 +234,7 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
     }
   }
 
-  /// Extract avatar URL from current page (fallback method)
-  Future<void> _extractAvatarUrlFromPage() async {
-    if (_controller == null) {
-      _showError('WebView not initialized');
-      return;
-    }
 
-    try {
-      // First, try to get the current URL
-      final currentUrl = await _controller!.currentUrl();
-      if (currentUrl != null) {
-        // Check if current URL contains avatar URL as parameter
-        final uri = Uri.parse(currentUrl);
-        final avatarUrl = uri.queryParameters['url'] ?? 
-                         uri.queryParameters['avatarUrl'] ??
-                         uri.queryParameters['model'];
-        
-        if (avatarUrl != null && RpmConfig.isValidRpmUrl(avatarUrl)) {
-          _downloadAvatar(avatarUrl);
-          return;
-        }
-      }
-
-      // Execute JavaScript to find the avatar URL in the page
-      final result = await _controller!.runJavaScriptReturningResult(
-        '''
-        (function() {
-          // Method 1: Try to find the URL in an input field
-          var inputs = document.querySelectorAll('input');
-          for (var i = 0; i < inputs.length; i++) {
-            var val = inputs[i].value || '';
-            if (val.includes('models.readyplayer.me') && val.includes('.glb')) {
-              return val.trim();
-            }
-          }
-          
-          // Method 2: Search in all text content
-          var bodyText = document.body.innerText || document.body.textContent || '';
-          var urlPattern = /https:\\/\\/models\\.readyplayer\\.me\\/[a-zA-Z0-9-]+\\.glb/;
-          var match = bodyText.match(urlPattern);
-          if (match) {
-            return match[0];
-          }
-          
-          // Method 3: Search in all links
-          var links = document.querySelectorAll('a');
-          for (var i = 0; i < links.length; i++) {
-            var href = links[i].href || '';
-            if (href.includes('models.readyplayer.me') && href.includes('.glb')) {
-              return href;
-            }
-          }
-          
-          return '';
-        })();
-        '''
-      );
-
-      final urlString = result?.toString() ?? '';
-      
-      if (urlString.isNotEmpty && 
-          urlString != 'null' && 
-          urlString != '<null>' &&
-          RpmConfig.isValidRpmUrl(urlString)) {
-        _downloadAvatar(urlString);
-      } else {
-        _showError('Could not find avatar URL. Please wait for the avatar to finish generating.');
-      }
-    } catch (e) {
-      _showError('Failed to extract URL: $e');
-    }
-  }
 
   /// Download avatar with progress tracking
   Future<void> _downloadAvatar(String url) async {
@@ -308,14 +319,7 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
           },
         ),
       ),
-      floatingActionButton: !_isDownloading && !_isLoading && _errorMessage == null
-          ? FloatingActionButton.extended(
-              onPressed: _extractAvatarUrlFromPage,
-              backgroundColor: AppColors.primary,
-              icon: const Icon(Icons.download),
-              label: const Text('Use This Avatar'),
-            )
-          : null,
+
       body: Stack(
         children: [
           // WebView

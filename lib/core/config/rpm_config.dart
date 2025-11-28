@@ -17,7 +17,7 @@ class RpmConfig {
   ///   - Better facial detail on small screens
   ///   - Faster loading
   /// - 'fullbody': Full body avatar (~5-8MB)
-  static const String bodyType = 'halfbody';
+  static const String bodyType = 'fullbody';
 
   /// Allow users to edit existing avatars
   /// 
