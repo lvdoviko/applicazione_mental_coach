@@ -5,6 +5,7 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_typography.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_animations.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// **Performance Message Bubble Component**
 /// 
@@ -176,8 +177,6 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
               child: _buildBubble(),
             ),
             if (widget.type == MessageType.user) ...[
-              const SizedBox(width: AppSpacing.xs), // Reduced spacing
-              _buildUserAvatar(),
               const SizedBox(width: AppSpacing.sm),
               _buildStatusIndicator(),
             ],
@@ -290,38 +289,46 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
       );
     }
 
-    // User Bubble (Existing Style)
-    return Container(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.85, 
+    // User Bubble (Deep Blue Glass)
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+        bottomLeft: Radius.circular(20),
+        bottomRight: Radius.circular(4), // "Coda" a destra
       ),
-      decoration: BoxDecoration(
-        color: AppColors.userBubble.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Effetto vetro
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.75, 
           ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            widget.message,
-            style: AppTypography.chatBubbleUser,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            // IL COLORE CHIAVE: Blu profondo semi-trasparente
+            color: const Color(0xFF1E3A8A).withOpacity(0.7), // Blu notte al 70%
+            
+            // Bordo sottile per definizione
+            border: Border.all(color: Colors.blue.withOpacity(0.2), width: 1),
           ),
-          if (_shouldShowTimestamp()) ...[
-            const SizedBox(height: AppSpacing.xs),
-            _buildTimestamp(AppColors.textPrimary),
-          ],
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                widget.message,
+                style: GoogleFonts.nunito(
+                  color: Colors.white.withOpacity(0.95), // Testo bianco
+                  fontSize: 16,
+                  height: 1.4,
+                ),
+              ),
+              if (_shouldShowTimestamp()) ...[
+                const SizedBox(height: AppSpacing.xs),
+                _buildTimestamp(Colors.white),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
