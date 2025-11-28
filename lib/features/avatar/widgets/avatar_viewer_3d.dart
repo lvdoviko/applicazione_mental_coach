@@ -145,34 +145,38 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
         <head>
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <style>
-            body, html { margin: 0; height: 100%; overflow: hidden; background-color: #0d1322; }
-
-            /* SFONDO */
-            .background-layer {
-              position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-              background-image: url('$bgImage'); 
-              background-size: cover; background-position: center bottom;
-              filter: blur(3px); /* Blur leggero */
-              transform: scale(1.05);
-              z-index: 0;
-            }
-
-            /* OVERLAY SCURO */
-            .overlay-layer {
-              position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-              background: linear-gradient(to bottom, rgba(13, 19, 34, 0.60) 0%, rgba(8, 10, 16, 0.95) 100%);
-              z-index: 1;
-            }
-
-            model-viewer { width: 100%; height: 100%; --poster-color: transparent; z-index: 2; }
-          </style>
+          html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: transparent; }
+          
+          .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('http://127.0.0.1:$port/sfondo_chat.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+            filter: blur(8px);
+            transform: scale(1.1);
+          }
+          model-viewer { 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: transparent;
+            z-index: 1; 
+            --poster-color: transparent;
+          }
+        </style>
           <!-- Usa model-viewer locale se possibile, altrimenti CDN -->
           <script type="module" src="http://127.0.0.1:$port/model-viewer.min.js"></script>
         </head>
         <body>
-          <div class="background-layer"></div>
-          <div class="overlay-layer"></div>
-
+          <div class="background-image"></div>
+          
           <model-viewer 
             id="coach"
             src="$avatarUrl" 

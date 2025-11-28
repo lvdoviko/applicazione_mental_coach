@@ -35,6 +35,7 @@ class ChatScreenBackend extends ConsumerStatefulWidget {
 class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     with WidgetsBindingObserver {
   
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
   
   // State
@@ -95,6 +96,12 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatProvider);
     
+    final avatarState = ref.watch(avatarProvider);
+    final config = switch (avatarState) {
+      AvatarStateLoaded(config: final c) => c,
+      _ => const AvatarConfigEmpty(),
+    };
+
     // Auto-scroll on new messages
     ref.listen(chatProvider, (previous, next) {
       if (previous?.messages.length != next.messages.length) {
@@ -106,225 +113,132 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       duration: const Duration(milliseconds: 500),
       color: _isCrisisMode ? AppColors.warmTerracotta.withOpacity(0.1) : AppColors.background,
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: Colors.transparent,
-        extendBodyBehindAppBar: true, // Allow body to extend behind the header
-        // appBar: Removed standard AppBar
+        extendBodyBehindAppBar: true,
+        drawer: _buildNavigationDrawer(context), // Add Drawer
         body: Stack(
           children: [
-            // 1. Avatar (Full Screen Background)
             Positioned.fill(
-              child: Consumer(
-                builder: (context, ref, child) {
-                  final avatarState = ref.watch(avatarProvider);
-                  
-                  // Always show AvatarViewer3D to ensure background is visible
-                  // It handles empty/error states internally now
-                  AvatarConfig config;
-                  if (avatarState is AvatarStateLoaded) {
-                    config = avatarState.config;
-                  } else {
-                    config = const AvatarConfigEmpty();
-                  }
+              child: AvatarViewer3D(
+                config: config,
+                enableCameraControls: true,
+                autoRotate: false,
+              ),
+            ),
 
-                  return AvatarViewer3D(
-                    config: config,
-                    enableCameraControls: true,
-                    autoRotate: false,
-                  );
-                },
-              ),
-            ),
-            
-            // 2. Gradient Overlay (For Text Readability)
-            Positioned(
-              bottom: 0, 
-              left: 0, 
-              right: 0, 
-              height: 500,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter, 
-                    end: Alignment.topCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.9),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 1.0],
-                  ),
-                ),
-              ),
-            ),
-            
-            // 3. Chat UI (Foreground)
+            // 2. CHAT CONTENT LAYER
             Column(
               children: [
-                if (_isCrisisMode) _buildSafetyNetBanner(),
-                if (chatState.connectionStatus != ChatConnectionStatus.connected)
-                  _buildConnectionStatusBanner(chatState.connectionStatus),
+                // Spacer for Header
+                SizedBox(height: MediaQuery.of(context).padding.top + 60),
                 
-                const Spacer(), // Push chat down (Dynamic Stage Rule 1)
+                // Connection Status
+                _buildConnectionStatusBanner(chatState.connectionStatus),
 
-                // Dynamic Stage: Limit height & Fade out
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.55, // Max 55% height
-                  child: ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent, // Fade out at top
-                          Colors.transparent, 
-                          Colors.black,       // Visible
-                          Colors.black        // Visible at bottom
-                        ],
-                        stops: [0.0, 0.1, 0.3, 1.0], // Smooth fade
-                      ).createShader(bounds);
-                    },
-                    blendMode: BlendMode.dstIn,
-                    child: _buildMessagesList(chatState.messages, chatState.isLoading),
-                  ),
+                // Safety Net Banner
+                if (_isCrisisMode) _buildSafetyNetBanner(),
+
+                // Messages List
+                Expanded(
+                  child: _buildMessagesList(chatState.messages, chatState.isLoading),
                 ),
                 
-                if (chatState.isTyping)
-                  _buildTypingIndicator(),
+                // Typing Indicator
+                if (chatState.isTyping) _buildTypingIndicator(),
+                
+                // Input Bar
                 _buildMessageComposer(chatState.isLoading),
               ],
             ),
-
-            // 4. Floating Glass Header (New Premium Header)
+            
+            // 4. Floating Glass Header
             Positioned(
               top: 0,
               left: 0,
               right: 0,
               child: ClipRRect(
-                // Nessun bordo arrotondato in alto, sfuma con lo schermo
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Sfocatura vetro
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top + 8,
+                      bottom: 12,
+                      left: 16,
+                      right: 16,
+                    ),
                     decoration: BoxDecoration(
-                      // Gradiente dall'alto per leggere bene batteria/orario e titolo
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.8), // Più scuro in alto (status bar)
-                          Colors.black.withOpacity(0.0), // Svanisce verso il basso
+                          Colors.black.withOpacity(0.6),
+                          Colors.black.withOpacity(0.0),
                         ],
+                      ),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withOpacity(0.05),
+                          width: 1,
+                        ),
                       ),
                     ),
-                    child: SafeArea(
-                      bottom: false, // Non aggiungere padding sotto
-                      child: Row(
-                        children: [
-                          // 1. BACK BUTTON (Stilizzato)
-                          GestureDetector(
-                            onTap: () {
-                              if (context.canPop()) {
-                                context.pop();
-                              } else {
-                                context.go(AppRoute.dashboard.path);
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.1), // Bottone vetro
-                              ),
-                              child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-                            ),
+                    child: Row(
+                      children: [
+                        // 1. HAMBURGER BUTTON (Sidebar)
+                        GestureDetector(
+                          onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.menu, color: Colors.white, size: 24),
                           ),
-                          
-                          const SizedBox(width: 16),
-                          
-                          // 2. INFO COACH (Senza avatar tondo, solo testo)
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // NOME
-                                Text(
-                                  "Kaix Coach",
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    shadows: [const Shadow(color: Colors.black45, blurRadius: 4)],
-                                  ),
+                        ),
+                        
+                        const SizedBox(width: 12),
+                        
+                        // 2. INFO COACH (Senza avatar tondo, solo testo)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // NOME
+                              Text(
+                                "Kaix Coach",
+                                style: GoogleFonts.outfit(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                // STATUS
-                                Row(
-                                  children: [
-                                    // Pallino verde
+                              ),
+                              // STATUS
+                              Row(
+                                children: [
                                     Container(
-                                      width: 8, height: 8,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF4ADE80), // Verde brillante
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(color: const Color(0xFF4ADE80).withOpacity(0.6), blurRadius: 6, spreadRadius: 1)
-                                        ]
-                                      ),
+                                    width: 6,
+                                    height: 6,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF4ADE80), // Green dot
+                                      shape: BoxShape.circle,
                                     ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      "Mental Performance", // O "Online"
-                                      style: GoogleFonts.nunito(
-                                        color: Colors.white70,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    "Mental Performance", // O "Online"
+                                    style: GoogleFonts.nunito(
+                                      color: Colors.white.withOpacity(0.7),
+                                      fontSize: 12,
                                     ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          
-                          // 3. MENU / SETTINGS
-                          PopupMenuButton<AppRoute>(
-                            icon: const Icon(Icons.more_vert, color: Colors.white70),
-                            onSelected: (route) => context.push(route.path),
-                            color: const Color(0xFF1A1A1A), // Dark background for menu
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                value: AppRoute.dashboard,
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.dashboard_outlined, color: Colors.white70),
-                                    const SizedBox(width: 8),
-                                    Text('Dashboard', style: GoogleFonts.nunito(color: Colors.white)),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: AppRoute.avatar,
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.face_outlined, color: Colors.white70),
-                                    const SizedBox(width: 8),
-                                    Text('Avatar', style: GoogleFonts.nunito(color: Colors.white)),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                value: AppRoute.settings,
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.settings_outlined, color: Colors.white70),
-                                    const SizedBox(width: 8),
-                                    Text('Settings', style: GoogleFonts.nunito(color: Colors.white)),
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                ],
+                              )
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                        
+                        // 3. (Optional) Right Action or Empty
+                        // Removed PopupMenuButton as requested
+                      ],
                     ),
                   ),
                 ),
@@ -333,6 +247,111 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNavigationDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFF0D1322).withOpacity(0.95), // Dark Glass
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+        child: Column(
+          children: [
+            // Drawer Header
+            Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + 20,
+                bottom: 20,
+                left: 20,
+                right: 20,
+              ),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.white.withOpacity(0.1)),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Colors.blue.shade800, Colors.purple.shade800],
+                      ),
+                    ),
+                    child: const Icon(Icons.person, color: Colors.white),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'User Menu',
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Navigation Items
+            _buildDrawerItem(
+              context,
+              icon: Icons.dashboard_outlined,
+              label: 'Dashboard',
+              onTap: () => context.go(AppRoute.dashboard.path),
+            ),
+            _buildDrawerItem(
+              context,
+              icon: Icons.face_outlined,
+              label: 'Edit Avatar',
+              onTap: () => context.push(AppRoute.avatar.path),
+            ),
+            _buildDrawerItem(
+              context,
+              icon: Icons.settings_outlined,
+              label: 'Settings',
+              onTap: () => context.push(AppRoute.settings.path),
+            ),
+            
+            const Spacer(),
+            
+            // Footer (Version or Logout)
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                'Kaix v1.0.0',
+                style: GoogleFonts.nunito(
+                  color: Colors.white.withOpacity(0.3),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap}) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.white70),
+      title: Text(
+        label,
+        style: GoogleFonts.nunito(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+      ),
+      onTap: () {
+        Navigator.pop(context); // Close drawer
+        onTap();
+      },
+      hoverColor: Colors.white.withOpacity(0.05),
     );
   }
 
