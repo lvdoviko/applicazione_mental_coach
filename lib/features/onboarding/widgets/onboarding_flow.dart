@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/language_step.dart';
+import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/welcome_step.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/user_details_step.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/avatar_selection_step.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/loading_step.dart';
@@ -111,7 +112,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   @override
   Widget build(BuildContext context) {
     final isFirstPage = _currentPage == 0;
-    final isLoadingStep = _currentPage == 3; // Assuming LoadingStep is index 3
+    final isLoadingStep = _currentPage == 4; // LoadingStep is now index 4
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -126,25 +127,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
           SafeArea(
             child: Column(
               children: [
-                // Top Bar (Back Button)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Row(
-                    children: [
-                      if (!isFirstPage && !isLoadingStep)
-                        IconButton(
-                          onPressed: _previousPage,
-                          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.white.withOpacity(0.1),
-                            padding: const EdgeInsets.all(12),
-                          ),
-                        )
-                      else
-                        const SizedBox(height: 48), // Placeholder to keep layout stable
-                    ],
-                  ),
-                ),
+                // Top Bar Removed (Handled locally in steps)
+                const SizedBox(height: 10), // Small spacer if needed, or remove completely
                 
                 // Main Content
                 Expanded(
@@ -160,6 +144,10 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                       LanguageStep(
                         onLanguageSelected: _handleLanguageSelected,
                         selectedLocale: _selectedLocale,
+                      ),
+                      WelcomeStep(
+                        onNext: _nextPage,
+                        onBack: _previousPage,
                       ),
                       UserDetailsStep(
                         nameController: _nameController,

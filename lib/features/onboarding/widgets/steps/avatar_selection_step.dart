@@ -23,99 +23,125 @@ class AvatarSelectionStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        children: [
-          Text(
-            l10n.avatarSelectionTitle,
-            style: GoogleFonts.poppins(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            l10n.avatarSelectionSubtitle,
-            style: GoogleFonts.nunito(
-              fontSize: 16,
-              color: Colors.white70,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Stack(
+      children: [
+        // 1. CONTENT
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 120), // Bottom padding for button
+            child: Column(
               children: [
-                Expanded(
-                  child: _buildAvatarCard(
-                    context,
-                    id: 'serena',
-                    name: l10n.coachSerena,
-                    description: l10n.coachSerenaDesc,
-                    // Ensure this is the Female image
-                    imageUrl: 'https://models.readyplayer.me/69286d45132e61458cee2d1f.png?bodyType=halfbody', 
-                    color: Colors.pinkAccent,
-                  ),
+                // NAVIGAZIONE (Tasto Back)
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: onBack,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.05),
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.md),
+                
+                const SizedBox(height: AppSpacing.md),
+
+                Text(
+                  l10n.avatarSelectionTitle,
+                  style: GoogleFonts.poppins(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  l10n.avatarSelectionSubtitle,
+                  style: GoogleFonts.nunito(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                
                 Expanded(
-                  child: _buildAvatarCard(
-                    context,
-                    id: 'atlas',
-                    name: l10n.coachAtlas,
-                    description: l10n.coachAtlasDesc,
-                    // Ensure this is the Male image
-                    imageUrl: 'https://models.readyplayer.me/6929b1e97b7a88e1f60a6f9e.png?bodyType=halfbody', 
-                    color: Colors.blueAccent,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: _buildAvatarCard(
+                          context,
+                          id: 'serena',
+                          name: l10n.coachSerena,
+                          description: l10n.coachSerenaDesc,
+                          imageUrl: 'https://models.readyplayer.me/69286d45132e61458cee2d1f.png?bodyType=halfbody', 
+                          color: Colors.pinkAccent,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _buildAvatarCard(
+                          context,
+                          id: 'atlas',
+                          name: l10n.coachAtlas,
+                          description: l10n.coachAtlasDesc,
+                          imageUrl: 'https://models.readyplayer.me/6929b1e97b7a88e1f60a6f9e.png?bodyType=halfbody', 
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          
-          const SizedBox(height: AppSpacing.xl),
-          
-          // Full width Next button
-          Container(
-            width: double.infinity,
+        ),
+        
+        // 2. FIXED BUTTON
+        Positioned(
+          left: 24,
+          right: 24,
+          bottom: 40,
+          child: Container(
+            height: 56,
             decoration: BoxDecoration(
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF4A90E2).withOpacity(0.4), // Blu Brand
-                  blurRadius: 20, // Effetto Glow diffuso
+                  color: AppColors.primary.withOpacity(0.4),
+                  blurRadius: 20,
                   offset: const Offset(0, 4),
                 )
               ],
             ),
-            child: ElevatedButton(
-              onPressed: selectedAvatarId != null ? onNext : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 0, // Shadow handled by Container
-                shadowColor: Colors.transparent,
-              ),
-              child: Text(
-                l10n.startJourney,
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: selectedAvatarId != null ? onNext : null,
+                child: Center(
+                  child: Text(
+                    l10n.startJourney,
+                    style: GoogleFonts.nunito(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
