@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
@@ -58,32 +59,40 @@ class UserDetailsStep extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Name Section (Clean Glass Input)
-                  // Removed label "COME TI CHIAMI?" as requested
                   Container(
+                    height: 60,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Colors.white.withOpacity(0.05), // Sfondo quasi trasparente
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
-                        width: 1,
-                      ),
+                      // Bordo sottile bianco (NON BLU)
+                      border: Border.all(color: Colors.white.withOpacity(0.15), width: 1), 
                     ),
-                    child: TextField(
-                      controller: nameController,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 18,
-                      ),
-                      cursorColor: AppColors.primary,
-                      decoration: InputDecoration(
-                        hintText: l10n.nameLabel,
-                        hintStyle: GoogleFonts.poppins(color: Colors.white38),
-                        border: InputBorder.none,
-                        prefixIcon: const Icon(Icons.person_outline, color: Colors.white70),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    child: Center(
+                      child: TextField(
+                        controller: nameController,
+                        style: GoogleFonts.nunito(color: Colors.white, fontSize: 18),
+                        cursorColor: const Color(0xFF4A90E2), // Solo il cursore è blu
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.person_outline, color: Colors.white60),
+                          hintText: l10n.nameLabel,
+                          hintStyle: GoogleFonts.nunito(color: Colors.white30),
+                          
+                        // RIMUOVE TUTTI I BORDI NATIVI
+                        border: InputBorder.none, 
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        
+                        // FIX: Remove ghost background
+                        filled: false, 
+                        fillColor: Colors.transparent,
+                        
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       ),
                     ),
                   ),
+                ),
                   const SizedBox(height: AppSpacing.xl),
 
                   // Gender Section
@@ -101,53 +110,47 @@ class UserDetailsStep extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xl),
 
                   // Age Section
+                  const SizedBox(height: 24), // Added breathing room
                   _buildSectionLabel(l10n.yourAgeLabel),
                   const SizedBox(height: AppSpacing.sm),
-                  SizedBox(
-                    height: 160,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Selection Overlay (Magnifier effect)
-                        Container(
-                          height: 50,
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            border: Border.symmetric(
-                              horizontal: BorderSide(
-                                color: Colors.white.withOpacity(0.2),
-                                width: 1,
-                              ),
+                  Container(
+                    height: 180, // Increased height for larger items
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white.withOpacity(0.15)),
+                    ),
+                    child: CupertinoPicker(
+                      itemExtent: 60, // Increased to avoid cutting numbers
+                      magnification: 1.2,
+                      useMagnifier: true,
+                      backgroundColor: Colors.transparent, // Ensure transparency
+                      scrollController: FixedExtentScrollController(initialItem: 0),
+                      onSelectedItemChanged: (index) {
+                        ageController.text = (index + 10).toString();
+                      },
+                      selectionOverlay: Container(
+                        decoration: BoxDecoration(
+                          border: Border.symmetric(
+                            horizontal: BorderSide(
+                              color: const Color(0xFF4A90E2).withOpacity(0.3),
+                              width: 1,
                             ),
                           ),
                         ),
-                        // Wheel Scroll View
-                        ListWheelScrollView.useDelegate(
-                          itemExtent: 50,
-                          perspective: 0.005,
-                          diameterRatio: 1.5,
-                          physics: const FixedExtentScrollPhysics(),
-                          onSelectedItemChanged: (index) {
-                            ageController.text = (index + 10).toString();
-                          },
-                          childDelegate: ListWheelChildBuilderDelegate(
-                            childCount: 90,
-                            builder: (context, index) {
-                              final age = index + 10;
-                              return Center(
-                                child: Text(
-                                  '$age',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 24,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              );
-                            },
+                      ),
+                      children: List.generate(90, (index) {
+                        return Center(
+                          child: Text(
+                            "${index + 10}",
+                            style: GoogleFonts.nunito(
+                              color: Colors.white,
+                              fontSize: 24, // Increased font size
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
+                        );
+                      }),
                     ),
                   ),
                 ],
@@ -158,8 +161,18 @@ class UserDetailsStep extends StatelessWidget {
           // Full Width Next Button (Bottom)
           Padding(
             padding: const EdgeInsets.only(bottom: 30),
-            child: SizedBox(
+            child: Container(
               width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4A90E2).withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+              ),
               child: ElevatedButton(
                 onPressed: onNext,
                 style: ElevatedButton.styleFrom(
@@ -169,8 +182,8 @@ class UserDetailsStep extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  elevation: 8,
-                  shadowColor: AppColors.primary.withOpacity(0.5),
+                  elevation: 0, // Shadow handled by Container
+                  shadowColor: Colors.transparent,
                 ),
                 child: Text(
                   l10n.continueButton,
@@ -213,7 +226,7 @@ class UserDetailsStep extends StatelessWidget {
           color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.1),
+            color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.15),
           ),
         ),
         child: Column(
