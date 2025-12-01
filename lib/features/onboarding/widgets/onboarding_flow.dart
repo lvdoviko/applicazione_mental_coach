@@ -10,6 +10,7 @@ import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/load
 import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/features/user/providers/user_provider.dart';
 import 'package:applicazione_mental_coach/core/providers/locale_provider.dart';
+import 'package:applicazione_mental_coach/shared/widgets/living_background.dart';
 
 class OnboardingFlow extends ConsumerStatefulWidget {
   const OnboardingFlow({super.key});
@@ -117,49 +118,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       body: Stack(
         children: [
           // 1. Global Background (Aurora Effect)
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF0F172A), // Slate 900
-                  Color(0xFF1E1B4B), // Indigo 950
-                  Color(0xFF000000), // Black
-                ],
-              ),
-            ),
-          ),
-          // Subtle radial overlay for depth
-          Positioned(
-            top: -100,
-            left: -100,
-            child: ImageFiltered(
-              imageFilter: org_ui.ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF4F46E5).withOpacity(0.2), // Indigo
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -100,
-            right: -100,
-            child: ImageFiltered(
-              imageFilter: org_ui.ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFFEC4899).withOpacity(0.1), // Pink
-                ),
-              ),
-            ),
+          const Positioned.fill(
+            child: LivingBackground(),
           ),
 
           // 2. Page Content

@@ -54,24 +54,24 @@ class AvatarSelectionStep extends StatelessWidget {
                 Expanded(
                   child: _buildAvatarCard(
                     context,
-                    id: 'atlas',
-                    name: l10n.coachAtlas,
-                    description: l10n.coachAtlasDesc,
-                    // Ensure this is the Male image
+                    id: 'serena',
+                    name: l10n.coachSerena,
+                    description: l10n.coachSerenaDesc,
+                    // Ensure this is the Female image
                     imageUrl: 'https://models.readyplayer.me/69286d45132e61458cee2d1f.png?bodyType=halfbody', 
-                    color: Colors.blueAccent,
+                    color: Colors.pinkAccent,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: _buildAvatarCard(
                     context,
-                    id: 'serena',
-                    name: l10n.coachSerena,
-                    description: l10n.coachSerenaDesc,
-                    // Ensure this is the Female image
+                    id: 'atlas',
+                    name: l10n.coachAtlas,
+                    description: l10n.coachAtlasDesc,
+                    // Ensure this is the Male image
                     imageUrl: 'https://models.readyplayer.me/6929b1e97b7a88e1f60a6f9e.png?bodyType=halfbody', 
-                    color: Colors.pinkAccent,
+                    color: Colors.blueAccent,
                   ),
                 ),
               ],
@@ -81,8 +81,18 @@ class AvatarSelectionStep extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           
           // Full width Next button
-          SizedBox(
+          Container(
             width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4A90E2).withOpacity(0.4), // Blu Brand
+                  blurRadius: 20, // Effetto Glow diffuso
+                  offset: const Offset(0, 4),
+                )
+              ],
+            ),
             child: ElevatedButton(
               onPressed: selectedAvatarId != null ? onNext : null,
               style: ElevatedButton.styleFrom(
@@ -92,8 +102,8 @@ class AvatarSelectionStep extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                elevation: 8,
-                shadowColor: AppColors.primary.withOpacity(0.5),
+                elevation: 0, // Shadow handled by Container
+                shadowColor: Colors.transparent,
               ),
               child: Text(
                 l10n.startJourney,

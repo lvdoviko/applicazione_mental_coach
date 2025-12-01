@@ -133,8 +133,8 @@ class UserDetailsStep extends StatelessWidget {
                         decoration: BoxDecoration(
                           border: Border.symmetric(
                             horizontal: BorderSide(
-                              color: const Color(0xFF4A90E2).withOpacity(0.3),
-                              width: 1,
+                              color: const Color(0xFF4A90E2).withOpacity(0.6),
+                              width: 1.5,
                             ),
                           ),
                         ),
