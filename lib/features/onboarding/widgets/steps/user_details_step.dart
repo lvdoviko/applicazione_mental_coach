@@ -172,7 +172,7 @@ class UserDetailsStep extends StatelessWidget {
         Positioned(
           left: 24,
           right: 24,
-          bottom: 40,
+          bottom: 70, // Aligned with WelcomeStep (Button + Text)
           child: Container(
             height: 56,
             decoration: BoxDecoration(

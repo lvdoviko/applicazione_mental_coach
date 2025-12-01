@@ -108,7 +108,7 @@ class AvatarSelectionStep extends StatelessWidget {
         Positioned(
           left: 24,
           right: 24,
-          bottom: 40,
+          bottom: 70, // Aligned with WelcomeStep
           child: Container(
             height: 56,
             decoration: BoxDecoration(

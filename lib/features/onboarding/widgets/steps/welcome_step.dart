@@ -37,7 +37,27 @@ class WelcomeStep extends StatelessWidget {
                   ],
                 ),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
+
+                // HERO ICON (Re-added & Enhanced)
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withOpacity(0.1),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.25),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                      )
+                    ],
+                  ),
+                  child: const Icon(Icons.psychology, size: 64, color: AppColors.primary),
+                ),
+
+                const SizedBox(height: 32),
 
                 // TITOLO
                 Text(
@@ -63,7 +83,7 @@ class WelcomeStep extends StatelessWidget {
                   ),
                 ),
                 
-                const SizedBox(height: 60),
+                const SizedBox(height: 40),
 
                 // FEATURE ICONS
                 Row(
@@ -74,58 +94,66 @@ class WelcomeStep extends StatelessWidget {
                     _buildFeatureItem(Icons.lock_outline, "Privacy\nTotale"),
                   ],
                 ),
-
-                const SizedBox(height: 40),
-
-                // TERMS & PRIVACY (Inside ScrollView)
-                Text(
-                  "Continuando accetti i Termini di Servizio\ne la Privacy Policy.",
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.nunito(
-                    fontSize: 12,
-                    color: Colors.white38,
-                  ),
-                ),
+                
+                // Extra space for scrolling content above fixed bottom area
+                const SizedBox(height: 140), 
               ],
             ),
           ),
         ),
 
-        // 2. FIXED BUTTON (Bottom Anchor)
+        // 2. FIXED BOTTOM AREA (Button + Legal Text)
         Positioned(
           left: 24,
           right: 24,
-          bottom: 40,
-          child: Container(
-            height: 56,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: onNext,
-                child: Center(
-                  child: Text(
-                    "Inizia",
-                    style: GoogleFonts.nunito(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+          bottom: 20, // Lower bottom margin to fit text
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.4),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: onNext,
+                    child: Center(
+                      child: Text(
+                        "Inizia",
+                        style: GoogleFonts.nunito(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+              
+              const SizedBox(height: 20),
+
+              // TERMS & PRIVACY (Moved below button)
+              Text(
+                "Continuando accetti i Termini di Servizio\ne la Privacy Policy.",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.nunito(
+                  fontSize: 12,
+                  color: Colors.white38,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -136,17 +164,20 @@ class WelcomeStep extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 70,
-          height: 70,
+          width: 70, height: 70,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.05), 
-            border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 1),
+            // 1. Sfondo più luminoso (Vetro)
+            color: Colors.white.withOpacity(0.08), 
+            // 2. Bordo per definizione
+            border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+            // 3. Leggero Glow
             boxShadow: [
-               BoxShadow(color: AppColors.primary.withOpacity(0.1), blurRadius: 10)
+               BoxShadow(color: AppColors.primary.withOpacity(0.15), blurRadius: 15)
             ]
           ),
-          child: Icon(icon, color: AppColors.primary, size: 30),
+          // 4. Icona Bianca (Per contrasto massimo)
+          child: Icon(icon, color: Colors.white, size: 28),
         ),
         const SizedBox(height: 12),
         Text(
@@ -154,7 +185,7 @@ class WelcomeStep extends StatelessWidget {
           textAlign: TextAlign.center,
           style: GoogleFonts.nunito(
             fontSize: 12,
-            color: Colors.white70,
+            color: Colors.white70, // Grigio chiaro per non competere col titolo
             height: 1.2
           ),
         ),
