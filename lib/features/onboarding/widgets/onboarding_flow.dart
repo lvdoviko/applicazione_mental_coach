@@ -56,7 +56,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       _selectedLocale = locale;
     });
     ref.read(localeProvider.notifier).setLocale(locale);
-    _nextPage();
+    
+    // Add a small delay so the user can see the selection feedback
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _nextPage();
+      }
+    });
   }
 
   void _handleUserDetailsNext() {
@@ -193,6 +199,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                     children: [
                       LanguageStep(
                         onLanguageSelected: _handleLanguageSelected,
+                        selectedLocale: _selectedLocale,
                       ),
                       UserDetailsStep(
                         nameController: _nameController,

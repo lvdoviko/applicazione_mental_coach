@@ -223,16 +223,35 @@ class UserDetailsStep extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.05),
+          // SFONDO: Se selezionato, Blu al 20%. Se no, Bianco al 5%.
+          color: isSelected 
+              ? const Color(0xFF4A90E2).withOpacity(0.20) 
+              : Colors.white.withOpacity(0.05),
+          
           borderRadius: BorderRadius.circular(16),
+          
+          // BORDO: Se selezionato, Blu Pieno (2px). Se no, Bianco Sottile (1px).
           border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.white.withOpacity(0.15),
+            color: isSelected 
+                ? const Color(0xFF4A90E2) 
+                : Colors.white.withOpacity(0.15),
+            width: isSelected ? 2 : 1,
           ),
+          
+          // GLOW: Solo se selezionato
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: const Color(0xFF4A90E2).withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            )
+          ] : [],
         ),
         child: Column(
           children: [
             Icon(
               icon, 
+              // Icona bianca se selezionata, altrimenti un po' spenta
               color: isSelected ? Colors.white : Colors.white70, 
               size: 24
             ),

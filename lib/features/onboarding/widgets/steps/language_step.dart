@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 
 class LanguageStep extends StatelessWidget {
   final Function(Locale) onLanguageSelected;
+  final Locale? selectedLocale;
 
   const LanguageStep({
     super.key,
     required this.onLanguageSelected,
+    this.selectedLocale,
   });
 
   @override
@@ -57,25 +58,60 @@ class LanguageStep extends StatelessWidget {
     required String flag,
     required String name,
   }) {
-    return PremiumGlassCard(
+    final isSelected = selectedLocale?.languageCode == locale.languageCode;
+    
+    return GestureDetector(
       onTap: () => onLanguageSelected(locale),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            flag,
-            style: const TextStyle(fontSize: 32),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 85, // Altezza generosa
+        decoration: BoxDecoration(
+          // SFONDO:
+          // Se selezionato: Blu leggerissimo (Vetro colorato)
+          // Se non selezionato: Bianco quasi invisibile (Vetro pulito)
+          color: isSelected 
+              ? const Color(0xFF4A90E2).withOpacity(0.20) 
+              : Colors.white.withOpacity(0.05),
+          
+          borderRadius: BorderRadius.circular(20),
+          
+          // BORDO:
+          // Se selezionato: Blu Elettrico (Focus)
+          // Se non selezionato: Bianco sottile (Definizione)
+          border: Border.all(
+            color: isSelected 
+                ? const Color(0xFF4A90E2) 
+                : Colors.white.withOpacity(0.15),
+            width: isSelected ? 2 : 1,
           ),
-          const SizedBox(width: AppSpacing.md),
-          Text(
-            name,
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+          
+          // GLOW (Solo se selezionato):
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: const Color(0xFF4A90E2).withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            )
+          ] : [],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              flag,
+              style: const TextStyle(fontSize: 32),
             ),
-          ),
-        ],
+            const SizedBox(width: 16),
+            Text(
+              name,
+              style: GoogleFonts.nunito(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
