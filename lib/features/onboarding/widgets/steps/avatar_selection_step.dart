@@ -59,7 +59,7 @@ class AvatarSelectionStep extends StatelessWidget {
 
                 // AVATAR CARDS
                 SizedBox(
-                  height: 380, // Increased height
+                  height: 450, // Maximized height
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
