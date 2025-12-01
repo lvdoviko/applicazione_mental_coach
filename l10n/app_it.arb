@@ -25,6 +25,41 @@
   "consent": "Acconsento al trattamento dei dati",
   "healthDataPermission": "Consenti accesso ai dati sanitari",
   "notificationPermission": "Abilita notifiche",
+  "languageSelectionTitle": "Scegli la tua lingua",
+  "journeyStartsHere": "Il tuo viaggio inizia qui",
+  "userDetailsTitle": "Piacere di conoscerti",
+  "userDetailsSubtitle": "Raccontaci qualcosa di te",
+  "nameLabel": "Come ti chiami?",
+  "genderLabel": "Genere",
+  "yourAgeLabel": "LA TUA ETÀ",
+  "genderMale": "Maschio",
+  "genderFemale": "Femmina",
+  "genderOther": "Altro",
+  "avatarSelectionTitle": "Scegli la tua guida",
+  "avatarSelectionSubtitle": "Chi ti accompagnerà nel tuo percorso?",
+  "coachAtlas": "Atlas",
+  "coachSerena": "Serena",
+  "coachAtlasDesc": "Resilienza, Focus, Strategia",
+  "coachSerenaDesc": "Empatia, Calma, Intuizione",
+  "startJourney": "Inizia il Viaggio",
+  "back": "Indietro",
+  "loadingConfiguring": "Configurazione di {coachName}...",
+  "@loadingConfiguring": {
+    "placeholders": {
+      "coachName": {
+        "type": "String"
+      }
+    }
+  },
+  "loadingCalibrating": "Calibrazione del piano per {userName}...",
+  "@loadingCalibrating": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "loadingReady": "Tutto pronto.",
   
   "@_CHAT_INTERFACE": {},
   "chatPlaceholder": "Condividi cosa hai in mente...",

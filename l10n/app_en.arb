@@ -25,6 +25,41 @@
   "consent": "I consent to data processing",
   "healthDataPermission": "Allow health data access",
   "notificationPermission": "Enable notifications",
+  "languageSelectionTitle": "Choose your language",
+  "journeyStartsHere": "Your journey starts here",
+  "userDetailsTitle": "Nice to meet you",
+  "userDetailsSubtitle": "Tell us something about yourself",
+  "nameLabel": "What's your name?",
+  "genderLabel": "Gender",
+  "yourAgeLabel": "YOUR AGE",
+  "genderMale": "Male",
+  "genderFemale": "Female",
+  "genderOther": "Other",
+  "avatarSelectionTitle": "Choose your Coach",
+  "avatarSelectionSubtitle": "Who will accompany you on your journey?",
+  "coachAtlas": "Atlas",
+  "coachSerena": "Serena",
+  "coachAtlasDesc": "Resilience, Focus, Strategy",
+  "coachSerenaDesc": "Empathy, Calm, Intuition",
+  "startJourney": "Start Journey",
+  "back": "Back",
+  "loadingConfiguring": "Configuring {coachName}...",
+  "@loadingConfiguring": {
+    "placeholders": {
+      "coachName": {
+        "type": "String"
+      }
+    }
+  },
+  "loadingCalibrating": "Calibrating plan for {userName}...",
+  "@loadingCalibrating": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "loadingReady": "All set.",
   
   "@_CHAT_INTERFACE": {},
   "chatPlaceholder": "Share what's on your mind...",

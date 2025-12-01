@@ -19,6 +19,7 @@ ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => ChatMessage(
       modelUsed: json['model_used'] as String?,
       processingTimeMs: (json['processing_time_ms'] as num?)?.toInt(),
       escalationNeeded: json['escalation_needed'] as bool? ?? false,
+      citation: json['citation'] as String?,
     );
 
 Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
@@ -34,6 +35,7 @@ Map<String, dynamic> _$ChatMessageToJson(ChatMessage instance) =>
       'model_used': instance.modelUsed,
       'processing_time_ms': instance.processingTimeMs,
       'escalation_needed': instance.escalationNeeded,
+      'citation': instance.citation,
     };
 
 const _$ChatMessageTypeEnumMap = {

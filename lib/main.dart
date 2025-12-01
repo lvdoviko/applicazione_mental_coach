@@ -9,6 +9,8 @@ import 'package:applicazione_mental_coach/core/config/app_config.dart';
 import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 import 'package:applicazione_mental_coach/features/chat/models/chat_message.dart';
 import 'package:applicazione_mental_coach/features/chat/models/chat_session.dart';
+import 'package:applicazione_mental_coach/features/user/models/user_model.dart';
+import 'package:applicazione_mental_coach/core/providers/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,7 @@ void main() async {
 
   // Register Hive adapters for chat models
   Hive.registerAdapter(ChatSessionAdapter()); // TypeId: 11
+  Hive.registerAdapter(UserModelAdapter()); // TypeId: 1
   // Note: ChatMessage uses JSON serialization, not Hive adapter
   
   // Set device orientation preferences
@@ -49,6 +52,7 @@ class AIWellbeingCoachApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    final locale = ref.watch(localeProvider);
     
     return MaterialApp.router(
       title: AppConfig.appName,
@@ -60,6 +64,7 @@ class AIWellbeingCoachApp extends ConsumerWidget {
       themeMode: ThemeMode.system, // A/B test hook: could be user preference
       
       // Localization
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       

@@ -139,7 +139,6 @@ class _ConversationListScreenState extends State<ConversationListScreen>
                     vertical: AppSpacing.md,
                   ),
                 ),
-                ),
               ),
             )
           : const SizedBox.shrink(),

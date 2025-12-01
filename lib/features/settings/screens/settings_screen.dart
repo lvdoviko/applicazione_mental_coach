@@ -9,6 +9,7 @@ import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart'
 import 'package:applicazione_mental_coach/core/config/app_config.dart';
 import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
 import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
+import 'package:applicazione_mental_coach/core/providers/locale_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -140,7 +141,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   _buildTile(
                     'Language',
-                    _selectedLanguage,
+                    ref.watch(localeProvider).languageCode == 'it' ? 'Italiano' : 'English',
                     Icons.language,
                     onTap: _showLanguageDialog,
                     trailing: const Icon(Icons.chevron_right, color: Colors.white54),
@@ -455,7 +456,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _showLanguageDialog() {
-    final languages = ['English', 'Italiano'];
+    final currentLocale = ref.read(localeProvider);
+    final languages = [
+      {'name': 'English', 'code': 'en'},
+      {'name': 'Italiano', 'code': 'it'},
+    ];
     
     showDialog(
       context: context,
@@ -465,12 +470,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: languages.map((language) {
+            final isSelected = currentLocale.languageCode == language['code'];
             return RadioListTile<String>(
-              title: Text(language, style: GoogleFonts.nunito(color: Colors.white)),
-              value: language,
-              groupValue: _selectedLanguage,
+              title: Text(language['name']!, style: GoogleFonts.nunito(color: Colors.white)),
+              value: language['code']!,
+              groupValue: currentLocale.languageCode,
               onChanged: (value) {
-                setState(() => _selectedLanguage = value!);
+                if (value != null) {
+                  ref.read(localeProvider.notifier).setLocale(Locale(value));
+                }
                 Navigator.of(context).pop();
               },
               activeColor: AppColors.primary,
