@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
@@ -190,7 +191,10 @@ class UserDetailsStep extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(16),
-                onTap: onNext,
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  onNext();
+                },
                 child: Center(
                   child: Text(
                     l10n.continueButton,

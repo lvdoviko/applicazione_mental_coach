@@ -111,75 +111,59 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
 
   @override
   Widget build(BuildContext context) {
-    final isFirstPage = _currentPage == 0;
-    final isLoadingStep = _currentPage == 4; // LoadingStep is now index 4
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          // 1. Global Background (Aurora Effect)
-          const Positioned.fill(
-            child: LivingBackground(),
-          ),
-
-          // 2. Page Content
-          SafeArea(
-            child: Column(
-              children: [
-                // Top Bar Removed (Handled locally in steps)
-                const SizedBox(height: 10), // Small spacer if needed, or remove completely
-                
-                // Main Content
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: (index) {
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Main Content
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                children: [
+                  LanguageStep(
+                    onLanguageSelected: _handleLanguageSelected,
+                    selectedLocale: _selectedLocale,
+                  ),
+                  WelcomeStep(
+                    onNext: _nextPage,
+                    onBack: _previousPage,
+                  ),
+                  UserDetailsStep(
+                    nameController: _nameController,
+                    ageController: _ageController,
+                    selectedGender: _selectedGender,
+                    onGenderChanged: (value) {
                       setState(() {
-                        _currentPage = index;
+                        _selectedGender = value;
                       });
                     },
-                    children: [
-                      LanguageStep(
-                        onLanguageSelected: _handleLanguageSelected,
-                        selectedLocale: _selectedLocale,
-                      ),
-                      WelcomeStep(
-                        onNext: _nextPage,
-                        onBack: _previousPage,
-                      ),
-                      UserDetailsStep(
-                        nameController: _nameController,
-                        ageController: _ageController,
-                        selectedGender: _selectedGender,
-                        onGenderChanged: (value) {
-                          setState(() {
-                            _selectedGender = value;
-                          });
-                        },
-                        onNext: _handleUserDetailsNext,
-                        // Back is handled globally now, but we keep the callback if needed or remove it from widget
-                        onBack: _previousPage, 
-                      ),
-                      AvatarSelectionStep(
-                        selectedAvatarId: _selectedAvatarId,
-                        onAvatarSelected: _handleAvatarSelected,
-                        onNext: _handleAvatarNext,
-                        onBack: _previousPage,
-                      ),
-                      LoadingStep(
-                        onFinished: _handleLoadingFinished,
-                        userName: _nameController.text,
-                        coachName: _selectedAvatarId == 'atlas' ? 'Atlas' : 'Serena',
-                      ),
-                    ],
+                    onNext: _handleUserDetailsNext,
+                    onBack: _previousPage, 
                   ),
-                ),
-              ],
+                  AvatarSelectionStep(
+                    selectedAvatarId: _selectedAvatarId,
+                    onAvatarSelected: _handleAvatarSelected,
+                    onNext: _handleAvatarNext,
+                    onBack: _previousPage,
+                  ),
+                  LoadingStep(
+                    onFinished: _handleLoadingFinished,
+                    userName: _nameController.text,
+                    coachName: _selectedAvatarId == 'atlas' ? 'Atlas' : 'Serena',
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

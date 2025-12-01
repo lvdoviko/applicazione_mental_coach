@@ -11,6 +11,7 @@ import 'package:applicazione_mental_coach/features/chat/models/chat_message.dart
 import 'package:applicazione_mental_coach/features/chat/models/chat_session.dart';
 import 'package:applicazione_mental_coach/features/user/models/user_model.dart';
 import 'package:applicazione_mental_coach/core/providers/locale_provider.dart';
+import 'package:applicazione_mental_coach/shared/widgets/living_background.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,9 +60,13 @@ class AIWellbeingCoachApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       
       // Theme configuration
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system, // A/B test hook: could be user preference
+      theme: AppTheme.lightTheme.copyWith(
+        scaffoldBackgroundColor: Colors.transparent,
+      ),
+      darkTheme: AppTheme.darkTheme.copyWith(
+        scaffoldBackgroundColor: Colors.transparent,
+      ),
+      themeMode: ThemeMode.dark, // Force Dark Mode for Neon Aesthetic
       
       // Localization
       locale: locale,
@@ -71,15 +76,27 @@ class AIWellbeingCoachApp extends ConsumerWidget {
       // Routing
       routerConfig: router,
       
-      // Performance optimizations
+      // Performance optimizations & Global Background
       builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(
-              MediaQuery.of(context).textScaler.scale(1.0).clamp(0.8, 1.3),
-            ),
+        // 1. Text Scaler Optimization
+        final mediaQueryData = MediaQuery.of(context).copyWith(
+          textScaler: TextScaler.linear(
+            MediaQuery.of(context).textScaler.scale(1.0).clamp(0.8, 1.3),
           ),
-          child: child!,
+        );
+
+        return MediaQuery(
+          data: mediaQueryData,
+          child: Stack(
+            children: [
+              // 2. GLOBAL BACKGROUND (Fixed & Persistent)
+              // Now has access to MediaQuery provided by MaterialApp
+              const Positioned.fill(child: LivingBackground()),
+
+              // 3. APP CONTENT (Navigator)
+              Positioned.fill(child: child!),
+            ],
+          ),
         );
       },
     );

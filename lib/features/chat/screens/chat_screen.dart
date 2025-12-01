@@ -94,8 +94,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             left: 0,
             right: 0,
             height: 400,
-            child: AvatarViewer3D(
-              config: avatarConfig,
+            child: Hero(
+              tag: 'coach_avatar',
+              child: AvatarViewer3D(
+                config: avatarConfig,
+              ),
             ),
           ),
 

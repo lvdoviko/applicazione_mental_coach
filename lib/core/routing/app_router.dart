@@ -37,28 +37,97 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoute.chat.path,
         name: 'chat',
-        builder: (context, state) => const ChatScreenBackend(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const ChatScreenBackend(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const curve = Curves.easeInOutCubic;
+            var tween = Tween(begin: const Offset(0.05, 0.0), end: Offset.zero) // Subtle slide
+                .chain(CurveTween(curve: curve));
+            
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
       ),
       
       // Dashboard
       GoRoute(
         path: AppRoute.dashboard.path,
         name: 'dashboard',
-        builder: (context, state) => const DashboardScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const DashboardScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const curve = Curves.easeInOutCubic;
+            var tween = Tween(begin: const Offset(0.05, 0.0), end: Offset.zero)
+                .chain(CurveTween(curve: curve));
+            
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
       ),
       
       // Avatar Customization
       GoRoute(
         path: AppRoute.avatar.path,
         name: 'avatar',
-        builder: (context, state) => const AvatarScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const AvatarScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const curve = Curves.easeInOutCubic;
+            var tween = Tween(begin: const Offset(0.05, 0.0), end: Offset.zero)
+                .chain(CurveTween(curve: curve));
+            
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
       ),
       
       // Settings
       GoRoute(
         path: AppRoute.settings.path,
         name: 'settings',
-        builder: (context, state) => const SettingsScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const SettingsScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // iOS Scale Back Effect for Settings
+            const curve = Curves.easeInOutCubic;
+            var slideTween = Tween(begin: const Offset(0.0, 0.1), end: Offset.zero) // Slide up slightly
+                .chain(CurveTween(curve: curve));
+            
+            return SlideTransition(
+              position: animation.drive(slideTween),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
       ),
       
       // Root redirect
