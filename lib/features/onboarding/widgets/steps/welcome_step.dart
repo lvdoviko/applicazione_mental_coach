@@ -103,61 +103,59 @@ class WelcomeStep extends StatelessWidget {
           ),
         ),
 
-        // 2. FIXED BOTTOM AREA (Button + Legal Text)
+        // 2. FIXED BUTTON (Aligned with other steps at 70px)
         Positioned(
           left: 24,
           right: 24,
-          bottom: 20, // Lower bottom margin to fit text
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 56,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      onNext();
-                    },
-                    child: Center(
-                      child: Text(
-                        "Inizia",
-                        style: GoogleFonts.nunito(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+          bottom: 70, 
+          child: Container(
+            height: 56,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                )
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  onNext();
+                },
+                child: Center(
+                  child: Text(
+                    "Inizia",
+                    style: GoogleFonts.nunito(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
-              
-              const SizedBox(height: 20),
+            ),
+          ),
+        ),
 
-              // TERMS & PRIVACY (Moved below button)
-              Text(
-                "Continuando accetti i Termini di Servizio\ne la Privacy Policy.",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.nunito(
-                  fontSize: 12,
-                  color: Colors.white38,
-                ),
-              ),
-            ],
+        // 3. TERMS & PRIVACY (Below button)
+        Positioned(
+          left: 24,
+          right: 24,
+          bottom: 20,
+          child: Text(
+            "Continuando accetti i Termini di Servizio\ne la Privacy Policy.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.nunito(
+              fontSize: 12,
+              color: Colors.white38,
+            ),
           ),
         ),
       ],
