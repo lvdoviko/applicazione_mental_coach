@@ -115,6 +115,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       body: SafeArea(
+        top: true,
+        bottom: false, // Allow content to extend to the bottom (fix for raised buttons)
         child: Column(
           children: [
             // Main Content
