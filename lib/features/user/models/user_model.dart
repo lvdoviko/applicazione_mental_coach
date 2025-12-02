@@ -19,11 +19,15 @@ class UserModel extends HiveObject {
   @HiveField(4)
   bool isOnboardingCompleted;
 
+  @HiveField(5)
+  String? avatarId;
+
   UserModel({
     this.name,
     this.age,
     this.gender,
     this.languageCode,
     this.isOnboardingCompleted = false,
+    this.avatarId,
   });
 }

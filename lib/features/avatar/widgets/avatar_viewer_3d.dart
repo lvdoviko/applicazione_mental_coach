@@ -123,9 +123,19 @@ class _AvatarViewer3DState extends State<AvatarViewer3D> {
       final port = _server!.port;
 
       // 2. URL AVATAR
-      String avatarUrl = "https://models.readyplayer.me/69286d45132e61458cee2d1f.glb?bodyType=fullbody&quality=high"; 
+      String? avatarUrl;
       if (widget.config is AvatarConfigLoaded) {
         avatarUrl = (widget.config as AvatarConfigLoaded).remoteUrl;
+      }
+      
+      if (avatarUrl == null) {
+        debugPrint("⚠️ No avatar URL provided, skipping load.");
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+        return;
       }
       
       // 3. CARICA ANIMAZIONE (Da Asset -> Base64)

@@ -12,6 +12,7 @@ import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/features/user/providers/user_provider.dart';
 import 'package:applicazione_mental_coach/core/providers/locale_provider.dart';
 import 'package:applicazione_mental_coach/shared/widgets/living_background.dart';
+import 'package:applicazione_mental_coach/features/avatar/providers/avatar_provider.dart';
 
 class OnboardingFlow extends ConsumerStatefulWidget {
   const OnboardingFlow({super.key});
@@ -98,7 +99,13 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       gender: _selectedGender,
       languageCode: _selectedLocale?.languageCode,
       isOnboardingCompleted: true,
+      avatarId: _selectedAvatarId,
     );
+
+    // Pre-load the selected avatar
+    if (_selectedAvatarId != null) {
+      await ref.read(avatarProvider.notifier).loadAvatarFromId(_selectedAvatarId!);
+    }
 
     print('User data saved.');
 

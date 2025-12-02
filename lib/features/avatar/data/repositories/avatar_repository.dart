@@ -197,7 +197,7 @@ class AvatarRepository {
   /// Validate Ready Player Me URL format
   bool _isValidRpmUrl(String url) {
     return url.startsWith('https://models.readyplayer.me/') &&
-           url.endsWith('.glb');
+           url.contains('.glb');
   }
 
   /// Convert Dio errors to domain failures

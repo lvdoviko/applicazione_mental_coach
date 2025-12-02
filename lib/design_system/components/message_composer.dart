@@ -34,7 +34,7 @@ class _MessageComposerState extends State<MessageComposer>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  // final SpeechToText _speechToText = SpeechToText();
+  final SpeechToText _speechToText = SpeechToText();
 
   bool _isListening = false;
   bool _speechEnabled = false;
@@ -92,22 +92,32 @@ class _MessageComposerState extends State<MessageComposer>
   void _initializeSpeech() async {
     if (!widget.supportsSpeech) return;
     
-    /*
-    _speechEnabled = await _speechToText.initialize(
-      onError: (error) {
-        setState(() => _isListening = false);
-        _pulseController.stop();
-      },
-      onStatus: (status) {
-        if (status == 'done' || status == 'notListening') {
-          setState(() => _isListening = false);
-          _pulseController.stop();
-          widget.onVoiceStop?.call();
-        }
-      },
-    );
-    */
-    setState(() {});
+    try {
+      _speechEnabled = await _speechToText.initialize(
+        onError: (error) {
+          debugPrint('Speech initialization error: $error');
+          if (mounted) {
+            setState(() => _isListening = false);
+            _pulseController.stop();
+          }
+        },
+        onStatus: (status) {
+          debugPrint('Speech status: $status');
+          if (mounted && (status == 'done' || status == 'notListening')) {
+            setState(() => _isListening = false);
+            _pulseController.stop();
+            widget.onVoiceStop?.call();
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint('Speech initialization failed: $e');
+      _speechEnabled = false;
+    }
+    
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _onTextChanged() {
@@ -137,32 +147,44 @@ class _MessageComposerState extends State<MessageComposer>
   }
 
   void _startListening() async {
-    /*
-    await _speechToText.listen(
-      onResult: (result) {
-        setState(() {
-          _textController.text = result.recognizedWords;
-        });
-      },
-      listenFor: const Duration(seconds: 30),
-      pauseFor: const Duration(seconds: 3),
-      partialResults: true,
-      localeId: 'en_US', // A/B test hook: could be dynamic
-    );
+    if (!_speechEnabled) return;
+    
+    try {
+      await _speechToText.listen(
+        onResult: (result) {
+          if (mounted) {
+            setState(() {
+              _textController.text = result.recognizedWords;
+            });
+          }
+        },
+        listenFor: const Duration(seconds: 30),
+        pauseFor: const Duration(seconds: 3),
+        partialResults: true,
+        localeId: 'it_IT', // Changed to Italian as default
+      );
 
-    setState(() => _isListening = true);
-    _pulseController.repeat(reverse: true);
-    widget.onVoiceStart?.call();
-    */
+      if (mounted) {
+        setState(() => _isListening = true);
+        _pulseController.repeat(reverse: true);
+        widget.onVoiceStart?.call();
+      }
+    } catch (e) {
+      debugPrint('Start listening failed: $e');
+    }
   }
 
   void _stopListening() async {
-    /*
-    await _speechToText.stop();
-    setState(() => _isListening = false);
-    _pulseController.stop();
-    widget.onVoiceStop?.call();
-    */
+    try {
+      await _speechToText.stop();
+      if (mounted) {
+        setState(() => _isListening = false);
+        _pulseController.stop();
+        widget.onVoiceStop?.call();
+      }
+    } catch (e) {
+      debugPrint('Stop listening failed: $e');
+    }
   }
 
   @override

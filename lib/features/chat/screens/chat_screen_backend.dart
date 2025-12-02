@@ -19,6 +19,7 @@ import '../providers/chat_provider.dart';
 import '../../avatar/widgets/avatar_viewer_3d.dart';
 import '../../avatar/providers/avatar_provider.dart';
 import '../../avatar/domain/models/avatar_config.dart';
+import 'package:applicazione_mental_coach/features/user/providers/user_provider.dart';
 
 /// Chat screen with full backend integration following KAIX platform flow
 class ChatScreenBackend extends ConsumerStatefulWidget {
@@ -54,6 +55,12 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     // Connect when screen initializes (if not already connected)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(chatProvider.notifier).connect();
+      
+      // Sync Avatar with User Profile
+      final user = ref.read(userProvider);
+      if (user?.avatarId != null) {
+        ref.read(avatarProvider.notifier).loadAvatarFromId(user!.avatarId!);
+      }
     });
   }
 
@@ -109,6 +116,15 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
         _scrollToBottom();
       }
     });
+    // Debug Avatar State
+    ref.listen(avatarProvider, (previous, next) {
+      debugPrint('👤 Avatar State Changed: $next');
+      if (next is AvatarStateError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Avatar Error: ${next.failure.message}')),
+        );
+      }
+    });
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
@@ -128,6 +144,25 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
                 autoRotate: false,
               ),
             ),
+            
+            // Avatar Loading Overlay
+            if (avatarState is AvatarStateDownloading || avatarState is AvatarStateLoading)
+              Container(
+                color: Colors.black.withOpacity(0.7),
+                child: const Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(color: AppColors.primary),
+                      SizedBox(height: 16),
+                      Text(
+                        "Downloading Avatar...",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
             // 2. CHAT CONTENT LAYER
             Column(

@@ -122,6 +122,34 @@ class AvatarNotifier extends StateNotifier<AvatarState> {
   Future<void> reload() async {
     await _loadAvatar();
   }
+
+  /// Load avatar based on ID (Atlas/Serena)
+  Future<void> loadAvatarFromId(String avatarId) async {
+    if (_repository == null) return;
+
+    final url = _getAvatarUrl(avatarId);
+    
+    // Check if we already have this avatar loaded
+    if (state is AvatarStateLoaded) {
+      final currentConfig = (state as AvatarStateLoaded).config;
+      if (currentConfig is AvatarConfigLoaded && currentConfig.remoteUrl == url) {
+        return; // Already loaded
+      }
+    }
+
+    await saveAvatar(url);
+  }
+
+  String _getAvatarUrl(String id) {
+    // Atlas (Male)
+    if (id == 'atlas') {
+      return 'https://models.readyplayer.me/6929b1e97b7a88e1f60a6f9e.glb?bodyType=fullbody&quality=high';
+    } 
+    // Serena (Female) - Default
+    else {
+      return 'https://models.readyplayer.me/69286d45132e61458cee2d1f.glb?bodyType=fullbody&quality=high';
+    }
+  }
 }
 
 /// Provider for avatar state
