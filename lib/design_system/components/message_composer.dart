@@ -34,7 +34,7 @@ class _MessageComposerState extends State<MessageComposer>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  final SpeechToText _speechToText = SpeechToText();
+  // final SpeechToText _speechToText = SpeechToText();
 
   bool _isListening = false;
   bool _speechEnabled = false;
@@ -92,6 +92,7 @@ class _MessageComposerState extends State<MessageComposer>
   void _initializeSpeech() async {
     if (!widget.supportsSpeech) return;
     
+    /*
     _speechEnabled = await _speechToText.initialize(
       onError: (error) {
         setState(() => _isListening = false);
@@ -105,6 +106,7 @@ class _MessageComposerState extends State<MessageComposer>
         }
       },
     );
+    */
     setState(() {});
   }
 
@@ -135,6 +137,7 @@ class _MessageComposerState extends State<MessageComposer>
   }
 
   void _startListening() async {
+    /*
     await _speechToText.listen(
       onResult: (result) {
         setState(() {
@@ -150,13 +153,16 @@ class _MessageComposerState extends State<MessageComposer>
     setState(() => _isListening = true);
     _pulseController.repeat(reverse: true);
     widget.onVoiceStart?.call();
+    */
   }
 
   void _stopListening() async {
+    /*
     await _speechToText.stop();
     setState(() => _isListening = false);
     _pulseController.stop();
     widget.onVoiceStop?.call();
+    */
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:health/health.dart';
+// import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/vendor_data_models.dart';
@@ -7,6 +7,7 @@ import '../models/vendor_data_models.dart';
 /// Core service for health data collection from various vendors
 /// Handles Apple HealthKit, Samsung Health, and other wearable integrations
 class HealthDataService {
+  /*
   static const List<HealthDataType> _healthTypes = [
     // Core metrics
     HealthDataType.HEART_RATE,
@@ -31,6 +32,7 @@ class HealthDataService {
   ];
 
   final Health _health = Health();
+  */
   late final SharedPreferences _prefs;
 
   /// Initialize service with shared preferences
@@ -48,8 +50,11 @@ class HealthDataService {
     try {
       if (!isHealthSupported) return false;
       
+      /*
       final permissions = await _health.hasPermissions(_healthTypes);
       return permissions ?? false;
+      */
+      return false;
     } catch (e) {
       return false;
     }
@@ -60,6 +65,7 @@ class HealthDataService {
     try {
       if (!isHealthSupported) return false;
       
+      /*
       final granted = await _health.requestAuthorization(_healthTypes);
       
       if (granted) {
@@ -69,6 +75,8 @@ class HealthDataService {
       }
       
       return granted;
+      */
+      return false;
     } catch (e) {
       throw Exception('Failed to request health permissions: $e');
     }
@@ -81,6 +89,7 @@ class HealthDataService {
   }) async {
     if (!Platform.isIOS) return null;
     
+    /*
     final start = startTime ?? DateTime.now().subtract(const Duration(days: 1));
     final end = endTime ?? DateTime.now();
     
@@ -97,6 +106,8 @@ class HealthDataService {
     } catch (e) {
       throw Exception('Failed to get Apple Health data: $e');
     }
+    */
+    return null;
   }
 
   /// Get Samsung Health data (Android Samsung devices only)
@@ -112,6 +123,7 @@ class HealthDataService {
   }
 
   /// Get raw health data points for specific time range
+  /*
   Future<List<HealthDataPoint>> getHealthDataPoints({
     required DateTime startTime,
     required DateTime endTime,
@@ -129,20 +141,25 @@ class HealthDataService {
       throw Exception('Failed to get health data points: $e');
     }
   }
+  */
 
   /// Get today's health data
+  /*
   Future<List<HealthDataPoint>> getTodayHealthData() async {
     final now = DateTime.now();
     final startOfDay = DateTime(now.year, now.month, now.day);
     return await getHealthDataPoints(startTime: startOfDay, endTime: now);
   }
+  */
 
   /// Get last N hours of health data
+  /*
   Future<List<HealthDataPoint>> getLastHoursData(int hours) async {
     final now = DateTime.now();
     final start = now.subtract(Duration(hours: hours));
     return await getHealthDataPoints(startTime: start, endTime: now);
   }
+  */
 
   /// Set up background delivery for health data (iOS)
   Future<bool> enableBackgroundDelivery() async {
@@ -169,6 +186,7 @@ class HealthDataService {
   }
 
   /// Check for new health data since last sync
+  /*
   Future<List<HealthDataPoint>> getNewHealthData() async {
     final lastSyncString = _prefs.getString('last_health_sync');
     final lastSync = lastSyncString != null 
@@ -185,8 +203,10 @@ class HealthDataService {
     
     return newData;
   }
+  */
 
   /// Convert Health plugin data to AppleHealthData model
+  /*
   AppleHealthData _convertToAppleHealthData(List<HealthDataPoint> data, DateTime timestamp) {
     final heartRateSamples = <HealthSample>[];
     final hrvSamples = <HealthSample>[];
@@ -300,8 +320,10 @@ class HealthDataService {
       restingHrSamples: restingHrSamples.isNotEmpty ? restingHrSamples : null,
     );
   }
+  */
 
   /// Map HealthKit sleep types to our model
+  /*
   String _mapSleepType(HealthDataType type) {
     switch (type) {
       case HealthDataType.SLEEP_IN_BED:
@@ -318,10 +340,12 @@ class HealthDataService {
         return 'unknown';
     }
   }
+  */
 
   /// Get Samsung Health data through Health Connect (Android)
   Future<SamsungHealthData?> _getSamsungThroughHealthConnect(DateTime? startTime, DateTime? endTime) async {
     try {
+      /*
       final start = startTime ?? DateTime.now().subtract(const Duration(days: 1));
       final end = endTime ?? DateTime.now();
       
@@ -334,12 +358,15 @@ class HealthDataService {
       if (healthData.isEmpty) return null;
       
       return _convertToSamsungHealthData(healthData, end);
+      */
+      return null;
     } catch (e) {
       return null; // Samsung Health not available
     }
   }
 
   /// Convert generic health data to Samsung Health format
+  /*
   SamsungHealthData _convertToSamsungHealthData(List<HealthDataPoint> data, DateTime timestamp) {
     final heartRateSamples = <HealthSample>[];
     final stressSamples = <HealthSample>[];
@@ -415,4 +442,5 @@ class HealthDataService {
       spo2Samples: spo2Samples.isNotEmpty ? spo2Samples : null,
     );
   }
+  */
 }

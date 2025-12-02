@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:health/health.dart';
+// import 'package:health/health.dart';
 
 /// Service for managing health data permissions and consent
 /// Handles granular consent management for GDPR compliance
@@ -19,6 +19,7 @@ class HealthPermissionsService {
     'respiratory_rate': 'Respiratory Rate',
   };
 
+  /*
   /// Health data types mapped to HealthKit/Health Connect types
   static const Map<String, List<HealthDataType>> _healthDataTypeMap = {
     'heart_rate': [
@@ -50,6 +51,7 @@ class HealthPermissionsService {
       HealthDataType.RESPIRATORY_RATE,
     ],
   };
+  */
 
   HealthPermissionsService(this._prefs);
 
@@ -71,6 +73,7 @@ class HealthPermissionsService {
     }
 
     try {
+      /*
       final healthTypes = _healthDataTypeMap[permission] ?? [];
       if (healthTypes.isEmpty) return false;
 
@@ -83,7 +86,7 @@ class HealthPermissionsService {
         // Android permissions
         return await _checkAndroidPermissions(permission);
       }
-      
+      */
       return false;
     } catch (e) {
       return false;
@@ -111,6 +114,7 @@ class HealthPermissionsService {
     }
 
     try {
+      /*
       final healthTypes = _healthDataTypeMap[permission] ?? [];
       if (healthTypes.isEmpty) return false;
 
@@ -126,7 +130,7 @@ class HealthPermissionsService {
       } else if (Platform.isAndroid) {
         return await _requestSpecificAndroidPermission(permission);
       }
-      
+      */
       return false;
     } catch (e) {
       return false;
@@ -251,6 +255,7 @@ class HealthPermissionsService {
 
   /// Request iOS HealthKit permissions
   Future<bool> _requestiOSPermissions() async {
+    /*
     final health = Health();
     
     // Get all health types
@@ -269,6 +274,8 @@ class HealthPermissionsService {
     }
     
     return granted;
+    */
+    return false;
   }
 
   /// Request Android permissions
@@ -288,6 +295,7 @@ class HealthPermissionsService {
     
     // Request Health Connect permissions if available
     try {
+      /*
       final health = Health();
       final allHealthTypes = <HealthDataType>[];
       for (final types in _healthDataTypeMap.values) {
@@ -303,6 +311,8 @@ class HealthPermissionsService {
       }
       
       return granted;
+      */
+      return false;
     } catch (e) {
       // Health Connect not available, use basic permissions
       return true;
@@ -312,6 +322,7 @@ class HealthPermissionsService {
   /// Check Android permissions
   Future<bool> _checkAndroidPermissions(String permission) async {
     try {
+      /*
       final healthTypes = _healthDataTypeMap[permission] ?? [];
       
       if (healthTypes.isEmpty) {
@@ -330,6 +341,8 @@ class HealthPermissionsService {
       final health = Health();
       final hasPermission = await health.hasPermissions(healthTypes);
       return hasPermission ?? false;
+      */
+      return false;
     } catch (e) {
       return false;
     }
@@ -338,6 +351,7 @@ class HealthPermissionsService {
   /// Request specific Android permission
   Future<bool> _requestSpecificAndroidPermission(String permission) async {
     try {
+      /*
       final healthTypes = _healthDataTypeMap[permission] ?? [];
       
       if (healthTypes.isEmpty) {
@@ -352,6 +366,8 @@ class HealthPermissionsService {
       }
       
       return granted;
+      */
+      return false;
     } catch (e) {
       return false;
     }

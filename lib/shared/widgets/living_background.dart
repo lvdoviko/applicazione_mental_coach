@@ -103,9 +103,11 @@ class _LivingBackgroundState extends State<LivingBackground> with TickerProvider
 
         // 4. IL SEGRETO: Blur Estremo (Mesh Effect)
         // Questo fonde le palle di colore in un'aurora liquida
+        // 4. IL SEGRETO: Blur Estremo (Mesh Effect)
+        // Questo fonde le palle di colore in un'aurora liquida
         Positioned.fill(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 100.0, sigmaY: 100.0), // Blur altissimo
+            filter: ImageFilter.blur(sigmaX: 30.0, sigmaY: 30.0), // Reduced from 100 to 30 for iOS stability
             child: Container(
               color: Colors.transparent, // Necessario per il filtro
             ),

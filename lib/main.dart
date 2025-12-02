@@ -92,6 +92,7 @@ class AIWellbeingCoachApp extends ConsumerWidget {
               // 2. GLOBAL BACKGROUND (Fixed & Persistent)
               // Now has access to MediaQuery provided by MaterialApp
               const Positioned.fill(child: LivingBackground()),
+              // const Positioned.fill(child: ColoredBox(color: Color(0xFF0D1322))),
 
               // 3. APP CONTENT (Navigator)
               Positioned.fill(child: child!),
