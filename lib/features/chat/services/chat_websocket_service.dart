@@ -126,6 +126,7 @@ class ChatWebSocketService {
         'message': text, // Updated from 'content'/'text'
         'chat_id': _currentChatId,
         'stream': true, // Required for streaming
+        'client_message_id': messageId, // Required for ACK matching
       },
     };
 
@@ -409,23 +410,44 @@ class ChatWebSocketService {
 
   /// Handle message acknowledgment from server
   void _handleMessageAck(Map<String, dynamic> payload) {
+    debugPrint('📩 ACK Payload: $payload'); // Debug log
+
     final clientMessageId = (payload['client_message_id'] ?? payload['clientMessageId'] ?? payload['message_id']) as String?;
     final serverMessageId = (payload['server_message_id'] ?? payload['serverMessageId'] ?? payload['message_id']) as String?;
 
-    if (clientMessageId != null && _pendingMessages.containsKey(clientMessageId)) {
-      // Update message status to sent
-      final message = _pendingMessages[clientMessageId]!;
-      final updatedMessage = message.copyWith(
-        status: ChatMessageStatus.sent,
-        metadata: {
-          ...message.metadata ?? {},
-          'serverMessageId': serverMessageId,
-        },
-      );
-
-      _messageController.add(updatedMessage);
-      debugPrint('Message ACK received: $clientMessageId -> $serverMessageId');
+    if (clientMessageId != null) {
+      if (_pendingMessages.containsKey(clientMessageId)) {
+        _confirmMessageSent(clientMessageId, serverMessageId);
+        debugPrint('✅ Message ACK matched: $clientMessageId -> $serverMessageId');
+      } else {
+        debugPrint('⚠️ Message ACK received for unknown ID: $clientMessageId');
+      }
+    } else {
+      // Fallback: Match with oldest pending message
+      if (_pendingMessages.isNotEmpty) {
+        final oldestClientMessageId = _pendingMessages.keys.first;
+        debugPrint('⚠️ ACK missing client ID. Matching with oldest pending: $oldestClientMessageId');
+        _confirmMessageSent(oldestClientMessageId, serverMessageId);
+      } else {
+        debugPrint('❌ Message ACK received but no pending messages found');
+      }
     }
+  }
+
+  void _confirmMessageSent(String clientMessageId, String? serverMessageId) {
+    if (!_pendingMessages.containsKey(clientMessageId)) return;
+
+    final message = _pendingMessages[clientMessageId]!;
+    final updatedMessage = message.copyWith(
+      status: ChatMessageStatus.sent,
+      metadata: {
+        ...message.metadata ?? {},
+        if (serverMessageId != null) 'serverMessageId': serverMessageId,
+      },
+    );
+
+    _messageController.add(updatedMessage);
+    _pendingMessages.remove(clientMessageId); // Remove from pending
   }
 
   /// Handle AI message generation start

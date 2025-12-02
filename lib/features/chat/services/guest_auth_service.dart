@@ -146,11 +146,21 @@ class GuestAuthService {
 
     await _guestBox!.put(_guestTokenKey, token);
     await _guestBox!.put(_guestTokenExpiryKey, expiryTime.toIso8601String());
+    await _guestBox!.put('tenant_id', AppConfig.tenantId); // Store tenant ID
   }
 
   /// Get stored guest token
   Future<String?> _getStoredGuestToken() async {
     await _ensureInitialized();
+    
+    // Check if tenant changed
+    final storedTenant = _guestBox!.get('tenant_id');
+    if (storedTenant != AppConfig.tenantId) {
+      debugPrint('🔄 Tenant changed ($storedTenant -> ${AppConfig.tenantId}), clearing session...');
+      await clearGuestSession();
+      return null;
+    }
+
     return _guestBox!.get(_guestTokenKey);
   }
 

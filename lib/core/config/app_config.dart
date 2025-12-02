@@ -18,8 +18,8 @@ class AppConfig {
   static const Duration chatTimeout = Duration(minutes: 5);
 
   // Multi-tenant Configuration
-  static const String tenantId = 'wordpress-plugin-test';
-  static const String apiKey = 'wp-test-0d809b36852247dd0e5d94673168d63444197c39da657dc8a2ca3d8546b62126';
+  static const String tenantId = 'kaix';
+  static const String apiKey = 'kaix_0o37k_mVbEkJ9c3mT_FIxn1_KZYOuvNfwlM4vYi3XuM=';
 
   // WebSocket Configuration
   static const Duration wsConnectionTimeout = Duration(seconds: 10);

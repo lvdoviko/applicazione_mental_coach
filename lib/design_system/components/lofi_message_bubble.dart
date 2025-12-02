@@ -404,9 +404,8 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
         color = AppColors.textTertiary;
         break;
       case MessageStatus.sent:
-        icon = Icons.check;
-        color = AppColors.textTertiary;
-        break;
+        // User requested no icon when sent correctly
+        return const SizedBox.shrink();
       case MessageStatus.delivered:
         icon = Icons.done_all;
         color = AppColors.textSecondary;
