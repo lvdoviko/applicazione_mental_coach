@@ -11,6 +11,7 @@ class TokenStorageService {
   static const String _jwtKey = 'jwt_token';
   static const String _refreshKey = 'refresh_token';
   static const String _expiryKey = 'jwt_expiry';
+  static const String _chatIdKey = 'chat_id';
   
   Box<String>? _secureBox;
   HiveAesCipher? _encryptionCipher;
@@ -41,11 +42,23 @@ class TokenStorageService {
       await _secureBox!.put(_expiryKey, jwtExpiry.toIso8601String());
     }
   }
+
+  /// Store persistent chat ID
+  Future<void> storeChatId(String chatId) async {
+    await _ensureInitialized();
+    await _secureBox!.put(_chatIdKey, chatId);
+  }
   
   /// Get stored JWT token
   Future<String?> getJwtToken() async {
     await _ensureInitialized();
     return _secureBox!.get(_jwtKey);
+  }
+
+  /// Get stored chat ID
+  Future<String?> getChatId() async {
+    await _ensureInitialized();
+    return _secureBox!.get(_chatIdKey);
   }
   
   /// Get stored refresh token
@@ -72,6 +85,7 @@ class TokenStorageService {
     await _secureBox!.delete(_jwtKey);
     await _secureBox!.delete(_refreshKey);
     await _secureBox!.delete(_expiryKey);
+    await _secureBox!.delete(_chatIdKey);
   }
   
   /// Check if user has valid authentication

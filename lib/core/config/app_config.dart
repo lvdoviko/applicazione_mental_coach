@@ -12,8 +12,8 @@ class AppConfig {
   static const bool enableCrashReporting = false; // Privacy-first default
   
   // API Configuration - MIP Technologies Backend
-  static const String baseUrl = 'https://api.miptechnologies.tech/api';
-  static const String wsUrl = 'wss://api.miptechnologies.tech/api/v1/ws/chat';
+  static const String baseUrl = 'https://api.miptechnologies.tech';
+  static const String wsUrl = 'wss://api.miptechnologies.tech/api/v1/ws/chat?tenant_id=kaix';
   static const Duration requestTimeout = Duration(seconds: 30);
   static const Duration chatTimeout = Duration(minutes: 5);
 

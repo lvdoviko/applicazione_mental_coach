@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
+import 'package:uuid/uuid.dart';
 import '../models/chat_message.dart';
 import '../services/chat_websocket_service.dart';
-import '../services/guest_auth_service.dart';
 import '../services/offline_fallback_engine.dart';
 import '../../../core/services/connectivity_service.dart';
 import '../../../core/security/token_storage_service.dart';
-import '../../../core/api/secure_api_client.dart';
 
 // --- State Class ---
+
 class ChatState {
   final List<ChatMessage> messages;
   final ChatConnectionStatus connectionStatus;
@@ -47,9 +48,9 @@ class ChatState {
 }
 
 // --- Notifier Class ---
+
 class ChatNotifier extends StateNotifier<ChatState> {
   final ChatWebSocketService _chatService;
-  final GuestAuthService _authService;
   final TokenStorageService _tokenStorage;
   final OfflineFallbackEngine _offlineEngine;
   
@@ -59,11 +60,9 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
   ChatNotifier({
     required ChatWebSocketService chatService,
-    required GuestAuthService authService,
     required TokenStorageService tokenStorage,
     required OfflineFallbackEngine offlineEngine,
   })  : _chatService = chatService,
-        _authService = authService,
         _tokenStorage = tokenStorage,
         _offlineEngine = offlineEngine,
         super(const ChatState()) {
@@ -93,28 +92,31 @@ class ChatNotifier extends StateNotifier<ChatState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // 1. Check/Get Token
-      // Note: TokenStorageService stores 'jwt_token' but we need 'websocket_token'
-      // For now we'll assume they are handled via GuestAuthService which caches internally
+      // 1. Get or Generate Chat ID (Persistence)
+      String? chatId = await _tokenStorage.getChatId();
       
-      // Check if we have a valid guest session
-      final authResult = await _authService.authenticateAsGuest();
-      
-      if (authResult.sessionToken.isNotEmpty) {
-        // 2. Connect WebSocket
-        // Connect using the session ID if available to resume session
-        _chatService.connect(sessionId: authResult.guestId); // Using guestId as session/user identifier context if needed, or let service handle it
-        
-        // 3. Add welcome message if empty
-        if (state.messages.isEmpty) {
-          _addWelcomeMessage(authResult.guestId);
-        }
+      if (chatId == null || chatId.startsWith('kaix-')) {
+        // Generate new persistent chat ID (UUID v4)
+        // BACKEND SPEC: Must be UUID v4, not timestamp based
+        chatId = const Uuid().v4();
+        await _tokenStorage.storeChatId(chatId);
+        debugPrint('🆕 Generated new persistent chat_id (UUID v4): $chatId');
+
+        // Add welcome message for new chats
+        _addWelcomeMessage(chatId);
       } else {
-        state = state.copyWith(
-          error: 'Authentication failed',
-          isLoading: false,
-        );
-      }
+        debugPrint('💾 Loaded persistent chat_id: $chatId');
+        // If we have no messages in memory (fresh start), show welcome message
+        if (state.messages.isEmpty) {
+          _addWelcomeMessage(chatId);
+        }
+      }    
+      // Update state with chat ID
+      state = state.copyWith(currentChatId: chatId);
+
+      // 2. Connect WebSocket with Chat ID
+      await _chatService.connect(savedChatId: chatId);
+      
     } catch (e) {
       state = state.copyWith(
         error: e.toString(),
@@ -128,6 +130,15 @@ class ChatNotifier extends StateNotifier<ChatState> {
     if (message.type == ChatMessageType.system && message.metadata?['typing'] == true) {
       state = state.copyWith(isTyping: true);
       return;
+    }
+
+    // Handle chat_joined event to persist ID
+    if (message.metadata?['type'] == 'chat_joined') {
+      final newChatId = message.metadata!['chat_id'] as String;
+      _tokenStorage.storeChatId(newChatId);
+      state = state.copyWith(currentChatId: newChatId);
+      debugPrint('💾 Persisted new chat_id from server: $newChatId');
+      return; // Internal event, don't show
     }
 
     final existingIndex = state.messages.indexWhere((m) => m.id == message.id);
@@ -229,14 +240,8 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
 // --- Providers ---
 
-final guestAuthServiceProvider = Provider<GuestAuthService>((ref) {
-  return GuestAuthService();
-});
-
 final chatServiceProvider = Provider<ChatWebSocketService>((ref) {
-  return ChatWebSocketService(
-    guestAuthService: ref.watch(guestAuthServiceProvider),
-  );
+  return ChatWebSocketService(Dio());
 });
 
 final tokenStorageProvider = Provider<TokenStorageService>((ref) {
@@ -256,7 +261,6 @@ final offlineEngineProvider = Provider<OfflineFallbackEngine>((ref) {
 final chatProvider = StateNotifierProvider<ChatNotifier, ChatState>((ref) {
   return ChatNotifier(
     chatService: ref.watch(chatServiceProvider),
-    authService: ref.watch(guestAuthServiceProvider),
     tokenStorage: ref.watch(tokenStorageProvider),
     offlineEngine: ref.watch(offlineEngineProvider),
   );
