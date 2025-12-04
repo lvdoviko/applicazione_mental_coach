@@ -31,9 +31,27 @@ class AvatarEngine extends ChangeNotifier {
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setBackgroundColor(const Color(0x00000000))
-        ..setOnConsoleMessage((message) {
-           debugPrint('WebView Console: ${message.message}');
-        });
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageFinished: (String url) {
+              debugPrint('📦 [AvatarEngine] Page Loaded: $url');
+            },
+            onWebResourceError: (WebResourceError error) {
+              debugPrint('❌ [AvatarEngine] Web Resource Error: ${error.description}');
+            },
+          ),
+        )
+        ..addJavaScriptChannel(
+          'AvatarLoadChannel',
+          onMessageReceived: (JavaScriptMessage message) {
+            if (message.message == 'loaded') {
+              debugPrint("✅ [AvatarEngine] JS Signal: Avatar Loaded");
+              if (!_avatarLoadedCompleter.isCompleted) {
+                _avatarLoadedCompleter.complete();
+              }
+            }
+          },
+        );
 
       _isInitialized = true;
       notifyListeners(); // Notify listeners that controller is ready
@@ -47,12 +65,20 @@ class AvatarEngine extends ChangeNotifier {
     }
   }
 
+  Completer<void> _avatarLoadedCompleter = Completer<void>();
+
+  /// Wait for the Avatar to be visually loaded in the WebView
+  Future<void> waitForAvatarLoad() => _avatarLoadedCompleter.future;
+
   /// Load the Avatar and Background into the WebView
   Future<void> loadContent({
     required String? avatarUrl,
     required String animationAsset, // e.g., 'assets/animations/idle.glb'
   }) async {
     if (_controller == null || _server == null) return;
+
+    // Reset completer for new load
+    _avatarLoadedCompleter = Completer<void>();
 
     try {
       final port = _server!.port;
@@ -128,11 +154,19 @@ class AvatarEngine extends ChangeNotifier {
             
             viewer.addEventListener('load', () => {
               console.log("✅ Avatar Online Caricato.");
+              // Notify Flutter
+              if (window.AvatarLoadChannel) {
+                window.AvatarLoadChannel.postMessage('loaded');
+              }
             });
 
             viewer.addEventListener('error', (e) => {
               console.log("❌ MODEL ERROR: " + JSON.stringify(e.detail));
               viewer.style.display = 'none';
+              // Also complete on error to avoid hanging
+              if (window.AvatarLoadChannel) {
+                window.AvatarLoadChannel.postMessage('loaded'); 
+              }
             });
           </script>
         </body>
@@ -144,6 +178,10 @@ class AvatarEngine extends ChangeNotifier {
 
     } catch (e) {
       debugPrint("❌ [AvatarEngine] Load Content Error: $e");
+      // Ensure we don't hang if something catastrophic happens
+      if (!_avatarLoadedCompleter.isCompleted) {
+        _avatarLoadedCompleter.complete();
+      }
     }
   }
 

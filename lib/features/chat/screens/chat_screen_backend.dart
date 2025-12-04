@@ -58,7 +58,16 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       
       // Sync Avatar with User Profile
       final user = ref.read(userProvider);
-      if (user?.avatarId != null) {
+      final avatarState = ref.read(avatarProvider);
+      
+      // Only load if we don't have a loaded avatar and we are not currently downloading/loading
+      final hasLoadedAvatar = avatarState is AvatarStateLoaded && 
+                              avatarState.config is AvatarConfigLoaded;
+      
+      if (!hasLoadedAvatar && 
+          avatarState is! AvatarStateDownloading && 
+          avatarState is! AvatarStateLoading &&
+          user?.avatarId != null) {
         ref.read(avatarProvider.notifier).loadAvatarFromId(user!.avatarId!);
       }
     });

@@ -159,6 +159,15 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
         avatarUrl: avatarUrl, 
         animationAsset: 'assets/animations/idle.glb'
       );
+      
+      // Wait for JS Signal (max 10 seconds)
+      try {
+        await engine.waitForAvatarLoad().timeout(const Duration(seconds: 10));
+        print('✅ Avatar Visually Ready (JS Signal Received)');
+      } catch (e) {
+        print('⚠️ Avatar Load Timeout (Proceeding anyway)');
+      }
+      
       print('✅ Avatar Engine Warmed Up');
     }
   }
