@@ -9,12 +9,14 @@ class LoadingStep extends StatefulWidget {
   final VoidCallback onFinished;
   final String userName;
   final String coachName;
+  final Future<void>? initializationFuture; // New parameter
 
   const LoadingStep({
     super.key,
     required this.onFinished,
     required this.userName,
     required this.coachName,
+    this.initializationFuture,
   });
 
   @override
@@ -47,14 +49,22 @@ class _LoadingStepState extends State<LoadingStep> {
   }
 
   void _startLoadingSequence() {
-    _textTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    _textTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       if (_currentTextIndex < _loadingTexts.length - 1) {
         setState(() {
           _currentTextIndex++;
         });
       } else {
         timer.cancel();
-        Future.delayed(const Duration(seconds: 1), widget.onFinished);
+        
+        // Wait for initialization to complete if provided
+        if (widget.initializationFuture != null) {
+          await widget.initializationFuture;
+        }
+        
+        if (mounted) {
+          Future.delayed(const Duration(seconds: 1), widget.onFinished);
+        }
       }
     });
   }

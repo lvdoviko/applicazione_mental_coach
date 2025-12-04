@@ -13,6 +13,11 @@ import 'package:applicazione_mental_coach/features/user/providers/user_provider.
 import 'package:applicazione_mental_coach/core/providers/locale_provider.dart';
 import 'package:applicazione_mental_coach/shared/widgets/living_background.dart';
 import 'package:applicazione_mental_coach/features/avatar/providers/avatar_provider.dart';
+import 'package:applicazione_mental_coach/features/avatar/providers/avatar_provider.dart';
+import 'package:applicazione_mental_coach/features/chat/providers/chat_provider.dart';
+import 'package:applicazione_mental_coach/features/avatar/services/avatar_engine.dart'; // Import AvatarEngine
+import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart'; // Import AvatarConfigLoaded
+import 'package:webview_flutter/webview_flutter.dart'; // Import WebViewWidget
 
 class OnboardingFlow extends ConsumerStatefulWidget {
   const OnboardingFlow({super.key});
@@ -31,6 +36,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   final TextEditingController _ageController = TextEditingController();
   String? _selectedGender;
   String? _selectedAvatarId;
+  Future<void>? _initializationFuture; // Store the future
 
   @override
   void dispose() {
@@ -87,12 +93,15 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   }
 
   void _handleAvatarNext() {
-    // Navigate to loading step
+    // Start initialization when moving to loading step
+    _initializationFuture = _initializeBackend();
     _nextPage();
   }
 
-  Future<void> _handleLoadingFinished() async {
-    // Save all data
+  Future<void> _initializeBackend() async {
+    print('🚀 Starting Backend Initialization...');
+    
+    // 1. Save User Data
     await ref.read(userProvider.notifier).updateUser(
       name: _nameController.text,
       age: int.tryParse(_ageController.text),
@@ -101,14 +110,60 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       isOnboardingCompleted: true,
       avatarId: _selectedAvatarId,
     );
+    print('✅ User data saved.');
 
-    // Pre-load the selected avatar
-    if (_selectedAvatarId != null) {
-      await ref.read(avatarProvider.notifier).loadAvatarFromId(_selectedAvatarId!);
+    // 2. Start Parallel Initialization
+    await Future.wait([
+      // A. Connect WebSocket
+      ref.read(chatProvider.notifier).connect().then((_) => print('✅ WebSocket Connected')),
+      
+      // B. Pre-load Avatar & Initialize Engine
+      _initializeAvatarEngine(),
+
+      // C. Pre-cache Background Image
+      precacheImage(const AssetImage('assets/images/sfondo_chat.png'), context).then((_) => print('✅ Background Cached')),
+    ]);
+    
+    print('🚀 Backend Initialization Complete!');
+  }
+
+  Future<void> _initializeAvatarEngine() async {
+    if (_selectedAvatarId == null) return;
+
+    // 1. Download Avatar (if needed)
+    await ref.read(avatarProvider.notifier).loadAvatarFromId(_selectedAvatarId!);
+    print('✅ Avatar Downloaded');
+
+    // 2. Initialize Engine & Load Content
+    final engine = ref.read(avatarEngineProvider);
+    await engine.initialize();
+    
+    // 3. Get URL (Robust Fallback)
+    String? avatarUrl;
+    final avatarState = ref.read(avatarProvider);
+    
+    if (avatarState is AvatarStateLoaded && avatarState.config is AvatarConfigLoaded) {
+      avatarUrl = (avatarState.config as AvatarConfigLoaded).remoteUrl;
+    } else {
+      // Fallback: Manually determine URL if state isn't ready yet
+      if (_selectedAvatarId == 'atlas') {
+        avatarUrl = 'https://models.readyplayer.me/6929b1e97b7a88e1f60a6f9e.glb?bodyType=fullbody&quality=high';
+      } else {
+        avatarUrl = 'https://models.readyplayer.me/69286d45132e61458cee2d1f.glb?bodyType=fullbody&quality=high';
+      }
+      print('⚠️ Using Fallback URL for Avatar Engine');
     }
 
-    print('User data saved.');
+    if (avatarUrl != null) {
+      await engine.loadContent(
+        avatarUrl: avatarUrl, 
+        animationAsset: 'assets/animations/idle.glb'
+      );
+      print('✅ Avatar Engine Warmed Up');
+    }
+  }
 
+  void _handleLoadingFinished() {
     try {
       AppRoute.chat.go(context);
     } catch (e) {
@@ -118,61 +173,76 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
 
   @override
   Widget build(BuildContext context) {
+    final engine = ref.watch(avatarEngineProvider);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
-      body: SafeArea(
-        top: true,
-        bottom: false, // Allow content to extend to the bottom (fix for raised buttons)
-        child: Column(
-          children: [
-            // Main Content
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                children: [
-                  LanguageStep(
-                    onLanguageSelected: _handleLanguageSelected,
-                    selectedLocale: _selectedLocale,
-                  ),
-                  WelcomeStep(
-                    onNext: _nextPage,
-                    onBack: _previousPage,
-                  ),
-                  UserDetailsStep(
-                    nameController: _nameController,
-                    ageController: _ageController,
-                    selectedGender: _selectedGender,
-                    onGenderChanged: (value) {
+      body: Stack(
+        children: [
+          // Hidden WebView to warm up the engine
+          // Required on iOS: loadHtmlString hangs if controller is not attached to a view
+          if (engine.controller != null)
+            Offstage(
+              offstage: true,
+              child: WebViewWidget(controller: engine.controller!),
+            ),
+
+          SafeArea(
+            top: true,
+            bottom: false, // Allow content to extend to the bottom (fix for raised buttons)
+            child: Column(
+              children: [
+                // Main Content
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (index) {
                       setState(() {
-                        _selectedGender = value;
+                        _currentPage = index;
                       });
                     },
-                    onNext: _handleUserDetailsNext,
-                    onBack: _previousPage, 
+                    children: [
+                      LanguageStep(
+                        onLanguageSelected: _handleLanguageSelected,
+                        selectedLocale: _selectedLocale,
+                      ),
+                      WelcomeStep(
+                        onNext: _nextPage,
+                        onBack: _previousPage,
+                      ),
+                      UserDetailsStep(
+                        nameController: _nameController,
+                        ageController: _ageController,
+                        selectedGender: _selectedGender,
+                        onGenderChanged: (value) {
+                          setState(() {
+                            _selectedGender = value;
+                          });
+                        },
+                        onNext: _handleUserDetailsNext,
+                        onBack: _previousPage, 
+                      ),
+                      AvatarSelectionStep(
+                        selectedAvatarId: _selectedAvatarId,
+                        onAvatarSelected: _handleAvatarSelected,
+                        onNext: _handleAvatarNext,
+                        onBack: _previousPage,
+                      ),
+                      LoadingStep(
+                        onFinished: _handleLoadingFinished,
+                        userName: _nameController.text,
+                        coachName: _selectedAvatarId == 'atlas' ? 'Atlas' : 'Serena',
+                        initializationFuture: _initializationFuture, // Pass the future
+                      ),
+                    ],
                   ),
-                  AvatarSelectionStep(
-                    selectedAvatarId: _selectedAvatarId,
-                    onAvatarSelected: _handleAvatarSelected,
-                    onNext: _handleAvatarNext,
-                    onBack: _previousPage,
-                  ),
-                  LoadingStep(
-                    onFinished: _handleLoadingFinished,
-                    userName: _nameController.text,
-                    coachName: _selectedAvatarId == 'atlas' ? 'Atlas' : 'Serena',
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
