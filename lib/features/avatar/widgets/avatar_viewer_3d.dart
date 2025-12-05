@@ -47,12 +47,36 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
   bool _isLoading = true;
   bool _hasError = false;
   String? _errorMessage;
+  late Key _webViewKey; // Stable key for this session
 
   @override
   void initState() {
     super.initState();
-    // No need to verify file locally in hybrid mode, engine handles it
+    // Generate key ONCE when screen opens
+    _webViewKey = UniqueKey(); 
+    
+    // ONE-TIME REFRESH (Android Only): 
+    // Wait for screen to stabilize, then force ONE recreation to fix black screen.
+    if (Platform.isAndroid) {
+      _scheduleAndroidRefresh();
+    }
+    
+    // Initialize engine immediately (Standard behavior)
     _checkEngineStatus();
+  }
+
+  void _scheduleAndroidRefresh() async {
+    // Wait for transition to complete + buffer
+    await Future.delayed(const Duration(milliseconds: 1000));
+    if (!mounted) return;
+
+    // FORCE RECREATION: This fixes the black screen/glitch
+    setState(() {
+      _webViewKey = UniqueKey(); 
+    });
+    
+    // Reload content into the new view
+    _updateContent();
   }
 
   void _checkEngineStatus() {
@@ -135,7 +159,7 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
         ? Container(
             color: Colors.transparent,
             child: WebViewWidget(
-              key: UniqueKey(), // Force recreation on Android
+              key: _webViewKey, // Use stable key (updated once by refresh)
               controller: engine.controller!
             ),
           )

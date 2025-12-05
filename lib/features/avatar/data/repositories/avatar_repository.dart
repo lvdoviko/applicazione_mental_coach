@@ -22,7 +22,7 @@ class AvatarRepository {
   final SharedPreferences _prefs;
   
   static const String _avatarConfigKey = 'avatar_config';
-  static const String _avatarFileName = 'coach.glb';
+  // static const String _avatarFileName = 'coach.glb'; // Removed for cache busting
   static const int _maxRetries = 3;
 
   AvatarRepository({
@@ -76,7 +76,11 @@ class AvatarRepository {
     try {
       // Get local storage directory
       final directory = await _getAvatarDirectory();
-      final localPath = '${directory.path}/$_avatarFileName';
+      
+      // CACHE BUSTING: Use unique filename based on URL hash
+      // This ensures WebView reloads the model when avatar changes
+      final fileName = 'avatar_${remoteUrl.hashCode}.glb';
+      final localPath = '${directory.path}/$fileName';
 
       // Append query parameters for optimization
       // NUCLEAR OPTION: Force HIGH quality.

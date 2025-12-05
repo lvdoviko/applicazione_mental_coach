@@ -60,14 +60,11 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       final user = ref.read(userProvider);
       final avatarState = ref.read(avatarProvider);
       
-      // Only load if we don't have a loaded avatar and we are not currently downloading/loading
-      final hasLoadedAvatar = avatarState is AvatarStateLoaded && 
-                              avatarState.config is AvatarConfigLoaded;
-      
-      if (!hasLoadedAvatar && 
+      // ALWAYS check and load the correct avatar based on User Profile
+      // The provider handles deduplication (skipping if URL matches)
+      if (user?.avatarId != null && 
           avatarState is! AvatarStateDownloading && 
-          avatarState is! AvatarStateLoading &&
-          user?.avatarId != null) {
+          avatarState is! AvatarStateLoading) {
         ref.read(avatarProvider.notifier).loadAvatarFromId(user!.avatarId!);
       }
     });
@@ -132,6 +129,14 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Avatar Error: ${next.failure.message}')),
         );
+      }
+    });
+
+    // Listen for User Profile changes (e.g. Avatar switch)
+    ref.listen(userProvider, (previous, next) {
+      if (next?.avatarId != null && next?.avatarId != previous?.avatarId) {
+        debugPrint('👤 User changed avatar to: ${next!.avatarId}');
+        ref.read(avatarProvider.notifier).loadAvatarFromId(next.avatarId!);
       }
     });
 
