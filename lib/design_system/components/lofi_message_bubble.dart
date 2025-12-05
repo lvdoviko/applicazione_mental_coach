@@ -134,6 +134,7 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
 
   @override
   Widget build(BuildContext context) {
+    // debugPrint('💬 [Bubble] Building: ${widget.message.length} chars');
     if (widget.isAnimated) {
       return FadeTransition(
         opacity: _fadeAnimation,

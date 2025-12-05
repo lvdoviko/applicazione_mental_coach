@@ -170,6 +170,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
     final userMessage = ChatMessage.user(
       text.trim(),
       sessionId: _chatService.currentSessionId,
+      status: ChatMessageStatus.sending,
     );
 
     // Optimistic update
@@ -178,15 +179,39 @@ class ChatNotifier extends StateNotifier<ChatState> {
     );
 
     try {
-      _chatService.sendMessage(
+      await _chatService.sendMessage(
         text,
         clientMessageId: userMessage.id,
       );
+      
+      // Update status to sent
+      final sentMessage = userMessage.copyWith(status: ChatMessageStatus.sent);
+      _updateMessage(sentMessage);
+      
     } catch (e) {
-      // Handle error (maybe mark message as failed)
+      // Handle error
       final failedMessage = userMessage.copyWith(status: ChatMessageStatus.error);
-      _handleIncomingMessage(failedMessage);
+      _updateMessage(failedMessage);
     }
+  }
+
+  void _updateMessage(ChatMessage updatedMessage) {
+    state = state.copyWith(
+      messages: state.messages.map((m) {
+        return m.id == updatedMessage.id ? updatedMessage : m;
+      }).toList(),
+    );
+  }
+
+  // --- Welcome Message Coordination ---
+  bool _isAvatarLoaded = false;
+  bool _isWelcomeMessagePending = false;
+  String? _pendingWelcomeText;
+  ChatMessage? _pendingWelcomeMessage;
+
+  void notifyAvatarLoaded() {
+    _isAvatarLoaded = true;
+    _tryStartWelcomeStream();
   }
 
   void _addWelcomeMessage(String? sessionId) {
@@ -199,13 +224,32 @@ class ChatNotifier extends StateNotifier<ChatState> {
       metadata: const {'welcome_message': true},
     );
     
-    state = state.copyWith(messages: [initialMessage]);
+    // Add initial empty message safely
+    state = state.copyWith(messages: [...state.messages, initialMessage]);
 
-    // Simulate streaming
-    int currentIndex = 0;
-    const chunkSize = 2; // Characters per tick
+    // Setup pending stream
+    _isWelcomeMessagePending = true;
+    _pendingWelcomeText = fullText;
+    _pendingWelcomeMessage = initialMessage;
     
-    Timer.periodic(const Duration(milliseconds: 30), (timer) {
+    // Try to start if avatar is already ready
+    _tryStartWelcomeStream();
+  }
+
+  void _tryStartWelcomeStream() {
+    if (!_isWelcomeMessagePending || !_isAvatarLoaded || _pendingWelcomeMessage == null) {
+      return;
+    }
+
+    _isWelcomeMessagePending = false; // Prevent double start
+    
+    final fullText = _pendingWelcomeText!;
+    final initialMessage = _pendingWelcomeMessage!;
+    
+    int currentIndex = 0;
+    const chunkSize = 1; 
+    
+    Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
@@ -215,12 +259,11 @@ class ChatNotifier extends StateNotifier<ChatState> {
         final endIndex = (currentIndex + chunkSize).clamp(0, fullText.length);
         final currentChunk = fullText.substring(0, endIndex);
         
-        // Update message
         final updatedMessage = initialMessage.copyWith(
           text: currentChunk,
         );
         
-        state = state.copyWith(messages: [updatedMessage]);
+        _updateMessage(updatedMessage);
         currentIndex += chunkSize;
       } else {
         timer.cancel();

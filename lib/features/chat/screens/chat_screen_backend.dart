@@ -116,6 +116,13 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
       _ => const AvatarConfigEmpty(),
     };
 
+    // Notify ChatProvider when Avatar is ready to receive the welcome stream
+    if (avatarState is AvatarStateLoaded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(chatProvider.notifier).notifyAvatarLoaded();
+      });
+    }
+
     // Auto-scroll on new messages
     ref.listen(chatProvider, (previous, next) {
       if (previous?.messages.length != next.messages.length) {
@@ -124,7 +131,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     });
     // Debug Avatar State
     ref.listen(avatarProvider, (previous, next) {
-      debugPrint('👤 Avatar State Changed: $next');
+      // debugPrint('👤 Avatar State Changed: $next'); // Removed to prevent spam
       if (next is AvatarStateError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Avatar Error: ${next.failure.message}')),
@@ -410,6 +417,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
         final message = messages[messages.length - 1 - index];
         
         return LoFiMessageBubble(
+          key: ValueKey('${message.id}_${message.displayText.length}'), // FORCE REBUILD on text change
           message: message.displayText,
           type: _mapMessageType(message.type),
           timestamp: message.timestamp,
