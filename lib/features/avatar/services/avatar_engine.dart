@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+// Import for Android specific features
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Service responsible for managing the 3D Avatar WebView and Local Server.
@@ -28,13 +30,28 @@ class AvatarEngine extends ChangeNotifier {
       if (_server == null) throw Exception("Server failed to start");
 
       // 2. Initialize Controller
-      _controller = WebViewController()
+      final WebViewController controller = WebViewController();
+      
+      // Android-specific configuration
+      if (Platform.isAndroid) {
+        // Enable debugging for Android WebView
+        AndroidWebViewController.enableDebugging(true);
+        
+        // Set media playback policy
+        (controller.platform as AndroidWebViewController)
+            .setMediaPlaybackRequiresUserGesture(false);
+      }
+
+      controller
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setBackgroundColor(const Color(0x00000000))
         ..setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (String url) {
               debugPrint('📦 [AvatarEngine] Page Loaded: $url');
+              // Force transparency via JS
+              controller.runJavaScript('document.body.style.backgroundColor = "transparent";');
+              controller.runJavaScript('document.body.parentElement.style.backgroundColor = "transparent";');
             },
             onWebResourceError: (WebResourceError error) {
               debugPrint('❌ [AvatarEngine] Web Resource Error: ${error.description}');
@@ -52,6 +69,8 @@ class AvatarEngine extends ChangeNotifier {
             }
           },
         );
+
+      _controller = controller;
 
       _isInitialized = true;
       notifyListeners(); // Notify listeners that controller is ready
@@ -96,7 +115,7 @@ class AvatarEngine extends ChangeNotifier {
         <head>
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <style>
-          html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: transparent; }
+          html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: transparent !important; }
           
           .background-image {
             position: absolute;
@@ -117,9 +136,9 @@ class AvatarEngine extends ChangeNotifier {
             left: 0;
             width: 100%; 
             height: 100%; 
-            background-color: transparent;
+            background-color: transparent !important;
             z-index: 1; 
-            --poster-color: transparent;
+            --poster-color: transparent !important;
           }
         </style>
           <script type="module" src="http://127.0.0.1:$port/model-viewer.min.js"></script>

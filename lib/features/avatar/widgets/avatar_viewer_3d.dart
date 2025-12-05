@@ -132,7 +132,13 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
       width: widget.width ?? double.infinity,
       height: widget.height ?? double.infinity,
       child: engine.controller != null 
-        ? WebViewWidget(controller: engine.controller!)
+        ? Container(
+            color: Colors.transparent,
+            child: WebViewWidget(
+              key: UniqueKey(), // Force recreation on Android
+              controller: engine.controller!
+            ),
+          )
         : const SizedBox(),
     );
   }
