@@ -12,6 +12,8 @@ import 'package:applicazione_mental_coach/features/avatar/widgets/rpm_avatar_cre
 import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart';
 import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
 import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
+import 'package:applicazione_mental_coach/features/avatar/screens/coach_selection_screen.dart'; // Import new screen
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart'; // Import localizations
 
 /// Avatar Screen - Manage 3D Coach Avatar
 /// 
@@ -169,10 +171,10 @@ class AvatarScreen extends ConsumerWidget {
         ],
       ),
       child: ElevatedButton.icon(
-        onPressed: () => _openAvatarCreator(context),
-        icon: const Icon(Icons.checkroom, color: Colors.white),
+        onPressed: () => _openCoachSelection(context), // Changed to open selection
+        icon: const Icon(Icons.people_alt_outlined, color: Colors.white), // Changed icon
         label: Text(
-          'Customize Look',
+          AppLocalizations.of(context)!.yourCoaches, // Localized text
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w600,
@@ -386,6 +388,16 @@ class AvatarScreen extends ConsumerWidget {
     }
   }
 
+  void _openCoachSelection(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const CoachSelectionScreen(),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
+  // Kept for reference or future use, but currently unused by the main button
   void _openAvatarCreator(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(

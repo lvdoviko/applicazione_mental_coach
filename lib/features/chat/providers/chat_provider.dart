@@ -86,8 +86,15 @@ class ChatNotifier extends StateNotifier<ChatState> {
     });
   }
 
-  Future<void> connect() async {
-    if (state.connectionStatus == ChatConnectionStatus.connected) return;
+  Future<void> connect({String? welcomeMessageText}) async {
+    // If already connected, check if we need to inject the welcome message
+    if (state.connectionStatus == ChatConnectionStatus.connected) {
+      if (welcomeMessageText != null && state.messages.isEmpty) {
+        debugPrint('⚠️ Already connected, but welcome message missing. Injecting now.');
+        _addWelcomeMessage(state.currentChatId, welcomeMessageText);
+      }
+      return;
+    }
 
     state = state.copyWith(isLoading: true, error: null);
 
@@ -103,12 +110,15 @@ class ChatNotifier extends StateNotifier<ChatState> {
         debugPrint('🆕 Generated new persistent chat_id (UUID v4): $chatId');
 
         // Add welcome message for new chats
-        _addWelcomeMessage(chatId);
+        if (welcomeMessageText != null) {
+          _addWelcomeMessage(chatId, welcomeMessageText);
+        }
       } else {
         debugPrint('💾 Loaded persistent chat_id: $chatId');
         // If we have no messages in memory (fresh start), show welcome message
-        if (state.messages.isEmpty) {
-          _addWelcomeMessage(chatId);
+        debugPrint('🔍 Checking welcome message conditions. Messages: ${state.messages.length}, Text: $welcomeMessageText');
+        if (state.messages.isEmpty && welcomeMessageText != null) {
+          _addWelcomeMessage(chatId, welcomeMessageText);
         }
       }    
       // Update state with chat ID
@@ -203,20 +213,40 @@ class ChatNotifier extends StateNotifier<ChatState> {
     );
   }
 
-  // --- Welcome Message Coordination ---
+  void clearMessages() {
+    state = state.copyWith(messages: []);
+  }
+
+  Future<void> resetChat({String? welcomeMessageText}) async {
+    // 1. Clear local messages
+    state = state.copyWith(messages: []);
+    
+    // 2. Generate new Chat ID for fresh session
+    final newChatId = const Uuid().v4();
+    await _tokenStorage.storeChatId(newChatId);
+    state = state.copyWith(currentChatId: newChatId);
+    
+    debugPrint('🔄 Chat Reset. New Chat ID: $newChatId');
+    
+    // 3. Reconnect with new ID (Force disconnect first)
+    await _chatService.disconnect();
+    
+    // 4. Connect and inject welcome message
+    await connect(welcomeMessageText: welcomeMessageText);
+  }
   bool _isAvatarLoaded = false;
   bool _isWelcomeMessagePending = false;
   String? _pendingWelcomeText;
   ChatMessage? _pendingWelcomeMessage;
 
   void notifyAvatarLoaded() {
+    debugPrint('📢 notifyAvatarLoaded called. _isWelcomeMessagePending: $_isWelcomeMessagePending');
     _isAvatarLoaded = true;
     _tryStartWelcomeStream();
   }
 
-  void _addWelcomeMessage(String? sessionId) {
-    const fullText = 'Ciao! Sono il tuo Mental Performance Coach. Sono qui per ottimizzare il tuo mindset. Come ti senti oggi?';
-    
+  void _addWelcomeMessage(String? sessionId, String text) {
+    debugPrint('➕ _addWelcomeMessage called with text: "$text"');
     // Create initial empty message
     final initialMessage = ChatMessage.ai(
       '',
@@ -229,7 +259,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
 
     // Setup pending stream
     _isWelcomeMessagePending = true;
-    _pendingWelcomeText = fullText;
+    _pendingWelcomeText = text;
     _pendingWelcomeMessage = initialMessage;
     
     // Try to start if avatar is already ready
@@ -237,41 +267,43 @@ class ChatNotifier extends StateNotifier<ChatState> {
   }
 
   void _tryStartWelcomeStream() {
-    if (!_isWelcomeMessagePending || !_isAvatarLoaded || _pendingWelcomeMessage == null) {
-      return;
+    debugPrint('🔄 _tryStartWelcomeStream. Pending: $_isWelcomeMessagePending, AvatarLoaded: $_isAvatarLoaded');
+    
+    if (_isWelcomeMessagePending && _isAvatarLoaded && _pendingWelcomeText != null && _pendingWelcomeMessage != null) {
+      debugPrint('🚀 Starting Welcome Stream!');
+      _isWelcomeMessagePending = false; // Prevent double start
+      
+      // Start streaming
+      int currentIndex = 0;
+      final fullText = _pendingWelcomeText!;
+      final messageId = _pendingWelcomeMessage!.id;
+      
+      // Use a timer to stream characters
+      Timer.periodic(const Duration(milliseconds: 50), (timer) {
+        if (!mounted) {
+          timer.cancel();
+          return;
+        }
+        if (currentIndex < fullText.length) {
+          currentIndex++;
+          final currentText = fullText.substring(0, currentIndex);
+          
+          // Update message in state
+          state = state.copyWith(
+            messages: state.messages.map((m) {
+              if (m.id == messageId) {
+                return m.copyWith(text: currentText);
+              }
+              return m;
+            }).toList(),
+          );
+        } else {
+          timer.cancel();
+          debugPrint('✅ Welcome Stream Complete');
+        }
+      });
     }
-
-    _isWelcomeMessagePending = false; // Prevent double start
-    
-    final fullText = _pendingWelcomeText!;
-    final initialMessage = _pendingWelcomeMessage!;
-    
-    int currentIndex = 0;
-    const chunkSize = 1; 
-    
-    Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-
-      if (currentIndex < fullText.length) {
-        final endIndex = (currentIndex + chunkSize).clamp(0, fullText.length);
-        final currentChunk = fullText.substring(0, endIndex);
-        
-        final updatedMessage = initialMessage.copyWith(
-          text: currentChunk,
-        );
-        
-        _updateMessage(updatedMessage);
-        currentIndex += chunkSize;
-      } else {
-        timer.cancel();
-      }
-    });
-  }
-
-  @override
+  } @override
   void dispose() {
     _messageSubscription?.cancel();
     _connectionSubscription?.cancel();

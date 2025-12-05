@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart'; // For custom fonts
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../design_system/tokens/app_colors.dart';
 import '../../../design_system/tokens/app_typography.dart';
@@ -54,11 +55,20 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     
     // Connect when screen initializes (if not already connected)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(chatProvider.notifier).connect();
-      
       // Sync Avatar with User Profile
       final user = ref.read(userProvider);
       final avatarState = ref.read(avatarProvider);
+      
+      // Determine Coach Name for Welcome Message
+      String coachName = "Atlas"; // Default
+      if (user?.avatarId == 'serena') {
+        coachName = "Serena";
+      }
+      
+      // Get localized welcome message
+      final welcomeText = AppLocalizations.of(context)!.welcomeMessage(coachName);
+
+      ref.read(chatProvider.notifier).connect(welcomeMessageText: welcomeText);
       
       // ALWAYS check and load the correct avatar based on User Profile
       // The provider handles deduplication (skipping if URL matches)
@@ -140,10 +150,22 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     });
 
     // Listen for User Profile changes (e.g. Avatar switch)
-    ref.listen(userProvider, (previous, next) {
+    ref.listen(userProvider, (previous, next) async {
       if (next?.avatarId != null && next?.avatarId != previous?.avatarId) {
         debugPrint('👤 User changed avatar to: ${next!.avatarId}');
-        ref.read(avatarProvider.notifier).loadAvatarFromId(next.avatarId!);
+        
+        // 1. Reload Avatar (Force reload to ensure engine updates)
+        ref.read(avatarProvider.notifier).loadAvatarFromId(next.avatarId!, force: true);
+        
+        // 2. Prepare Welcome Message
+        String coachName = "Atlas";
+        if (next.avatarId == 'serena') {
+          coachName = "Serena";
+        }
+        final welcomeText = AppLocalizations.of(context)!.welcomeMessage(coachName);
+
+        // 3. Reset Chat Session & Inject Welcome Message
+        await ref.read(chatProvider.notifier).resetChat(welcomeMessageText: welcomeText);
       }
     });
 

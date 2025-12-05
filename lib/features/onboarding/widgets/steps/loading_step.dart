@@ -82,42 +82,21 @@ class _LoadingStepState extends State<LoadingStep> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Pulsating Logo Effect
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.8, end: 1.2),
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeInOut,
-            builder: (context, value, child) {
-              return Transform.scale(
-                scale: value,
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.secondary],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.5),
-                        blurRadius: 20 * value,
-                        spreadRadius: 5,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.psychology,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
-              );
-            },
-            onEnd: () {}, // Loop handled by parent if needed, but simple tween is fine for now or use AnimationController for continuous loop
+          // Large Logo
+          SizedBox(
+            height: 160, // Occupy less layout space
+            child: OverflowBox(
+              minHeight: 240,
+              maxHeight: 240,
+              child: Image.asset(
+                'assets/icons/app_logo.png',
+                width: 240,
+                height: 240,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: AppSpacing.md), // Reduced from xxl
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
             child: Text(
@@ -131,6 +110,7 @@ class _LoadingStepState extends State<LoadingStep> {
               textAlign: TextAlign.center,
             ),
           ),
+          const SizedBox(height: 180), // Push content up visually (increased)
         ],
       ),
     );

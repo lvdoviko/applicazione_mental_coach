@@ -58,6 +58,35 @@ class AppLocalizationsIt extends AppLocalizations {
       'Supportiamo il tuo percorso di benessere mentale con empatia e comprensione';
 
   @override
+  String get welcomeFeature1 => 'Conversazioni\nsu Misura';
+
+  @override
+  String get welcomeFeature2 => 'Supporto\nH24';
+
+  @override
+  String get welcomeFeature3 => 'Privacy\nTotale';
+
+  @override
+  String get welcomeTerms =>
+      'Continuando accetti i Termini di Servizio\ne la Privacy Policy.';
+
+  @override
+  String welcomeUser(String userName) {
+    return 'Ciao, $userName';
+  }
+
+  @override
+  String get yourCoaches => 'I Tuoi Coach';
+
+  @override
+  String get selectCoach => 'Seleziona Coach';
+
+  @override
+  String welcomeMessage(String coachName) {
+    return 'Ciao! Sono $coachName, il tuo Mental Performance Coach. Sono qui per ottimizzare il tuo mindset. Come ti senti oggi?';
+  }
+
+  @override
   String get consentTitle => 'Privacy e Dati';
 
   @override
@@ -250,6 +279,12 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get hapticFeedbackDescription =>
       'Senti le vibrazioni per le interazioni';
+
+  @override
+  String get sidebarChat => 'Chat';
+
+  @override
+  String get freePlan => 'PIANO GRATUITO';
 
   @override
   String get privacyAndSecurity => 'Privacy e Sicurezza';
@@ -501,6 +536,38 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get recommendedActions => 'Azioni Consigliate';
+
+  @override
+  String get morningBriefingInsight =>
+      'Il tuo recupero è all\'85%. Sei pronto per una sessione di focus?';
+
+  @override
+  String get startActivation => 'Inizia Attivazione (3 min)';
+
+  @override
+  String get mentalEnergy => 'Energia Mentale';
+
+  @override
+  String get biometrics => 'Biometria';
+
+  @override
+  String get sleep => 'Sonno';
+
+  @override
+  String get hrv => 'HRV';
+
+  @override
+  String get rhr => 'RHR';
+
+  @override
+  String get trend => 'Trend';
+
+  @override
+  String get focusIncreasing => 'Focus in aumento';
+
+  @override
+  String get coherenceImproved =>
+      'La tua coerenza è migliorata del 15% questa settimana.';
 
   @override
   String get now => 'ora';

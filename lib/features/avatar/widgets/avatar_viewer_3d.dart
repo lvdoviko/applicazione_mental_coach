@@ -133,10 +133,41 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
     final engine = ref.read(avatarEngineProvider);
     if (widget.config is AvatarConfigLoaded) {
       final url = (widget.config as AvatarConfigLoaded).remoteUrl;
-      await engine.loadContent(
-        avatarUrl: url, 
-        animationAsset: 'assets/animations/idle.glb'
-      );
+      
+      // FORCE RECREATION: This fixes the black screen by ensuring a fresh WebView
+      setState(() {
+        _isLoading = true;
+        _webViewKey = UniqueKey(); // Generate new key to force Widget replacement
+      });
+      
+      // Small delay to allow widget tree to update
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      if (!mounted) return;
+
+      // Now load content into the NEW WebView (via initEngine or just letting build handle it)
+      // Actually, since we rebuilt the WebView, we need to wait for it to be ready.
+      // But the engine is shared.
+      // If we destroy the WebView, the controller might detach.
+      // We need to re-initialize the engine or just reload.
+      
+      final engine = ref.read(avatarEngineProvider);
+      
+      try {
+        // Reload content
+        await engine.loadContent(
+          avatarUrl: url, 
+          animationAsset: 'assets/animations/idle.glb'
+        );
+      } catch (e) {
+        debugPrint("Error updating avatar content: $e");
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 

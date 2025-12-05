@@ -403,36 +403,21 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Animated coach icon
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0.8, end: 1.0),
-                        duration: const Duration(milliseconds: 800),
-                        curve: Curves.easeInOut,
-                        builder: (context, scale, child) {
-                          return Transform.scale(
-                            scale: scale,
-                            child: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColors.primary,
-                                    AppColors.secondary,
-                                  ],
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.psychology,
-                                size: 40,
-                                color: AppColors.white,
-                              ),
-                            ),
-                          );
-                        },
+                      // Large Logo
+                      SizedBox(
+                        height: 160, // Occupy less layout space
+                        child: OverflowBox(
+                          minHeight: 240,
+                          maxHeight: 240,
+                          child: Image.asset(
+                            'assets/icons/app_logo.png',
+                            width: 240,
+                            height: 240,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: AppSpacing.xl),
+                      const SizedBox(height: AppSpacing.md), // Reduced from xl
                       Text(
                         'Preparing your coach...',
                         style: AppTypography.h3.copyWith(
@@ -469,6 +454,7 @@ class _RpmAvatarCreatorState extends ConsumerState<RpmAvatarCreator> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 180), // Push content up visually (increased)
                     ],
                   ),
                 ),

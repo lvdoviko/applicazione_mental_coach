@@ -1,16 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 import '../../core/routing/app_router.dart';
+import '../../features/user/providers/user_provider.dart';
 
-class GlassDrawer extends StatelessWidget {
+class GlassDrawer extends ConsumerWidget {
   const GlassDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Get current location to determine active state
     final String location = GoRouterState.of(context).uri.toString();
+    final user = ref.watch(userProvider);
+    final userName = user?.name ?? "User";
 
     // Usiamo ClipRRect per arrotondare i bordi destri del pannello
     return ClipRRect(
@@ -74,7 +79,7 @@ class GlassDrawer extends StatelessWidget {
                       const SizedBox(height: 16),
                       // Nome
                       Text(
-                        "Ciao, Ludovico",
+                        AppLocalizations.of(context)!.welcomeUser(userName),
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 22,
@@ -100,7 +105,7 @@ class GlassDrawer extends StatelessWidget {
                             const Icon(Icons.star_outline, color: Colors.white60, size: 12),
                             const SizedBox(width: 4),
                             Text(
-                              "FREE PLAN",
+                              AppLocalizations.of(context)!.freePlan,
                               style: GoogleFonts.nunito(
                                 color: Colors.white70, 
                                 fontSize: 11, 
@@ -122,28 +127,28 @@ class GlassDrawer extends StatelessWidget {
                 _buildMenuItem(
                   context, 
                   Icons.chat_bubble_outline, 
-                  "Chat", 
+                  AppLocalizations.of(context)!.sidebarChat, 
                   location == AppRoute.chat.path,
                   () => context.go(AppRoute.chat.path),
                 ),
                 _buildMenuItem(
                   context, 
                   Icons.dashboard_outlined, 
-                  "Dashboard", 
+                  AppLocalizations.of(context)!.dashboard, 
                   location == AppRoute.dashboard.path,
                   () => context.go(AppRoute.dashboard.path),
                 ),
                 _buildMenuItem(
                   context, 
                   Icons.face, 
-                  "Edit Avatar", 
+                  AppLocalizations.of(context)!.yourCoaches, 
                   location == AppRoute.avatar.path,
                   () => context.push(AppRoute.avatar.path),
                 ),
                 _buildMenuItem(
                   context, 
                   Icons.settings_outlined, 
-                  "Settings", 
+                  AppLocalizations.of(context)!.settings, 
                   location == AppRoute.settings.path,
                   () => context.push(AppRoute.settings.path),
                 ),

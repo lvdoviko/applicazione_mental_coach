@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 
 class WelcomeStep extends StatelessWidget {
   final VoidCallback onNext;
@@ -38,31 +39,31 @@ class WelcomeStep extends StatelessWidget {
                   ],
                 ),
                 
-                const SizedBox(height: 20),
+                // const SizedBox(height: 20), // Removed to push content up
 
-                // HERO ICON (Re-added & Enhanced)
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary.withOpacity(0.1),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.25),
-                        blurRadius: 30,
-                        spreadRadius: 5,
-                      )
-                    ],
+                // HERO LOGO
+                Padding(
+                  padding: const EdgeInsets.only(top: 30), // Restored top padding
+                  child: SizedBox(
+                    height: 180, // Occupy less layout space to pull text closer
+                    child: OverflowBox(
+                      minHeight: 280,
+                      maxHeight: 280,
+                      child: Image.asset(
+                        'assets/icons/app_logo.png',
+                        width: 280,
+                        height: 280,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
                   ),
-                  child: const Icon(Icons.psychology, size: 64, color: AppColors.primary),
                 ),
 
-                const SizedBox(height: 32),
+                const SizedBox(height: 8), // Significantly reduced spacing
 
                 // TITOLO
                 Text(
-                  "Il Tuo Coach AI\nPersonale",
+                  AppLocalizations.of(context)!.onboardingTitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 32,
@@ -75,7 +76,7 @@ class WelcomeStep extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 Text(
-                  "Supportiamo il tuo percorso di benessere mentale con empatia e comprensione.",
+                  AppLocalizations.of(context)!.onboardingSubtitle,
                   textAlign: TextAlign.center,
                   style: GoogleFonts.nunito(
                     fontSize: 16,
@@ -90,9 +91,9 @@ class WelcomeStep extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildFeatureItem(Icons.chat_bubble_outline, "Conversazioni\nsu Misura"),
-                    _buildFeatureItem(Icons.favorite_border, "Supporto\nH24"),
-                    _buildFeatureItem(Icons.lock_outline, "Privacy\nTotale"),
+                    _buildFeatureItem(Icons.chat_bubble_outline, AppLocalizations.of(context)!.welcomeFeature1),
+                    _buildFeatureItem(Icons.favorite_border, AppLocalizations.of(context)!.welcomeFeature2),
+                    _buildFeatureItem(Icons.lock_outline, AppLocalizations.of(context)!.welcomeFeature3),
                   ],
                 ),
                 
@@ -131,7 +132,7 @@ class WelcomeStep extends StatelessWidget {
                 },
                 child: Center(
                   child: Text(
-                    "Inizia",
+                    AppLocalizations.of(context)!.getStarted,
                     style: GoogleFonts.nunito(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -150,7 +151,7 @@ class WelcomeStep extends StatelessWidget {
           right: 24,
           bottom: 20,
           child: Text(
-            "Continuando accetti i Termini di Servizio\ne la Privacy Policy.",
+            AppLocalizations.of(context)!.welcomeTerms,
             textAlign: TextAlign.center,
             style: GoogleFonts.nunito(
               fontSize: 12,

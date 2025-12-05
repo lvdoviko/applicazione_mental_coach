@@ -20,6 +20,28 @@
   "@_ONBOARDING": {},
   "onboardingTitle": "Your Personal AI Coach",
   "onboardingSubtitle": "Supporting your mental wellness journey with empathy and understanding",
+  "welcomeFeature1": "Tailored\nConversations",
+  "welcomeFeature2": "24/7\nSupport",
+  "welcomeFeature3": "Total\nPrivacy",
+  "welcomeTerms": "By continuing you accept the Terms of Service\nand Privacy Policy.",
+  "welcomeUser": "Welcome, {userName}",
+  "yourCoaches": "Your Coaches",
+  "selectCoach": "Select Coach",
+  "@welcomeUser": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeMessage": "Hi! I'm {coachName}, your Mental Performance Coach. I'm here to optimize your mindset. How are you feeling today?",
+  "@welcomeMessage": {
+    "placeholders": {
+      "coachName": {
+        "type": "String"
+      }
+    }
+  },
   "consentTitle": "Privacy & Data",
   "consentSubtitle": "We prioritize your privacy and data security",
   "consent": "I consent to data processing",
@@ -102,6 +124,8 @@
   "soundEffectsDescription": "Play sounds for interactions",
   "hapticFeedback": "Haptic Feedback",
   "hapticFeedbackDescription": "Feel vibrations for interactions",
+  "sidebarChat": "Chat",
+  "freePlan": "FREE PLAN",
   
   "@_PRIVACY_SECURITY": {},
   "privacyAndSecurity": "Privacy & Security",
@@ -195,6 +219,16 @@
   "wellnessInsights": "Wellness Insights",
   "progressOverview": "Progress Overview",
   "recommendedActions": "Recommended Actions",
+  "morningBriefingInsight": "Your recovery is at 85%. Are you ready for a focus session?",
+  "startActivation": "Start Activation (3 min)",
+  "mentalEnergy": "Mental Energy",
+  "biometrics": "Biometrics",
+  "sleep": "Sleep",
+  "hrv": "HRV",
+  "rhr": "RHR",
+  "trend": "Trend",
+  "focusIncreasing": "Focus Increasing",
+  "coherenceImproved": "Your coherence improved by 15% this week.",
   
   "@_TIME_FORMATS": {},
   "now": "now",

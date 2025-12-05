@@ -28,73 +28,83 @@ class AvatarSelectionStep extends StatelessWidget {
       children: [
         // 1. CONTENT
         Positioned.fill(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 120), // Bottom padding for button
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start, // 1. Align to top
-              children: [
-                // 2. Fixed Top Spacing (Increased for header clearance)
-                const SizedBox(height: 60),
-
-                Text(
-                  l10n.avatarSelectionTitle,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.avatarSelectionSubtitle,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.nunito(
-                    fontSize: 16,
-                    color: Colors.white70,
-                  ),
-                ),
-                
-                const SizedBox(height: 20), // Reduced spacing
-
-                // AVATAR CARDS
-                SizedBox(
-                  height: 450, // Maximized height
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 120),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      _buildAvatarCard(
-                        id: 'atlas',
-                        name: l10n.coachAtlas,
-                        role: l10n.coachAtlasDesc,
-                        imageUrl: 'https://models.readyplayer.me/6929b1e97b7a88e1f60a6f9e.png?bodyType=halfbody',
-                        color: const Color(0xFF2962FF),
-                        isSelected: selectedAvatarId == 'atlas',
-                        onTap: () => onAvatarSelected('atlas'),
+                      // 2. Fixed Top Spacing
+                      const SizedBox(height: 60),
+
+                      Text(
+                        l10n.avatarSelectionTitle,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                      const SizedBox(width: 16),
-                      _buildAvatarCard(
-                        id: 'serena',
-                        name: l10n.coachSerena,
-                        role: l10n.coachSerenaDesc,
-                        imageUrl: 'https://models.readyplayer.me/69286d45132e61458cee2d1f.png?bodyType=halfbody',
-                        color: const Color(0xFF00E5FF),
-                        isSelected: selectedAvatarId == 'serena',
-                        onTap: () => onAvatarSelected('serena'),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.avatarSelectionSubtitle,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.nunito(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
                       ),
+                      
+                      const SizedBox(height: 20),
+
+                      // AVATAR CARDS
+                      SizedBox(
+                        height: 450, // Fixed height as requested
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: _buildAvatarCard(
+                                id: 'atlas',
+                                name: l10n.coachAtlas,
+                                role: l10n.coachAtlasDesc,
+                                imageUrl: 'https://models.readyplayer.me/6929b1e97b7a88e1f60a6f9e.png?bodyType=halfbody',
+                                color: const Color(0xFF2962FF),
+                                isSelected: selectedAvatarId == 'atlas',
+                                onTap: () => onAvatarSelected('atlas'),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildAvatarCard(
+                                id: 'serena',
+                                name: l10n.coachSerena,
+                                role: l10n.coachSerenaDesc,
+                                imageUrl: 'https://models.readyplayer.me/69286d45132e61458cee2d1f.png?bodyType=halfbody',
+                                color: const Color(0xFF00E5FF),
+                                isSelected: selectedAvatarId == 'serena',
+                                onTap: () => onAvatarSelected('serena'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // 3. Safety Spacing
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
-
-                // 3. Safety Spacing at Bottom
-                const SizedBox(height: 120),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         
-        // 2. BACK BUTTON (Global Position)
+        // 2. BACK BUTTON
         Positioned(
           top: 0,
           left: 24,
@@ -117,41 +127,45 @@ class AvatarSelectionStep extends StatelessWidget {
           ),
         ),
 
-        // 3. FIXED BUTTON
+        // 3. FIXED BUTTON (Bottom Safe Area)
         Positioned(
           left: 24,
           right: 24,
-          bottom: 70, // Aligned with WelcomeStep
-          child: Container(
-            height: 56,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                )
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
+          bottom: 40, // Adjusted for safe area usually handled by parent or padding
+          child: SafeArea(
+            top: false,
+            child: Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(16),
-                onTap: selectedAvatarId != null 
-                  ? () {
-                      HapticFeedback.lightImpact();
-                      onNext();
-                    } 
-                  : null,
-                child: Center(
-                  child: Text(
-                    l10n.startJourney,
-                    style: GoogleFonts.nunito(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.4),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  )
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: selectedAvatarId != null 
+                    ? () {
+                        debugPrint('🔘 Start Journey Button Tapped');
+                        HapticFeedback.lightImpact();
+                        onNext();
+                      } 
+                    : null,
+                  child: Center(
+                    child: Text(
+                      l10n.startJourney,
+                      style: GoogleFonts.nunito(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -177,7 +191,7 @@ class AvatarSelectionStep extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        width: 160, // Fixed width for the card
+        // width: 160, // REMOVED: Let parent constrain width
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           border: Border.all(

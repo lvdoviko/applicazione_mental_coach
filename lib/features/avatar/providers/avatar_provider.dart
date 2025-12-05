@@ -124,13 +124,13 @@ class AvatarNotifier extends StateNotifier<AvatarState> {
   }
 
   /// Load avatar based on ID (Atlas/Serena)
-  Future<void> loadAvatarFromId(String avatarId) async {
+  Future<void> loadAvatarFromId(String avatarId, {bool force = false}) async {
     if (_repository == null) return;
 
     final url = _getAvatarUrl(avatarId);
     
     // Check if we already have this avatar loaded
-    if (state is AvatarStateLoaded) {
+    if (!force && state is AvatarStateLoaded) {
       final currentConfig = (state as AvatarStateLoaded).config;
       if (currentConfig is AvatarConfigLoaded && currentConfig.remoteUrl == url) {
         return; // Already loaded

@@ -9,6 +9,7 @@ import 'package:applicazione_mental_coach/features/dashboard/widgets/readiness_b
 import 'package:applicazione_mental_coach/features/dashboard/widgets/daily_pulse.dart';
 import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
 import 'package:applicazione_mental_coach/design_system/components/glass_drawer.dart';
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -51,9 +52,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               const SizedBox(height: AppSpacing.md),
               // 1. Morning Briefing (Anticipatory UI)
               MorningBriefingCard(
-                greeting: 'Buongiorno, Alex',
-                insight: 'Il tuo recupero è all\'85%. Sei pronto per una sessione di focus?',
-                actionLabel: 'Inizia Attivazione (3 min)',
+                greeting: AppLocalizations.of(context)!.welcomeUser('Alex'),
+                insight: AppLocalizations.of(context)!.morningBriefingInsight,
+                actionLabel: AppLocalizations.of(context)!.startActivation,
                 onActionTap: () {
                   // TODO: Start activation protocol
                 },
@@ -68,9 +69,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     flex: 5,
                     child: PremiumGlassCard(
                       padding: const EdgeInsets.all(AppSpacing.md),
-                      child: const ReadinessBattery(
+                      child: ReadinessBattery(
                         percentage: 0.85,
-                        label: 'Energia Mentale',
+                        label: AppLocalizations.of(context)!.mentalEnergy,
                       ),
                     ),
                   ),
@@ -131,12 +132,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 onPressed: () {},
                 icon: const Icon(Icons.notifications_none, color: Colors.white70),
               ),
-              const SizedBox(width: AppSpacing.sm),
-              const CircleAvatar(
-                radius: 16,
-                backgroundColor: AppColors.primary,
-                child: Text('A', style: TextStyle(color: Colors.white, fontSize: 12)),
-              ),
             ],
           ),
         ],
@@ -149,7 +144,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Biometria',
+          AppLocalizations.of(context)!.biometrics,
           style: AppTypography.h4.copyWith(color: Colors.white, fontFamily: 'Poppins'),
         ),
         const SizedBox(height: AppSpacing.md),
@@ -157,11 +152,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
-              _buildBiometricItem(Icons.bedtime, 'Sonno', '7h 30m', const Color(0xFF22D3EE)), // Cyan
+              _buildBiometricItem(Icons.bedtime, AppLocalizations.of(context)!.sleep, '7h 30m', const Color(0xFF22D3EE)), // Cyan
               _buildDivider(),
-              _buildBiometricItem(Icons.favorite, 'HRV', '55ms', const Color(0xFF4ADE80)), // Neon Green
+              _buildBiometricItem(Icons.favorite, AppLocalizations.of(context)!.hrv, '55ms', const Color(0xFF4ADE80)), // Neon Green
               _buildDivider(),
-              _buildBiometricItem(Icons.monitor_heart, 'RHR', '48bpm', const Color(0xFFF472B6)), // Pink
+              _buildBiometricItem(Icons.monitor_heart, AppLocalizations.of(context)!.rhr, '48bpm', const Color(0xFFF472B6)), // Pink
             ],
           ),
         ),
@@ -215,7 +210,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Trend',
+          AppLocalizations.of(context)!.trend,
           style: AppTypography.h4.copyWith(color: Colors.white, fontFamily: 'Poppins'),
         ),
         const SizedBox(height: AppSpacing.md),
@@ -230,7 +225,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Focus in aumento',
+                      AppLocalizations.of(context)!.focusIncreasing,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -238,7 +233,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                     ),
                     Text(
-                      'La tua coerenza è migliorata del 15% questa settimana.',
+                      AppLocalizations.of(context)!.coherenceImproved,
                       style: AppTypography.bodySmall.copyWith(
                         color: Colors.white70,
                         fontFamily: 'Nunito',

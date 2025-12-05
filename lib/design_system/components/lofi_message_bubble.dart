@@ -227,103 +227,61 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
     );
   }
 
+
+
+
+
+
+
   Widget _buildBubble() {
     final isUser = widget.type == MessageType.user;
+    final borderRadius = _getBorderRadius(isUser);
     
-    if (!isUser) {
-      // 💎 Glassmorphism Bubble for Coach
-      return ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-          bottomLeft: Radius.circular(4), // "Coda" del fumetto piccola
-        ),
-        child: BackdropFilter(
-          // 1. IL BLUR (La sfocatura che dà l'effetto vetro)
-          filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-          child: Container(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.85, 
-            ),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              // 2. IL COLORE (Sfondo scuro ma trasparente)
-              color: const Color(0xFF1C2541).withOpacity(0.6), // Blu notte al 60%
-              
-              // 3. IL BORDO (Sottile riflesso di luce)
-              border: Border.all(
-                color: Colors.white.withOpacity(0.1),
-                width: 1,
-              ),
-              // Gradiente sottile per dare volume
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF1C2541).withOpacity(0.7),
-                  const Color(0xFF1C2541).withOpacity(0.4),
-                ],
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.message,
-                  style: AppTypography.chatBubbleBot.copyWith( // Using AppTypography instead of GoogleFonts
-                    color: Colors.white.withOpacity(0.95),
-                    fontSize: 16,
-                    height: 1.4,
-                    fontWeight: FontWeight.w400,
-                    shadows: [],
-                  ),
-                ),
-                if (widget.citation != null) ...[
-                  const SizedBox(height: AppSpacing.sm),
-                  _buildCitationChip(),
-                ],
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    // Exact colors from user request
+    final glassColor = isUser 
+        ? const Color(0xFF4A90E2).withOpacity(0.7) 
+        : const Color(0xFF0D1322).withOpacity(0.70);
+        
+    final borderColor = Colors.white.withOpacity(0.15);
 
-    // User Bubble (Deep Blue Glass)
+    final maxWidth = MediaQuery.of(context).size.width * (isUser ? 0.75 : 0.85);
+
     return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(20),
-        topRight: Radius.circular(20),
-        bottomLeft: Radius.circular(20),
-        bottomRight: Radius.circular(4), // "Coda" a destra
-      ),
+      borderRadius: borderRadius,
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Effetto vetro
+        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
         child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.75, 
-          ),
+          constraints: BoxConstraints(maxWidth: maxWidth),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            // IL COLORE CHIAVE: Blu profondo semi-trasparente
-            color: const Color(0xFF1E3A8A).withOpacity(0.7), // Blu notte al 70%
-            
-            // Bordo sottile per definizione
-            border: Border.all(color: Colors.blue.withOpacity(0.2), width: 1),
+            color: glassColor,
+            border: Border.all(color: borderColor, width: 1),
+            // No borderRadius here as per user instruction
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Text(
                 widget.message,
-                style: GoogleFonts.nunito(
-                  color: Colors.white.withOpacity(0.95), // Testo bianco
-                  fontSize: 16,
-                  height: 1.4,
-                ),
+                style: isUser 
+                  ? GoogleFonts.nunito(
+                      color: Colors.white.withOpacity(0.95),
+                      fontSize: 16,
+                      height: 1.4,
+                    )
+                  : AppTypography.chatBubbleBot.copyWith(
+                      color: Colors.white.withOpacity(0.95),
+                      fontSize: 16,
+                      height: 1.4,
+                      fontWeight: FontWeight.w400,
+                      shadows: [],
+                    ),
               ),
-              if (_shouldShowTimestamp()) ...[
+              if (widget.citation != null && !isUser) ...[
+                const SizedBox(height: AppSpacing.sm),
+                _buildCitationChip(),
+              ],
+              if (isUser && _shouldShowTimestamp()) ...[
                 const SizedBox(height: AppSpacing.xs),
                 _buildTimestamp(Colors.white),
               ],
@@ -364,8 +322,8 @@ class _LoFiMessageBubbleState extends State<LoFiMessageBubble>
   }
 
   BorderRadius _getBorderRadius(bool isUser) {
-    const radius = 24.0; // Rounder bubbles
-    const tailRadius = 4.0;
+    const radius = 24.0;
+    const tailRadius = 0.0; // Sharp tail as per user request
     
     if (isUser) {
       return const BorderRadius.only(

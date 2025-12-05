@@ -79,8 +79,24 @@ class ChatWebSocketService {
     }
   }
 
+  /// Disconnect current session
+  Future<void> disconnect() async {
+    if (_channel != null) {
+      debugPrint('🔌 [WS] Disconnecting...');
+      await _channel!.sink.close(status.normalClosure);
+      _channel = null;
+    }
+    _isConnected = false;
+    _isConnecting = false;
+    _connectionController.add(ChatConnectionStatus.disconnected);
+  }
+
   /// STEP 2: Connect WebSocket
-  Future<void> connect({String? savedChatId}) async {
+  Future<void> connect({String? savedChatId, bool forceReconnect = false}) async {
+    if (forceReconnect) {
+      await disconnect();
+    }
+
     if (_isConnecting || _isConnected) return;
 
     _isConnecting = true;
@@ -89,6 +105,7 @@ class ChatWebSocketService {
     try {
       // 1. Get Token
       final jwt = await _getWebSocketToken();
+      // ... rest of the function
 
       debugPrint('🌐 [WS] Connecting with Token...');
 

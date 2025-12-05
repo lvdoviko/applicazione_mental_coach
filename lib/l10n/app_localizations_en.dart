@@ -58,6 +58,35 @@ class AppLocalizationsEn extends AppLocalizations {
       'Supporting your mental wellness journey with empathy and understanding';
 
   @override
+  String get welcomeFeature1 => 'Tailored\nConversations';
+
+  @override
+  String get welcomeFeature2 => '24/7\nSupport';
+
+  @override
+  String get welcomeFeature3 => 'Total\nPrivacy';
+
+  @override
+  String get welcomeTerms =>
+      'By continuing you accept the Terms of Service\nand Privacy Policy.';
+
+  @override
+  String welcomeUser(String userName) {
+    return 'Welcome, $userName';
+  }
+
+  @override
+  String get yourCoaches => 'Your Coaches';
+
+  @override
+  String get selectCoach => 'Select Coach';
+
+  @override
+  String welcomeMessage(String coachName) {
+    return 'Hi! I\'m $coachName, your Mental Performance Coach. I\'m here to optimize your mindset. How are you feeling today?';
+  }
+
+  @override
   String get consentTitle => 'Privacy & Data';
 
   @override
@@ -248,6 +277,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hapticFeedbackDescription => 'Feel vibrations for interactions';
+
+  @override
+  String get sidebarChat => 'Chat';
+
+  @override
+  String get freePlan => 'FREE PLAN';
 
   @override
   String get privacyAndSecurity => 'Privacy & Security';
@@ -490,6 +525,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recommendedActions => 'Recommended Actions';
+
+  @override
+  String get morningBriefingInsight =>
+      'Your recovery is at 85%. Are you ready for a focus session?';
+
+  @override
+  String get startActivation => 'Start Activation (3 min)';
+
+  @override
+  String get mentalEnergy => 'Mental Energy';
+
+  @override
+  String get biometrics => 'Biometrics';
+
+  @override
+  String get sleep => 'Sleep';
+
+  @override
+  String get hrv => 'HRV';
+
+  @override
+  String get rhr => 'RHR';
+
+  @override
+  String get trend => 'Trend';
+
+  @override
+  String get focusIncreasing => 'Focus Increasing';
+
+  @override
+  String get coherenceImproved => 'Your coherence improved by 15% this week.';
 
   @override
   String get now => 'now';

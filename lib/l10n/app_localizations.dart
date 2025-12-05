@@ -194,6 +194,54 @@ abstract class AppLocalizations {
   /// **'Supporting your mental wellness journey with empathy and understanding'**
   String get onboardingSubtitle;
 
+  /// No description provided for @welcomeFeature1.
+  ///
+  /// In en, this message translates to:
+  /// **'Tailored\nConversations'**
+  String get welcomeFeature1;
+
+  /// No description provided for @welcomeFeature2.
+  ///
+  /// In en, this message translates to:
+  /// **'24/7\nSupport'**
+  String get welcomeFeature2;
+
+  /// No description provided for @welcomeFeature3.
+  ///
+  /// In en, this message translates to:
+  /// **'Total\nPrivacy'**
+  String get welcomeFeature3;
+
+  /// No description provided for @welcomeTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing you accept the Terms of Service\nand Privacy Policy.'**
+  String get welcomeTerms;
+
+  /// No description provided for @welcomeUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {userName}'**
+  String welcomeUser(String userName);
+
+  /// No description provided for @yourCoaches.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Coaches'**
+  String get yourCoaches;
+
+  /// No description provided for @selectCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Coach'**
+  String get selectCoach;
+
+  /// No description provided for @welcomeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! I\'m {coachName}, your Mental Performance Coach. I\'m here to optimize your mindset. How are you feeling today?'**
+  String welcomeMessage(String coachName);
+
   /// No description provided for @consentTitle.
   ///
   /// In en, this message translates to:
@@ -565,6 +613,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Feel vibrations for interactions'**
   String get hapticFeedbackDescription;
+
+  /// No description provided for @sidebarChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get sidebarChat;
+
+  /// No description provided for @freePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'FREE PLAN'**
+  String get freePlan;
 
   /// No description provided for @privacyAndSecurity.
   ///
@@ -1027,6 +1087,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recommended Actions'**
   String get recommendedActions;
+
+  /// No description provided for @morningBriefingInsight.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recovery is at 85%. Are you ready for a focus session?'**
+  String get morningBriefingInsight;
+
+  /// No description provided for @startActivation.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Activation (3 min)'**
+  String get startActivation;
+
+  /// No description provided for @mentalEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Mental Energy'**
+  String get mentalEnergy;
+
+  /// No description provided for @biometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometrics'**
+  String get biometrics;
+
+  /// No description provided for @sleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get sleep;
+
+  /// No description provided for @hrv.
+  ///
+  /// In en, this message translates to:
+  /// **'HRV'**
+  String get hrv;
+
+  /// No description provided for @rhr.
+  ///
+  /// In en, this message translates to:
+  /// **'RHR'**
+  String get rhr;
+
+  /// No description provided for @trend.
+  ///
+  /// In en, this message translates to:
+  /// **'Trend'**
+  String get trend;
+
+  /// No description provided for @focusIncreasing.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus Increasing'**
+  String get focusIncreasing;
+
+  /// No description provided for @coherenceImproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coherence improved by 15% this week.'**
+  String get coherenceImproved;
 
   /// No description provided for @now.
   ///
