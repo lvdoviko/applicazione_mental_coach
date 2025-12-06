@@ -19,36 +19,84 @@ class LanguageStep extends StatelessWidget {
     // because the user hasn't selected the language.
     // We'll show a generic welcome or both languages.
     
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.journeyStartsHere,
-            style: GoogleFonts.poppins(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: SingleChildScrollView(
+            // Matches WelcomeStep padding
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 120),
+            child: Column(
+              children: [
+                // GHOST NAV BAR (To match WelcomeStep height exactly)
+                Opacity(
+                  opacity: 0,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        ),
+                        child: const Icon(Icons.arrow_back_ios_new, size: 20),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 1. HERO LOGO (Exactly matching WelcomeStep)
+                Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: SizedBox(
+                    height: 180, // Occupy less layout space to pull text closer
+                    child: OverflowBox(
+                      minHeight: 280,
+                      maxHeight: 280,
+                      child: Image.asset(
+                        'assets/icons/app_logo.png',
+                        width: 280,
+                        height: 280,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // 2. TITLE
+                Text(
+                  AppLocalizations.of(context)!.journeyStartsHere,
+                   textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 32, // Increased to 32 to match Welcome Title size
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    height: 1.2,
+                  ),
+                ),
+                
+                const SizedBox(height: 40), // Spacing before options
+
+                // 3. OPTIONS
+                _buildLanguageOption(
+                  context,
+                  locale: const Locale('it'),
+                  flag: '🇮🇹',
+                  name: 'Italiano',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _buildLanguageOption(
+                  context,
+                  locale: const Locale('en'),
+                  flag: '🇬🇧',
+                  name: 'English',
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.xxl),
-          _buildLanguageOption(
-            context,
-            locale: const Locale('it'),
-            flag: '🇮🇹',
-            name: 'Italiano',
-          ),
-          const SizedBox(height: AppSpacing.md),
-          _buildLanguageOption(
-            context,
-            locale: const Locale('en'),
-            flag: '🇬🇧',
-            name: 'English',
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
