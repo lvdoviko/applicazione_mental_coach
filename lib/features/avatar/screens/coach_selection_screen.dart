@@ -6,6 +6,8 @@ import 'package:applicazione_mental_coach/features/user/providers/user_provider.
 import 'package:go_router/go_router.dart';
 import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart';
+import 'package:applicazione_mental_coach/features/chat/providers/chat_provider.dart';
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 
 class CoachSelectionScreen extends ConsumerStatefulWidget {
   const CoachSelectionScreen({super.key});
@@ -50,9 +52,24 @@ class _CoachSelectionScreenState extends ConsumerState<CoachSelectionScreen> {
     // This will trigger the download and update the AvatarProvider state
     await ref.read(avatarProvider.notifier).loadAvatarFromId(_selectedAvatarId!);
 
+    // 3. Reset Chat & Prepare Welcome Message
     if (mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      final coachName = _selectedAvatarId == 'atlas' 
+          ? l10n.coachAtlas 
+          : l10n.coachSerena;
+      
+      final welcomeText = l10n.welcomeMessage(coachName);
+
+      // Reset chat session and inject the new welcome message to be streamed
+      await ref.read(chatProvider.notifier).resetChat(
+        welcomeMessageText: welcomeText,
+      );
+
       // Navigate directly to Chat Screen
-      context.go(AppRoute.chat.path);
+      if (mounted) {
+        context.go(AppRoute.chat.path);
+      }
     }
   }
 
