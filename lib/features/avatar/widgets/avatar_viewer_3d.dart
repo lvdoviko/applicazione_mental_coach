@@ -52,15 +52,12 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
   @override
   void initState() {
     super.initState();
-    // Generate key ONCE when screen opens
-    _webViewKey = UniqueKey(); 
-    
     // ONE-TIME REFRESH (Android Only): 
     // Wait for screen to stabilize, then force ONE recreation to fix black screen.
     if (Platform.isAndroid) {
       _scheduleAndroidRefresh();
     }
-    
+
     // Initialize engine immediately (Standard behavior)
     _checkEngineStatus();
   }
@@ -79,8 +76,18 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
     _updateContent();
   }
 
+
+
   void _checkEngineStatus() {
     final engine = ref.read(avatarEngineProvider);
+    
+    // ANDROID FIX: Always force a fresh controller when entering the screen.
+    // This prevents "Zombie Controller" issues where the controller is attached to a dead view.
+    if (Platform.isAndroid) {
+      _initEngine(forceRecreate: true);
+      return;
+    }
+
     if (engine.isInitialized && engine.controller != null) {
       setState(() {
         _isLoading = false;
@@ -91,10 +98,21 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
     }
   }
 
-  Future<void> _initEngine() async {
+  Future<void> _initEngine({bool forceRecreate = false}) async {
     try {
       final engine = ref.read(avatarEngineProvider);
-      await engine.initialize();
+      
+      if (forceRecreate) {
+        // ANDROID TIMING FIX:
+        // Wait for Screen Transition Animation (approx 200ms) to finish.
+        // Creating WebView during transition kills the GPU context on some devices.
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (!mounted) return;
+        
+        await engine.recreateWebViewController();
+      } else {
+        await engine.initialize();
+      }
       
       // Load content if config is ready
       if (widget.config is AvatarConfigLoaded) {
@@ -134,27 +152,36 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
     if (widget.config is AvatarConfigLoaded) {
       final url = (widget.config as AvatarConfigLoaded).remoteUrl;
       
-      // FORCE RECREATION: This fixes the black screen by ensuring a fresh WebView
+      // 1. FORCE RECREATION (The "Turn it off and on again" fix)
+      // This destroys the old Android View, cleaning up the stuck OpenGL context.
       setState(() {
         _isLoading = true;
-        _webViewKey = UniqueKey(); // Generate new key to force Widget replacement
+        _webViewKey = UniqueKey(); 
       });
       
-      // Small delay to allow widget tree to update
-      await Future.delayed(const Duration(milliseconds: 100));
+      // 2. WAIT FOR CLEANUP
+      await Future.delayed(const Duration(milliseconds: 200));
       
       if (!mounted) return;
 
-      // Now load content into the NEW WebView (via initEngine or just letting build handle it)
-      // Actually, since we rebuilt the WebView, we need to wait for it to be ready.
-      // But the engine is shared.
-      // If we destroy the WebView, the controller might detach.
-      // We need to re-initialize the engine or just reload.
-      
       final engine = ref.read(avatarEngineProvider);
       
       try {
-        // Reload content
+        // 3. SURGICAL CONTROLLER RESET (The Final Fix)
+        // On Android, we swap the controller instance to match the new View instance.
+        // This clears the OpenGL context without killing the server.
+        if (Platform.isAndroid) {
+           await engine.recreateWebViewController();
+           // Wait a tick for Provider/Listeners to propogate the new controller
+           await Future.delayed(const Duration(milliseconds: 50)); 
+        }
+
+        // 4. TRANSPARENCY SAFETY CHECK
+        if (engine.controller != null) {
+          await engine.controller!.setBackgroundColor(const Color(0x00000000));
+        }
+
+        // 5. LOAD CONTENT (Into the fresh new Controller)
         await engine.loadContent(
           avatarUrl: url, 
           animationAsset: 'assets/animations/idle.glb'
@@ -166,6 +193,11 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
           setState(() {
             _isLoading = false;
           });
+          
+          // 5. DOUBLE CHECK (Paranoia Mode)
+          if (Platform.isAndroid && engine.controller != null) {
+             engine.controller!.setBackgroundColor(const Color(0x00000000));
+          }
         }
       }
     }

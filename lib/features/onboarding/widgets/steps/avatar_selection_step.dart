@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:applicazione_mental_coach/shared/widgets/premium_glass_card.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_spacing.dart';
 import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
@@ -218,31 +220,35 @@ class AvatarSelectionStep extends StatelessWidget {
                 left: 0,
                 right: 0,
                 bottom: 100, // Leave space for text
-                child: ClipRRect(
+                  child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                   child: Hero(
                     tag: isSelected ? 'coach_avatar' : 'avatar_$id', // Only hero the selected one
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl, 
+                      fit: BoxFit.cover, // Reverted to cover for full size
                       alignment: Alignment.topCenter,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                            color: color,
+                      placeholder: (context, url) => Center(
+                        child: CircularProgressIndicator(
+                          color: color, 
+                          strokeWidth: 2,
+                        ),
+                      ),
+                      errorListener: (e) => debugPrint("❌ [AvatarSelection] Image Load Error ($id): $e"),
+                      errorWidget: (context, url, error) {
+                        debugPrint("❌ [AvatarSelection] Widget Error: $error");
+                        return Container(
+                          color: Colors.red.withOpacity(0.1),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error_outline, color: Colors.red, size: 32),
+                              SizedBox(height: 4),
+                              Text("Error", style: TextStyle(color: Colors.red, fontSize: 10)),
+                            ],
                           ),
                         );
                       },
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.person,
-                        size: 64,
-                        color: color,
-                      ),
                     ),
                   ),
                 ),

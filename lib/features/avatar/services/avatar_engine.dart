@@ -17,6 +17,67 @@ class AvatarEngine extends ChangeNotifier {
   
   WebViewController? get controller => _controller;
   bool get isInitialized => _isInitialized;
+  
+  /// Surgical Fix for Android: Recreates the WebViewController ONLY.
+  /// Does NOT stop the server (preventing regression) but ensures a fresh
+  /// Controller for the fresh WebView (preventing OpenGL stall).
+  Future<void> recreateWebViewController() async {
+    debugPrint("🔄 [AvatarEngine] Recreating WebViewController...");
+    
+    // 1. Cleanup old controller (Best Effort)
+    if (_controller != null) {
+      try {
+        await _controller!.clearCache();
+        // Don't await these potentially hanging calls too long
+        _controller!.clearLocalStorage().timeout(const Duration(milliseconds: 200), onTimeout: () {});
+      } catch (e) {
+        debugPrint("⚠️ Controller cleanup error: $e");
+      }
+      _controller = null;
+    }
+
+    // 2. Create NEW Controller with identical setup
+    final WebViewController newController = WebViewController();
+    
+    if (Platform.isAndroid) {
+      AndroidWebViewController.enableDebugging(true);
+      (newController.platform as AndroidWebViewController)
+          .setMediaPlaybackRequiresUserGesture(false);
+    }
+
+    newController
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (String url) {
+            debugPrint('📦 [AvatarEngine] Page Loaded (New Controller): $url');
+            newController.runJavaScript('document.body.style.backgroundColor = "transparent";');
+            newController.runJavaScript('document.body.parentElement.style.backgroundColor = "transparent";');
+          },
+          onWebResourceError: (WebResourceError error) {
+            debugPrint('❌ [AvatarEngine] Web Resource Error: ${error.description}');
+          },
+        ),
+      )
+      ..addJavaScriptChannel(
+        'AvatarLoadChannel',
+        onMessageReceived: (JavaScriptMessage message) {
+          if (message.message == 'loaded') {
+            debugPrint("✅ [AvatarEngine] JS Signal: Avatar Loaded");
+            if (!_avatarLoadedCompleter.isCompleted) {
+              _avatarLoadedCompleter.complete();
+            }
+          }
+        },
+      );
+
+    // 3. Assign
+    _controller = newController;
+    // _isInitialized remains true because Server is up.
+    notifyListeners();
+    debugPrint("✅ [AvatarEngine] WebViewController Recreated.");
+  }
 
   /// Initialize the engine (Server + WebView)
   Future<void> initialize() async {

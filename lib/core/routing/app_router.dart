@@ -7,7 +7,7 @@ import 'package:applicazione_mental_coach/features/chat/screens/chat_screen_back
 import 'package:applicazione_mental_coach/features/dashboard/screens/dashboard_screen.dart';
 import 'package:applicazione_mental_coach/features/avatar/screens/avatar_screen.dart';
 import 'package:applicazione_mental_coach/features/settings/screens/settings_screen.dart';
-import 'package:applicazione_mental_coach/features/settings/screens/settings_screen.dart';
+import 'package:applicazione_mental_coach/features/avatar/screens/coach_selection_screen.dart';
 
 enum AppRoute {
   onboarding('/onboarding'),
@@ -81,13 +81,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       
-      // Avatar Customization
+      // Avatar Selection (Directly to Cards)
       GoRoute(
         path: AppRoute.avatar.path,
         name: 'avatar',
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: const AvatarScreen(),
+          child: const CoachSelectionScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const curve = Curves.easeInOutCubic;
             var tween = Tween(begin: const Offset(0.05, 0.0), end: Offset.zero)
