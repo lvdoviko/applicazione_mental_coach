@@ -51,14 +51,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get loading => 'Caricamento...';
 
   @override
-  String get onboardingTitle => 'Il Tuo Coach AI Personale';
+  String get onboardingTitle => 'Il Tuo AI Mental Coach Personale';
 
   @override
   String get onboardingSubtitle =>
-      'Supportiamo il tuo percorso di benessere mentale con empatia e comprensione';
+      'Supportiamo la tua performance mentale con professionalità e competenza';
 
   @override
-  String get welcomeFeature1 => 'Conversazioni\nsu Misura';
+  String get welcomeFeature1 => 'Consulenza\nPersonalizzata';
 
   @override
   String get welcomeFeature2 => 'Supporto\nH24';

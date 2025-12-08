@@ -185,19 +185,19 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your Personal AI Coach'**
+  /// **'Your Personal AI Mental Coach'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Supporting your mental wellness journey with empathy and understanding'**
+  /// **'Supporting your mental performance with professionalism and expertise'**
   String get onboardingSubtitle;
 
   /// No description provided for @welcomeFeature1.
   ///
   /// In en, this message translates to:
-  /// **'Tailored\nConversations'**
+  /// **'Personalized\nConsulting'**
   String get welcomeFeature1;
 
   /// No description provided for @welcomeFeature2.

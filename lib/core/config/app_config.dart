@@ -2,7 +2,7 @@ class AppConfig {
   AppConfig._();
 
   // App Metadata
-  static const String appName = 'AI Wellbeing Coach';
+  static const String appName = 'KAIX';
   static const String appVersion = '1.0.0';
   static const String appDescription = 'Your Personal AI Mental Wellness Coach';
   
