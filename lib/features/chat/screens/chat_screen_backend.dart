@@ -44,6 +44,7 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
   // State
   bool _isOnline = true;
   bool _isCrisisMode = false; // Safety Net State
+  bool _isAvatarVisuallyReady = false; // Controls the initial black veil for seamless transition
   
   // Subscriptions
   StreamSubscription<ConnectivityStatus>? _connectivitySubscription;
@@ -129,7 +130,12 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
     // Notify ChatProvider when Avatar is ready to receive the welcome stream
     if (avatarState is AvatarStateLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(chatProvider.notifier).notifyAvatarLoaded();
+        // Add delay to allow avatar to visually appear before text starts
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          if (mounted) {
+             ref.read(chatProvider.notifier).notifyAvatarLoaded();
+          }
+        });
       });
     }
 
@@ -185,11 +191,16 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
                 config: config,
                 enableCameraControls: true,
                 autoRotate: false,
+                onAvatarLoaded: () {
+                  if (!_isAvatarVisuallyReady) {
+                    setState(() => _isAvatarVisuallyReady = true);
+                  }
+                },
               ),
             ),
             
-            // Avatar Loading Overlay
-            if (avatarState is AvatarStateDownloading || avatarState is AvatarStateLoading)
+            // Avatar Loading Overlay (Standard - for avatar switches)
+            if ((avatarState is AvatarStateDownloading || avatarState is AvatarStateLoading) && !_isAvatarVisuallyReady)
               Container(
                 color: Colors.black.withOpacity(0.7),
                 child: const Center(
@@ -206,6 +217,22 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
                   ),
                 ),
               ),
+
+             // INITIAL LOADING VEIL (Cinematic Transition)
+             // Covers everything until the avatar is fully ready
+             IgnorePointer(
+               ignoring: _isAvatarVisuallyReady,
+               child: AnimatedOpacity(
+                 duration: const Duration(milliseconds: 500),
+                 opacity: _isAvatarVisuallyReady ? 0.0 : 1.0,
+                 child: Container(
+                   color: Colors.black, // Opaque black to match CoachSelectionScreen
+                   child: const Center(
+                     child: CircularProgressIndicator(color: AppColors.primary),
+                   ),
+                 ),
+               ),
+             ),
 
             // 2. CHAT CONTENT LAYER
             Column(

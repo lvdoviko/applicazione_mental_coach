@@ -48,7 +48,7 @@
   "healthDataPermission": "Consenti accesso ai dati sanitari",
   "notificationPermission": "Abilita notifiche",
   "languageSelectionTitle": "Scegli la tua lingua",
-  "journeyStartsHere": "Il tuo viaggio inizia qui",
+  "journeyStartsHere": "Il tuo coaching inizia qui",
   "userDetailsTitle": "Piacere di conoscerti",
   "userDetailsSubtitle": "Raccontaci qualcosa di te",
   "nameLabel": "Come ti chiami?",
@@ -63,7 +63,7 @@
   "coachSerena": "Serena",
   "coachAtlasDesc": "Resilienza, Focus, Strategia",
   "coachSerenaDesc": "Empatia, Calma, Intuizione",
-  "startJourney": "Inizia il Viaggio",
+  "startJourney": "Inizia il Coaching",
   "back": "Indietro",
   "loadingConfiguring": "Configurazione di {coachName}...",
   "@loadingConfiguring": {

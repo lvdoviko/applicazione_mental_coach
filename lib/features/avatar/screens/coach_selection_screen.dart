@@ -8,6 +8,7 @@ import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart';
 import 'package:applicazione_mental_coach/features/chat/providers/chat_provider.dart';
 import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
+import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
 
 class CoachSelectionScreen extends ConsumerStatefulWidget {
   const CoachSelectionScreen({super.key});
@@ -18,6 +19,7 @@ class CoachSelectionScreen extends ConsumerStatefulWidget {
 
 class _CoachSelectionScreenState extends ConsumerState<CoachSelectionScreen> {
   String? _selectedAvatarId;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -43,32 +45,40 @@ class _CoachSelectionScreenState extends ConsumerState<CoachSelectionScreen> {
   Future<void> _handleNext() async {
     if (_selectedAvatarId == null) return;
 
-    // 1. Update User Provider
-    await ref.read(userProvider.notifier).updateUser(
-      avatarId: _selectedAvatarId,
-    );
+    setState(() => _isLoading = true);
 
-    // 2. Load the new avatar
-    // This will trigger the download and update the AvatarProvider state
-    await ref.read(avatarProvider.notifier).loadAvatarFromId(_selectedAvatarId!);
-
-    // 3. Reset Chat & Prepare Welcome Message
-    if (mounted) {
-      final l10n = AppLocalizations.of(context)!;
-      final coachName = _selectedAvatarId == 'atlas' 
-          ? l10n.coachAtlas 
-          : l10n.coachSerena;
-      
-      final welcomeText = l10n.welcomeMessage(coachName);
-
-      // Reset chat session and inject the new welcome message to be streamed
-      await ref.read(chatProvider.notifier).resetChat(
-        welcomeMessageText: welcomeText,
+    try {
+      // 1. Update User Provider
+      await ref.read(userProvider.notifier).updateUser(
+        avatarId: _selectedAvatarId,
       );
 
-      // Navigate directly to Chat Screen
+      // 2. Load the new avatar
+      // This will trigger the download and update the AvatarProvider state
+      await ref.read(avatarProvider.notifier).loadAvatarFromId(_selectedAvatarId!);
+
+      // 3. Reset Chat & Prepare Welcome Message
       if (mounted) {
-        context.go(AppRoute.chat.path);
+        final l10n = AppLocalizations.of(context)!;
+        final coachName = _selectedAvatarId == 'atlas' 
+            ? l10n.coachAtlas 
+            : l10n.coachSerena;
+        
+        final welcomeText = l10n.welcomeMessage(coachName);
+
+        // Reset chat session and inject the new welcome message to be streamed
+        await ref.read(chatProvider.notifier).resetChat(
+          welcomeMessageText: welcomeText,
+        );
+
+        // Navigate directly to Chat Screen
+        if (mounted) {
+          context.go(AppRoute.chat.path);
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -76,27 +86,54 @@ class _CoachSelectionScreenState extends ConsumerState<CoachSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topCenter,
-            radius: 1.2,
-            colors: [
-              Color(0xFF1C2541), // Deep Blue
-              Color(0xFF000000), // Black
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SizedBox.expand( // Force full size for the Stack in AvatarSelectionStep
-            child: AvatarSelectionStep(
-              selectedAvatarId: _selectedAvatarId,
-              onAvatarSelected: _handleAvatarSelected,
-              onNext: _handleNext,
-              onBack: () => Navigator.of(context).pop(),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                center: Alignment.topCenter,
+                radius: 1.2,
+                colors: [
+                  Color(0xFF1C2541), // Deep Blue
+                  Color(0xFF000000), // Black
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: SizedBox.expand( // Force full size for the Stack in AvatarSelectionStep
+                child: AvatarSelectionStep(
+                  selectedAvatarId: _selectedAvatarId,
+                  onAvatarSelected: _handleAvatarSelected,
+                  onNext: _handleNext,
+                  onBack: () => Navigator.of(context).pop(),
+                ),
+              ),
             ),
           ),
-        ),
+          
+          // Loading Overlay
+          if (_isLoading)
+            Container(
+              color: Colors.black,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: AppColors.primary),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Preparing your coach...",
+                      style: TextStyle(
+                        color: Colors.white, 
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

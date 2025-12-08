@@ -105,7 +105,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSelectionTitle => 'Choose your language';
 
   @override
-  String get journeyStartsHere => 'Your journey starts here';
+  String get journeyStartsHere => 'Your coaching starts here';
 
   @override
   String get userDetailsTitle => 'Nice to meet you';
@@ -151,7 +151,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coachSerenaDesc => 'Empathy, Calm, Intuition';
 
   @override
-  String get startJourney => 'Start Journey';
+  String get startJourney => 'Start Coaching';
 
   @override
   String get back => 'Back';

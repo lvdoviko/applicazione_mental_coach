@@ -28,6 +28,7 @@ class AvatarViewer3D extends ConsumerStatefulWidget {
   final bool enableCameraControls;
   final bool autoRotate;
   final String? animationName; // 'idle' or 'talking'
+  final VoidCallback? onAvatarLoaded;
 
   const AvatarViewer3D({
     super.key,
@@ -37,6 +38,7 @@ class AvatarViewer3D extends ConsumerStatefulWidget {
     this.enableCameraControls = false,
     this.autoRotate = false,
     this.animationName,
+    this.onAvatarLoaded,
   });
 
   @override
@@ -47,7 +49,7 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
   bool _isLoading = true;
   bool _hasError = false;
   String? _errorMessage;
-  late Key _webViewKey; // Stable key for this session
+  Key _webViewKey = UniqueKey(); // Stable key for this session
 
   @override
   void initState() {
@@ -92,6 +94,10 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
       setState(() {
         _isLoading = false;
       });
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (mounted) widget.onAvatarLoaded?.call();
+      });
     } else {
       // If not initialized (e.g. direct navigation), initialize it
       _initEngine();
@@ -127,6 +133,10 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
         setState(() {
           _isLoading = false;
         });
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (mounted) widget.onAvatarLoaded?.call();
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -135,6 +145,11 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
           _errorMessage = e.toString();
           _isLoading = false;
         });
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+             widget.onAvatarLoaded?.call(); // Lift veil even on error
+          });
+        }
       }
     }
   }
@@ -198,6 +213,11 @@ class _AvatarViewer3DState extends ConsumerState<AvatarViewer3D> {
           if (Platform.isAndroid && engine.controller != null) {
              engine.controller!.setBackgroundColor(const Color(0x00000000));
           }
+          
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+             await Future.delayed(const Duration(milliseconds: 500));
+             if (mounted) widget.onAvatarLoaded?.call(); // Trigger after update
+          });
         }
       }
     }

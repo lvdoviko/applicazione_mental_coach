@@ -281,7 +281,7 @@ abstract class AppLocalizations {
   /// No description provided for @journeyStartsHere.
   ///
   /// In en, this message translates to:
-  /// **'Your journey starts here'**
+  /// **'Your coaching starts here'**
   String get journeyStartsHere;
 
   /// No description provided for @userDetailsTitle.
@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @startJourney.
   ///
   /// In en, this message translates to:
-  /// **'Start Journey'**
+  /// **'Start Coaching'**
   String get startJourney;
 
   /// No description provided for @back.
