@@ -260,6 +260,7 @@ class ChatWebSocketService {
         currentText,
         sessionId: _currentSessionId,
         metadata: {'streaming': true},
+        isStreaming: true,
       ).copyWith(id: serverMessageId));
     }
   }
@@ -276,6 +277,7 @@ class ChatWebSocketService {
       fullText,
       sessionId: _currentSessionId,
       metadata: {'streaming': false},
+      isStreaming: false,
     ).copyWith(id: serverMessageId));
   }
 

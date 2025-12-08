@@ -252,6 +252,7 @@ class ChatNotifier extends StateNotifier<ChatState> {
       '',
       sessionId: sessionId,
       metadata: const {'welcome_message': true},
+      isStreaming: true,
     );
     
     // Add initial empty message safely
@@ -288,17 +289,29 @@ class ChatNotifier extends StateNotifier<ChatState> {
           currentIndex++;
           final currentText = fullText.substring(0, currentIndex);
           
-          // Update message in state
+            // Update message in state
           state = state.copyWith(
             messages: state.messages.map((m) {
               if (m.id == messageId) {
-                return m.copyWith(text: currentText);
+                return m.copyWith(
+                  text: currentText,
+                  isStreaming: true,
+                );
               }
               return m;
             }).toList(),
           );
         } else {
           timer.cancel();
+          // Mark as complete (not streaming)
+          state = state.copyWith(
+            messages: state.messages.map((m) {
+              if (m.id == messageId) {
+                return m.copyWith(isStreaming: false);
+              }
+              return m;
+            }).toList(),
+          );
           debugPrint('✅ Welcome Stream Complete');
         }
       });

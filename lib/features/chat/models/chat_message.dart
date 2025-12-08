@@ -47,6 +47,10 @@ class ChatMessage extends Equatable {
   /// RAG Citation source
   final String? citation;
 
+  /// Streaming status for UI indicators
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final bool isStreaming;
+
   const ChatMessage({
     required this.id,
     required this.text,
@@ -60,6 +64,7 @@ class ChatMessage extends Equatable {
     this.processingTimeMs,
     this.escalationNeeded = false,
     this.citation,
+    this.isStreaming = false,
   });
 
   // === Factory Constructors ===
@@ -71,6 +76,7 @@ class ChatMessage extends Equatable {
     String? sessionId,
     Map<String, dynamic>? metadata,
     ChatMessageStatus status = ChatMessageStatus.sending,
+    bool isStreaming = false,
   }) {
     return ChatMessage(
       id: id ?? _generateId(),
@@ -80,6 +86,7 @@ class ChatMessage extends Equatable {
       status: status,
       sessionId: sessionId,
       metadata: metadata,
+      isStreaming: isStreaming,
     );
   }
 
@@ -93,6 +100,7 @@ class ChatMessage extends Equatable {
     int? processingTimeMs,
     bool escalationNeeded = false,
     String? citation,
+    bool isStreaming = false,
   }) {
     return ChatMessage(
       id: _generateId(),
@@ -107,6 +115,7 @@ class ChatMessage extends Equatable {
       processingTimeMs: processingTimeMs,
       escalationNeeded: escalationNeeded,
       citation: citation,
+      isStreaming: isStreaming,
     );
   }
 
@@ -195,6 +204,7 @@ class ChatMessage extends Equatable {
     int? processingTimeMs,
     bool? escalationNeeded,
     String? citation,
+    bool? isStreaming,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -209,6 +219,7 @@ class ChatMessage extends Equatable {
       processingTimeMs: processingTimeMs ?? this.processingTimeMs,
       escalationNeeded: escalationNeeded ?? this.escalationNeeded,
       citation: citation ?? this.citation,
+      isStreaming: isStreaming ?? this.isStreaming,
     );
   }
 
@@ -270,7 +281,7 @@ class ChatMessage extends Equatable {
   @override
   List<Object?> get props => [
     id, text, type, timestamp, status, sessionId, metadata,
-    confidenceScore, modelUsed, processingTimeMs, escalationNeeded, citation,
+    confidenceScore, modelUsed, processingTimeMs, escalationNeeded, citation, isStreaming,
   ];
 
   // === Private Helpers ===

@@ -10,6 +10,7 @@ import '../../../design_system/tokens/app_colors.dart';
 import '../../../design_system/tokens/app_typography.dart';
 import '../../../design_system/tokens/app_spacing.dart';
 import '../../../design_system/components/lofi_message_bubble.dart';
+import '../../../design_system/components/mental_coach_response_bubble.dart';
 import '../../../design_system/components/ios_button.dart';
 import '../../../design_system/components/message_composer.dart';
 import '../../../design_system/components/glass_drawer.dart';
@@ -465,8 +466,16 @@ class _ChatScreenBackendState extends ConsumerState<ChatScreenBackend>
         // index 0 (bottom) should be newest -> messages.length - 1
         final message = messages[messages.length - 1 - index];
         
+        if (message.type == ChatMessageType.ai) {
+           return MentalCoachResponseBubble(
+             key: ValueKey('${message.id}_${message.displayText.length}'),
+             text: message.displayText,
+             isStreaming: message.isStreaming, 
+           );
+        }
+
         return LoFiMessageBubble(
-          key: ValueKey('${message.id}_${message.displayText.length}'), // FORCE REBUILD on text change
+          key: ValueKey('${message.id}_${message.displayText.length}'), 
           message: message.displayText,
           type: _mapMessageType(message.type),
           timestamp: message.timestamp,
