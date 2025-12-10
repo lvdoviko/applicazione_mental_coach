@@ -28,6 +28,7 @@ class UserNotifier extends StateNotifier<UserModel?> {
     String? languageCode,
     bool? isOnboardingCompleted,
     String? avatarId,
+    String? personality,
   }) async {
     final box = await Hive.openBox<UserModel>('userBox');
     
@@ -39,6 +40,7 @@ class UserNotifier extends StateNotifier<UserModel?> {
     if (languageCode != null) currentUser.languageCode = languageCode;
     if (isOnboardingCompleted != null) currentUser.isOnboardingCompleted = isOnboardingCompleted;
     if (avatarId != null) currentUser.avatarId = avatarId;
+    if (personality != null) currentUser.personality = personality;
 
     await box.put(0, currentUser);
     state = currentUser;

@@ -22,6 +22,9 @@ class UserModel extends HiveObject {
   @HiveField(5)
   String? avatarId;
 
+  @HiveField(6)
+  String? personality;
+
   UserModel({
     this.name,
     this.age,
@@ -29,5 +32,6 @@ class UserModel extends HiveObject {
     this.languageCode,
     this.isOnboardingCompleted = false,
     this.avatarId,
+    this.personality,
   });
 }

@@ -6,7 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/language_step.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/welcome_step.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/user_details_step.dart';
-import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/avatar_selection_step.dart';
+import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/personality_step.dart';
+import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/coach_result_step.dart';
 import 'package:applicazione_mental_coach/features/onboarding/widgets/steps/loading_step.dart';
 import 'package:applicazione_mental_coach/core/routing/app_router.dart';
 import 'package:applicazione_mental_coach/features/user/providers/user_provider.dart';
@@ -18,6 +19,8 @@ import 'package:applicazione_mental_coach/features/chat/providers/chat_provider.
 import 'package:applicazione_mental_coach/features/avatar/services/avatar_engine.dart'; // Import AvatarEngine
 import 'package:applicazione_mental_coach/features/avatar/domain/models/avatar_config.dart'; // Import AvatarConfigLoaded
 import 'package:webview_flutter/webview_flutter.dart'; // Import WebViewWidget
+import 'package:applicazione_mental_coach/design_system/tokens/app_colors.dart';
+import 'package:applicazione_mental_coach/l10n/app_localizations.dart';
 
 class OnboardingFlow extends ConsumerStatefulWidget {
   const OnboardingFlow({super.key});
@@ -36,7 +39,9 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   final TextEditingController _ageController = TextEditingController();
   String? _selectedGender;
   String? _selectedAvatarId;
+  String? _selectedPersonality;
   Future<void>? _initializationFuture; // Store the future
+  bool _isAnalyzing = false;
 
   @override
   void dispose() {
@@ -86,16 +91,40 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
     }
   }
 
-  void _handleAvatarSelected(String id) {
+  void _handlePersonalitySelected(String personalityId) async {
     setState(() {
-      _selectedAvatarId = id;
+      _selectedPersonality = personalityId;
+      _isAnalyzing = true;
     });
+
+    // 🧠 Matching Algorithm
+    // Competitivo, Disciplinato -> Atlas
+    // Riflessivo, Empatico, Energetico -> Serena
+    String assignedCoachId;
+    if (['Competitivo', 'Disciplinato'].contains(personalityId)) {
+      assignedCoachId = 'atlas';
+    } else {
+      assignedCoachId = 'serena'; // Default ID
+    }
+
+    // UX: Simulate Analysis
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (mounted) {
+      setState(() {
+        _selectedAvatarId = assignedCoachId;
+        _isAnalyzing = false;
+      });
+      
+      // Proceed to Result Step
+      _nextPage();
+    }
   }
 
-  void _handleAvatarNext() {
-    // Start initialization when moving to loading step
-    _initializationFuture = _initializeBackend();
-    _nextPage();
+  void _handleCoachResultStart() {
+      // Start initialization when moving to loading step
+      _initializationFuture = _initializeBackend();
+      _nextPage();
   }
 
   Future<void> _initializeBackend() async {
@@ -109,6 +138,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
       languageCode: _selectedLocale?.languageCode,
       isOnboardingCompleted: true,
       avatarId: _selectedAvatarId,
+      personality: _selectedPersonality,
     );
     print('✅ User data saved.');
 
@@ -233,17 +263,23 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                         onNext: _handleUserDetailsNext,
                         onBack: _previousPage, 
                       ),
-                      AvatarSelectionStep(
-                        selectedAvatarId: _selectedAvatarId,
-                        onAvatarSelected: _handleAvatarSelected,
-                        onNext: _handleAvatarNext,
+                      // NEW: Personality Step (Algorithm)
+                      PersonalityStep(
+                        onPersonalitySelected: _handlePersonalitySelected,
                         onBack: _previousPage,
                       ),
+                      // NEW: Coach Result Step
+                      if (_selectedAvatarId != null)
+                        CoachResultStep(
+                          assignedCoachId: _selectedAvatarId!,
+                          onStart: _handleCoachResultStart,
+                        ),
+                      // Result/Loading Step
                       LoadingStep(
                         onFinished: _handleLoadingFinished,
                         userName: _nameController.text,
                         coachName: _selectedAvatarId == 'atlas' ? 'Atlas' : 'Serena',
-                        initializationFuture: _initializationFuture, // Pass the future
+                        initializationFuture: _initializationFuture, 
                       ),
                     ],
                   ),
@@ -251,6 +287,30 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
               ],
             ),
           ),
+
+          // Analysis Overlay
+          if (_isAnalyzing)
+            Container(
+              color: Colors.black.withOpacity(0.8),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: AppColors.primary),
+                    const SizedBox(height: 20),
+                    Text(
+                      AppLocalizations.of(context)!.assigningCoach(_nameController.text),
+                      style: const TextStyle(
+                        color: Colors.white, 
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

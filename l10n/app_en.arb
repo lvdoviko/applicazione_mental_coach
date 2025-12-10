@@ -57,6 +57,31 @@
   "genderMale": "Male",
   "genderFemale": "Female",
   "genderOther": "Other",
+  "personalityTitle": "How would you describe yourself?",
+  "personalitySubtitle": "Choose the trait that represents you best.",
+  "traitCompetitive": "Competitive",
+  "traitCompetitiveDesc": "You aim for victory and love challenges.",
+  "traitDisciplined": "Disciplined",
+  "traitDisciplinedDesc": "Order, rigor, and consistency are your strengths.",
+  "traitReflective": "Reflective",
+  "traitReflectiveDesc": "You analyze deeply and seek awareness.",
+  "traitEmpathetic": "Empathetic",
+  "traitEmpatheticDesc": "You listen to emotions and value support.",
+  "traitEnergetic": "Energetic",
+  "traitEnergeticDesc": "You are pure charge and motivation for others.",
+  
+  "assigningCoach": "Assigning best coach for {userName}...",
+  "@assigningCoach": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
+  "coachResultTitle": "Your Perfect Match",
+  "coachResultSubtitle": "Based on your personality, we selected:",
+  "letsStart": "Let's Start!",
+
   "avatarSelectionTitle": "Choose your Coach",
   "avatarSelectionSubtitle": "Who will accompany you on your journey?",
   "coachAtlas": "Atlas",
