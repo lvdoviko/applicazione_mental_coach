@@ -36,7 +36,9 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   // State
   Locale? _selectedLocale;
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
+  // final TextEditingController _ageController = TextEditingController(); // Removed
+  final TextEditingController _dobController = TextEditingController();
+  DateTime? _selectedDateOfBirth;
   String? _selectedGender;
   String? _selectedAvatarId;
   String? _selectedPersonality;
@@ -47,7 +49,8 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   void dispose() {
     _pageController.dispose();
     _nameController.dispose();
-    _ageController.dispose();
+    _dobController.dispose();
+    // _ageController.dispose();
     super.dispose();
   }
 
@@ -81,7 +84,7 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
 
   void _handleUserDetailsNext() {
     if (_nameController.text.isNotEmpty && 
-        _ageController.text.isNotEmpty && 
+        _selectedDateOfBirth != null && 
         _selectedGender != null) {
       _nextPage();
     } else {
@@ -130,10 +133,21 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
   Future<void> _initializeBackend() async {
     print('🚀 Starting Backend Initialization...');
     
+    // Calculate accurate age
+    int age = 0;
+    if (_selectedDateOfBirth != null) {
+      final now = DateTime.now();
+      age = now.year - _selectedDateOfBirth!.year;
+      if (now.month < _selectedDateOfBirth!.month || 
+          (now.month == _selectedDateOfBirth!.month && now.day < _selectedDateOfBirth!.day)) {
+        age--;
+      }
+    }
+
     // 1. Save User Data
     await ref.read(userProvider.notifier).updateUser(
       name: _nameController.text,
-      age: int.tryParse(_ageController.text),
+      age: age,
       gender: _selectedGender,
       languageCode: _selectedLocale?.languageCode,
       isOnboardingCompleted: true,
@@ -253,11 +267,18 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
                       ),
                       UserDetailsStep(
                         nameController: _nameController,
-                        ageController: _ageController,
+                        dobController: _dobController,
                         selectedGender: _selectedGender,
                         onGenderChanged: (value) {
                           setState(() {
                             _selectedGender = value;
+                          });
+                        },
+                        onDobSelected: (date) {
+                          setState(() {
+                             _selectedDateOfBirth = date;
+                             // Format: dd/MM/yyyy
+                             _dobController.text = "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
                           });
                         },
                         onNext: _handleUserDetailsNext,

@@ -132,6 +132,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genderOther => 'Other';
 
   @override
+  String get dateOfBirthLabel => 'Date of Birth';
+
+  @override
+  String get dateFormat => 'dd/MM/yyyy';
+
+  @override
+  String get confirmDate => 'Confirm';
+
+  @override
+  String get dataPrivacyReassurance => 'Your data is private and encrypted.';
+
+  @override
   String get personalityTitle => 'How would you describe yourself?';
 
   @override

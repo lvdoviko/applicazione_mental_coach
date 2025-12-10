@@ -332,6 +332,30 @@ abstract class AppLocalizations {
   /// **'Other'**
   String get genderOther;
 
+  /// No description provided for @dateOfBirthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth'**
+  String get dateOfBirthLabel;
+
+  /// No description provided for @dateFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'dd/MM/yyyy'**
+  String get dateFormat;
+
+  /// No description provided for @confirmDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmDate;
+
+  /// No description provided for @dataPrivacyReassurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is private and encrypted.'**
+  String get dataPrivacyReassurance;
+
   /// No description provided for @personalityTitle.
   ///
   /// In en, this message translates to:
